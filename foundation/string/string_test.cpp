@@ -1,11 +1,11 @@
 #include <iostream>
-#include <string.h>
-#include <stdio.h>
 #include <regex>
 #include <vector>
 #include <stdarg.h>
+#include <string.h>
+#include <stdio.h>
 #include <time.h>
-#include <regex>
+#include <assert.h>
 using namespace std;
 
 #define END 0
@@ -34,6 +34,32 @@ int MySnprintf(char *dest, int size, char *formate, ...)
 void MyStrcpy(char* dest, const char* src)
 {
     while ((*dest++ = *src++) != '\0') ;
+}
+
+void MyStrncpy(char*dest, const char* src, int len)
+{
+    assert((dest!=NULL)&&(src!=NULL));
+	char *cp = dest;
+	while( len && (*cp++ = *src++) != '\0')
+	{
+		len--;
+	}
+	if(len)
+	{
+		while(--len)
+		*cp++='\0';
+	}
+}
+
+void *MyMemcpy(void *dest, const void *src, size_t n)
+{
+    char *dp = (char*)dest;
+    const char *sp = (const char*)src;
+    while (n--)
+    {
+        *dp++ = *sp++;
+    }
+    return dest;
 }
 
 
@@ -71,7 +97,7 @@ void string_stl()
 
     char ch = 'z';
     char *strchr_res = strchr(ch_str, ch);       // strchr 返回指向第一次出现字符ch的指针
-    char *strrchr_res = strrchr(ch_str, ch);     // strchr 返回指向最后出现字符ch的指针
+    char *strrchr_res = strrchr(ch_str, ch);     // strrchr 返回指向最后出现字符ch的指针
     char *strstr_res = strstr(ch_str, "az");     // strstr 返回str2中str1第一次出现的位置，返回指针，否则返回 NULL; strrstr返回最后一次出现
     if(strchr_res != NULL && strrchr_res != NULL && strstr_res != NULL )
     {
@@ -80,15 +106,24 @@ void string_stl()
         printf("strstr:%s\n", strstr_res);
     }
 
-    printf(" \n----------------- strcpy / strncpy / strncat / memcpy -----------------\n");
-    const char* src = "Hello, Strcpy";
-    char dest[20], Mydest[0];
-    strcpy(dest, src);
-    MyStrcpy(Mydest, src);
-    cout << "strcpy(\"Hello, Strcpy\"): " << dest << endl;
-    cout << "MyStrcpy(\"Hello, Strcpy\"): " << Mydest << endl;
+    printf(" \n----------------- strcpy / strncpy -----------------\n");
+    const char* p_src = "asdfasdf\0 is a good boy";
+    char dest[20], Mydest[0], vardst[30];
+    strcpy(dest, p_src); // 从源串的开始到结尾（’\0’)完全拷贝到目标串地址
+    MyStrcpy(Mydest, p_src);
+
+    cout << "strcpy: " << dest << endl;
+    cout << "MyStrcpy: " << Mydest << endl;
+
+    // strncpy(vardst, p_src, sizeof(vardest)); // 从源串的开始拷贝n个字符到目标串地址，n大于源串长度时，遇到’\0’结束;
+    strncpy(vardst, p_src, 3); // n小于源串长度时，到第n个字符结束，但不会在目标串尾补’\0’
+    cout << "strncpy: " << vardst << endl;
+    MyStrncpy(vardst, p_src, 3);
+    cout << "MyStrncpy: " << vardst << endl;
 
 
+    printf(" \n----------------- memcpy / memmove -----------------\n");
+    // 相对于strncpy, memcpy 可以拷贝任意类型, 按字节拷贝不会遇到\0而停止
 
 
     printf(" \n----------------- 格式化字符串 sprintf / snprintf / vsprintf ---------------------------\n");
