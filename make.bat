@@ -1,0 +1,1 @@
+bash -c "g++ --std=c++11 -g %1 -o %2 -lpthread"

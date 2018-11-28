@@ -1,0 +1,256 @@
+#include <iostream>
+#include <string.h>
+#include <stdio.h>
+#include <regex>
+#include <vector>
+#include <stdarg.h>
+#include <time.h>
+#include <regex>
+using namespace std;
+
+#define END 0
+
+void debugLog(const char *, int , const char * , ...);
+
+struct  stuff
+{
+    char job[20];
+    int age;
+    float height;
+};
+
+// 用vsprintf 实现snprintf
+// snprintf(char*res, sizeof(res), char*formate, ...);
+int MySnprintf(char *dest, int size, char *formate, ...)
+{
+    int iRst;
+    va_list ap;
+    va_start(ap, formate);
+    iRst = vsprintf(dest, formate, ap);
+    va_end(ap);
+    return iRst;
+}
+
+void MyStrcpy(char* dest, const char* src)
+{
+    while ((*dest++ = *src++) != '\0') ;
+}
+
+
+// 变长参数
+void va_sum (int &sum, ...)
+{
+    va_list ap;
+    va_start(ap, sum);
+    int temp = 0;
+    while((temp = va_arg(ap, int)) != END)
+    {
+        sum  += temp;
+    }
+    va_end(ap);
+}
+
+void string_stl()
+{
+    printf(" \n---------------------- 字符数组初始化 ---------------------------\n");
+    /* 
+    char str3[10] = {0};     // 元素均为'\0'
+    char str4[10] = {'0'};   // 第一个元素为'0'，其他元素均为'\0'
+    char str5[10] = {0,};    // 元素均为'\0'
+    char str6[10] = {'\0'};  // 元素均为'\0'
+    printf("str3[0]:%c,%c",str3[0],str3[1]);
+    printf("str4[0]:%c,%c",str4[0],str4[1]);
+    printf("str5[0]:%c,%c",str5[0],str5[1]);
+    printf("str6[0]:%c,%c",str6[0],str6[1]);
+    */
+
+    printf(" \n---------------------- strchr / strrchr / strstr / strrstr ----------------------\n");
+    // http://blog.csdn.net/eager7/article/details/8131437
+    char ch_str[] = "asdfasdzfasdfaz-=-=-=-=azsdfz-=";
+
+
+    char ch = 'z';
+    char *strchr_res = strchr(ch_str, ch);       // strchr 返回指向第一次出现字符ch的指针
+    char *strrchr_res = strrchr(ch_str, ch);     // strchr 返回指向最后出现字符ch的指针
+    char *strstr_res = strstr(ch_str, "az");     // strstr 返回str2中str1第一次出现的位置，返回指针，否则返回 NULL; strrstr返回最后一次出现
+    if(strchr_res != NULL && strrchr_res != NULL && strstr_res != NULL )
+    {
+        printf("strchr:%s\n", strchr_res);
+        printf("strrchr:%s\n", strrchr_res);
+        printf("strstr:%s\n", strstr_res);
+    }
+
+    printf(" \n----------------- strcpy / strncpy / strncat / memcpy -----------------\n");
+    const char* src = "Hello, Strcpy";
+    char dest[20], Mydest[0];
+    strcpy(dest, src);
+    MyStrcpy(Mydest, src);
+    cout << "strcpy(\"Hello, Strcpy\"): " << dest << endl;
+    cout << "MyStrcpy(\"Hello, Strcpy\"): " << Mydest << endl;
+
+
+
+
+    printf(" \n----------------- 格式化字符串 sprintf / snprintf / vsprintf ---------------------------\n");
+
+    // char sprintf_str[10] = {0};
+    // int sprintf_res  = sprintf(sprintf_str, "I'm %d years old!",10);
+    // 返回实际写入的字符串长度，不会进行越界判断，会直接对之后的内存进行覆盖
+    // printf("sprintf_str:%s\t sprintf_res:%d\n", sprintf_str, sprintf_res); 
+    
+    char snprintf_str[10] = {0};
+    // int snprintf_res = snprintf(snprintf_str, sizeof(snprintf_str), "I'm %d years old!",10);
+    // 相比snprintf多个第二个缓存的参数，返回欲写入的长度, 但是只拷贝了n-1个, 就在末尾自动加上'\0'
+    int snprintf_res = snprintf(snprintf_str, 20, "I'm %d years old!",10);
+    // int snprintf_res = MySnprintf(snprintf_str, sizeof(snprintf_str), "I'm %d years old!",10);
+    printf("snprintf_str:%s\t snprintf_res:%d\n", snprintf_str, snprintf_res);
+
+
+
+    printf(" \n----------------- strlen / sizeof  ---------------------------\n");
+    /* 
+     * https://www.cnblogs.com/carekee/articles/1630789.html
+     * strlen 函数，求字符串开始到结束符的长度（字符串以\0结尾）；运行时计算值，参数必须是char * 类型(当数组名作为参数，实际数组是退化成指针了)
+     * sizeof 运算符，求类型所占大小；编译时计算值, 参数可以是数组、指针、类型、对象、函数等
+    */
+    char ch_str2[10] = "Wha\0t?";
+    char *a = (char*)"abcdef";  // 字符指针指向常量字符串 // c语言允许直接将字符串赋值给字符指针，但是c++会报警告,这里用类型强转就没事了 
+    char b[] = "abcdef";        // 字符数组，以字符串的形式给字符数组赋值,字符串末尾自动添加\0
+    char c[] = {'a','b','c','d','e','f'}; // 字符数组，以单个元素的形式赋值,没有\0,strlen返回的值不确定
+    printf("strlen(\"Wha\\0t?\"):%lld\t sizeof(char str2[10]):%lld\n", strlen(ch_str2), sizeof(ch_str2));
+    printf("sizeof(字符指针):%lld\t strlen(字符指针):%lld\n", sizeof(a), strlen(a));
+    printf("sizeof(字符数组):%lld\t strlen(字符数组):%lld\n", sizeof(b), strlen(b));
+    printf("sizeof(字符数组):%lld\t strlen(字符数组):%lld\n", sizeof(c), strlen(c));
+
+
+    printf(" \n-------------------------- char *a / char a[] / string ---------------------------\n");
+    string str = "abcdef";
+    // char *p_str = (char * )str.c_str();
+}
+
+/*
+void email_check2(char * szEmail, const char * szEmailChkRegexp)
+{
+    if (strlen(szEmail) > 0)
+    {
+        regex_t reg;
+        regmatch_t pmatch[1];
+        int cflags = REG_EXTENDED;
+
+        const char* pattern = szEmailChkRegexp;
+        const size_t nmatch = 1;
+        char * buf = szEmail;
+        regcomp(&reg, pattern, cflags);
+        if(regexec(&reg, szEmail, nmatch, pmatch, 0))
+        {
+            printf("Email格式[%s]无效\n", szEmail);
+        }
+        regfree(&reg);
+    }
+}
+*/
+
+void email_check(char str[])
+{
+
+    regex reg("\\w[-\\w.+]*@([a-za-z0-9][-a-za-z0-9]+\\.)+[a-za-z]{2,14}");
+    // const char* pattern = "^[a-z0-9A-Z]+([a-z0-9A-Z._-]+)?[a-z0-9A-Z]+@([a-z0-9A-Z])+(-[a-z0-9A-Z]+)?.)+[a-zA-Z]{2,}$";
+    // string str1="8701.31615@qq.com";
+    smatch r1;
+    if (regex_match(str,reg))
+    {
+        cout << "邮箱格式正确" <<endl;
+    }
+    else
+    {
+        cout << "邮箱格式有误" <<endl;
+    }
+}
+
+/* 
+ 无符号数陷阱
+ http://blog.csdn.net/jiejinquanil/article/details/51789682
+ http://blog.csdn.net/songbai_pu/article/details/9172689
+ */
+void unsigned_test(string str)
+{
+    // int res = str.find("abc");
+    // if(res < 0)
+    if(str.find("xxx") < 0)
+    {
+        cout << "not found" << endl;
+    }
+    /* 正确写法: 
+     * find函数找不到指定值的时候，会返回string::npos,表示字符串的结束
+     * npos也表示sizt_t的最大值
+    if (str.find("xxx") == string::npos)
+    {
+        cout << "not found till npos" << endl;
+    }
+     */
+    else // err
+    {
+        cout << "found" << endl;
+    }
+}
+
+/*
+ * 打印调试信息
+ */
+void debugLog(const char * FileName, int Line, const char * msg, ...)
+{
+	FILE *fp;
+	char ViewStr[4096] = { 0 };
+	char bufStr[10240] = { 0 };
+	// char TmpBuff[4096] = { 0 };
+	char szOccurTime[32 + 1] = { 0 };
+
+	va_list arg_ptr;
+	va_start(arg_ptr, msg);
+	vsprintf(ViewStr, msg, arg_ptr); // sprintf(ViewStr, msg, arg_ptr);
+	va_end(arg_ptr);
+
+	time_t timep;
+	time(&timep);
+	strftime(szOccurTime, sizeof(szOccurTime), "%Y-%m-%d %H:%M:%S", localtime(&timep));
+	// g_clRuntimeMsg.GetDBTimestamp(szOccurTime, sizeof(szOccurTime) - 1);
+
+	sprintf(bufStr, "[Time:%s][File:%s][Line:%d][%s]\n", szOccurTime, FileName, Line, ViewStr);
+
+	fp = fopen("../../debug.log", "a+");
+	if (fp == NULL)
+	{
+		printf("open file error\n");
+		return;
+	}
+	fprintf(fp, "%s\n", bufStr);
+	fclose(fp);
+	printf("%s", bufStr);
+	return;
+}
+
+int main( )
+{
+    cout << "----------- 正则表达式 -----------" << endl;
+    char str_email[] = "fasdf2@qq.com";
+    email_check(str_email);
+
+    cout << "----------- string函数 -----------" << endl;
+    string_stl();
+
+    cout << "----------- 无符号陷阱 -----------" << endl;
+    string str_src = "abcdefghijklmn";
+    unsigned_test(str_src);
+
+    cout << "----------- 变长参数 -----------" << endl;
+    int sum  =  0;
+    va_sum(sum,1,2,3,4,5,6,7,8,9,END);
+    cout << "va_sum:" << sum << endl;
+
+    unsigned int val = -1; 
+    cout << val << endl;
+
+    debugLog(__FILE__, __LINE__, "TEST");
+
+    return 0;
+}

@@ -1,0 +1,7 @@
+*.exe
+*.i
+*.s
+*.o
+*.out
+debug.log
+/dbf_to_oracle/
