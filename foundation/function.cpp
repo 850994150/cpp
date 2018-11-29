@@ -68,10 +68,14 @@
 **********************************************************/
 
 #include <iostream>
-#include <algorithm>
+#include <algorithm> // for_each
+#include <stdarg.h> // va_list
+#include <assert.h>
 #include <vector>
 
 using namespace std;
+
+#define END 0
 
 //内联函数定义
 inline double square(double x){ return x*x; }
@@ -218,14 +222,36 @@ int counterGreator(vector<int> & vecNumber, int y)
 }
 
 
-// const放在函数名前后
-const int* constFunc()
+// const放在函数名前
+// const int& constFunc(int a)
+int& constFunc(int &a)
 {
-
+    return a;
 }
 
 
-// int FuncConst(int a) const {}
+void NullPtr(int a)
+{
+    cout << a << endl;
+}
+
+void NullPtr(int *ptr)
+{
+    assert(!ptr);
+    cout << ptr << endl;
+}
+
+void va_sum (int &sum, ...)
+{
+    va_list ap;
+    va_start(ap, sum);
+    int temp = 0;
+    while((temp = va_arg(ap, int)) != END)
+    {
+        sum  += temp;
+    }
+    va_end(ap);
+}
 
 int main()
 {
@@ -240,8 +266,17 @@ int main()
     }
     
 
+    cout << " \n---------------- for_each -----------------\n";
+    // c++98初始化 int a = 10;
+    vector<int> vecInt = {1,2,3,4,5};
+    // c++11初始化 int a(10);
+    vector<int> vecIntNew{1,2,3,4,5};
 
-    cout << " \n----------------**传递-----------------\n";
+    for_each(begin(vecIntNew), end(vecIntNew),[](int a) { cout << a << " ";});
+    cout << endl;
+
+
+    cout << " \n----------------参数传递-----------------\n";
     cout << "实参地址:\t"  << &n << endl;
     change_val(n);
     cout << "按值传递:\tn=" << n << endl;
@@ -262,13 +297,14 @@ int main()
     CallPrintfText(PrintfText, (char * )"Hello World!\n");
 
 
-    cout << " \n----------------匿名函数----------------\n";
+    cout << " \n---------------- lambda ----------------\n";
     LambdaSample();
     LambdaSample2();
     cout << counterGreator(vecIntNumber, 5) << endl;
 
     // 这里是怎么给lambda形参入参的?
     // 相当与每个vecIntNumber的元素对lambda表达式入参
+    // for_each里用的是逗号
     for_each(begin(vecIntNumber), end(vecIntNumber), [](int i){
         std::cout << i << " ";
     });
@@ -290,16 +326,23 @@ int main()
     */
     
 
+    cout << " \n--------------- nullptr ---------------\n";
+    int *p = nullptr;
+    int *q = NULL;
+    bool equal = (p == q); // nullptr 和 NULL 都可以定义空指针
+    NullPtr(0); // c++98编译失败, 存在二义性
+    NullPtr(p);
+
+    cout << " \n--------------- 变长参数 ---------------\n";
+    int sum  =  0;
+    va_sum(sum,1,2,3,4,5,6,7,8,9,END);
+    cout << "va_sum:" << sum << endl;
 
     cout << " \n---------------const和函数---------------\n";
-    // constFunc();
-    // FuncConst();
-
-    // FIXME 不知道为什么只显示一个字符
-    // double d;
-    // cout << typeid(d).name() << endl;
-    
+    // 见 const.cpp
+    int iA = 10;
+    constFunc(iA) = 100; // 不加const的话, 这里直接把iA给改了
+    cout << iA << endl;
 
     return true;
 }
-

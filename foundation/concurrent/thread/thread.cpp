@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-
+#include <algorithm> // for_each 头文件
 // c++11 多线程相关头文件
 #include <thread>
 #include <mutex>

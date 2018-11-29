@@ -86,11 +86,11 @@ int main(int argc, char *argv[])
 	printf("count array with define：%d\n", ARRAYCOUNT(array));
 
 	cout << "\n===---===---=== 宏与do...while(0) ===---===---===" << endl;
-	char *ptr  = new char [10];
+	const char *ptr  = new char [10];
 	ptr = "adfasdfadsf";
 
 	cout << ptr << "\t" << &ptr << endl;
-	SAFEDELETE(ptr);
+	SAFEDELETE(ptr)   // 这里用不用分号都可以
 	cout << &ptr << endl; // cored dump
 
 

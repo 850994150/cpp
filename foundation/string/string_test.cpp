@@ -8,7 +8,7 @@
 #include <assert.h>
 using namespace std;
 
-#define END 0
+// http://blog.csdn.net/eager7/article/details/8131437
 
 void debugLog(const char *, int , const char * , ...);
 
@@ -62,18 +62,82 @@ void *MyMemcpy(void *dest, const void *src, size_t n)
     return dest;
 }
 
-
-// 变长参数
-void va_sum (int &sum, ...)
+// char *strchr_res = strchr(ch_str, ch);
+char* MyStrchr(const char*src, char ch)
 {
-    va_list ap;
-    va_start(ap, sum);
-    int temp = 0;
-    while((temp = va_arg(ap, int)) != END)
+    assert(src != nullptr);
+    const char*cp = src;
+    while(*cp++ !='\0')
     {
-        sum  += temp;
+        if (*cp == ch)
+        {
+            return (char*)cp;
+        }
     }
-    va_end(ap);
+}
+
+// char *strrchr_res = strrchr(ch_str, ch);
+char* MyStrrchr(const char*src, char ch)
+{
+    assert(src != nullptr);
+    const char*cp = src;
+    char* ret = nullptr;
+    while(*cp++ !='\0')
+    {
+        if (*cp == ch)
+        {
+            ret = (char*)cp;
+        }
+    }
+    return ret;
+}
+
+// char *strstr_res = strstr(ch_str, "az");
+char* MyStrstr(char* str1, char* str2)
+{
+    const char* s1 = str1;
+    const char* s2 = str2;
+    char * cur = str1;
+
+    assert(str1 != NULL);
+    assert(str2 != NULL);
+    
+    if (*str2 == '\0') return str1;
+    
+    while(cur)
+    {
+        s1 = cur;
+        s2 = str2;
+        while(*s1 == *s2){s1++; s2++; };
+        if (*s2 == '\0') return cur;
+        if (*s1 == '\0') return NULL;
+        cur++;
+    }
+    return NULL;
+}
+
+// char *strcat_res = strcat(ch_str, "+strcat");
+char* MyStrcat(char* dst, const char* src)
+{
+    assert(dst != NULL);
+    if (src == NULL)
+    {
+        return dst;
+    }
+    int len = strlen(src);
+    char * tmp = dst + strlen(dst);
+
+    while ((*tmp++ = *src++) != '\0') ;
+    return dst;
+}
+
+// int len = strlen(str);
+int MyStrlen(const char*src)
+{
+    int iLen = 0;
+    assert(src != NULL);
+    while(*src++ != '\0' && ++iLen);
+    return iLen;
 }
 
 void string_stl()
@@ -89,30 +153,55 @@ void string_stl()
     printf("str5[0]:%c,%c",str5[0],str5[1]);
     printf("str6[0]:%c,%c",str6[0],str6[1]);
     */
+    printf(" \n---------------------- char* 加减 ---------------------------\n");
 
-    printf(" \n---------------------- strchr / strrchr / strstr / strrstr ----------------------\n");
-    // http://blog.csdn.net/eager7/article/details/8131437
+    printf(" \n---------------------- strchr / strrchr / strstr / strcat / strcmp ----------------------\n");
     char ch_str[] = "asdfasdzfasdfaz-=-=-=-=azsdfz-=";
-
-
     char ch = 'z';
-    char *strchr_res = strchr(ch_str, ch);       // strchr 返回指向第一次出现字符ch的指针
-    char *strrchr_res = strrchr(ch_str, ch);     // strrchr 返回指向最后出现字符ch的指针
-    char *strstr_res = strstr(ch_str, "az");     // strstr 返回str2中str1第一次出现的位置，返回指针，否则返回 NULL; strrstr返回最后一次出现
-    if(strchr_res != NULL && strrchr_res != NULL && strstr_res != NULL )
-    {
-        printf("strchr:%s\n", strchr_res);
-        printf("strrchr:%s\n", strrchr_res);
-        printf("strstr:%s\n", strstr_res);
-    }
 
-    printf(" \n----------------- strcpy / strncpy -----------------\n");
+    char *strchr_res = strchr(ch_str, ch);       // strchr 返回指向第一次出现字符ch的指针
+    printf("strchr: %s\n", strchr_res);
+    char *strchr_rest = MyStrchr(ch_str, ch);
+    printf("MyStrchr: %s\n", strchr_rest);
+
+    char *strrchr_res = strrchr(ch_str, ch);     // strrchr 返回指向最后出现字符ch的指针
+    printf("strrchr: %s\n", strrchr_res);
+    char *strrchr_rest = MyStrrchr(ch_str, ch);
+    printf("MyStrrchr: %s\n", strrchr_rest);
+
+    char *strstr_res = strstr(ch_str, "fz");     // strstr 返回str2中str1第一次出现的位置，返回指针，否则返回 NULL; strrstr返回最后一次出现
+    printf("strstr: %s\n", strstr_res);
+    char *strstr_rest = MyStrstr(ch_str, "fz");
+    printf("Mystrstr: %s\n", strstr_rest);
+
+    char *strcat_res = strcat(ch_str, "+strcat"); // strcat 字符串拼接, dst和src不能有内存重叠; dst必需有足够空间容纳src; 感觉不安全
+    printf("strcat: %s\n", strcat_res);
+    char *strcat_rest = MyStrcat(ch_str, "-strcat");
+    printf("MyStrcat: %s\n", strcat_rest);
+
+    char strsrc[] = "asdfasdzfasdfaz-=-=-=-=azsdfz-="; // strcmp
+    char strdst[] = "asdfasdzfasdfaz-=-=-=-=azsdfz-=";
+    if (strcmp(strsrc, strdst) != 0)
+    {
+        printf("不相等");
+    }
+    else
+    {
+        printf("相等");
+    }
+    
+
+    printf(" \n----------------- strlen / strcpy / strncpy -----------------\n");
+    char sss[] = "aaaaaa";
+    cout << "strlen: " << strlen(sss) << endl;
+    cout << "MyStrlen: " << MyStrlen(sss) << endl;
+
     const char* p_src = "asdfasdf\0 is a good boy";
     char dest[20], Mydest[0], vardst[30];
-    strcpy(dest, p_src); // 从源串的开始到结尾（’\0’)完全拷贝到目标串地址
-    MyStrcpy(Mydest, p_src);
 
+    strcpy(dest, p_src); // 从源串的开始到结尾（’\0’)完全拷贝到目标串地址
     cout << "strcpy: " << dest << endl;
+    MyStrcpy(Mydest, p_src);
     cout << "MyStrcpy: " << Mydest << endl;
 
     // strncpy(vardst, p_src, sizeof(vardest)); // 从源串的开始拷贝n个字符到目标串地址，n大于源串长度时，遇到’\0’结束;
@@ -120,6 +209,7 @@ void string_stl()
     cout << "strncpy: " << vardst << endl;
     MyStrncpy(vardst, p_src, 3);
     cout << "MyStrncpy: " << vardst << endl;
+
 
 
     printf(" \n----------------- memcpy / memmove -----------------\n");
@@ -209,14 +299,13 @@ void email_check(char str[])
  */
 void unsigned_test(string str)
 {
-    // int res = str.find("abc");
-    // if(res < 0)
+    // 错误写法:
     if(str.find("xxx") < 0)
     {
         cout << "not found" << endl;
     }
     /* 正确写法: 
-     * find函数找不到指定值的时候，会返回string::npos,表示字符串的结束
+     * find 函数找不到指定值的时候，会返回string::npos,表示字符串的结束
      * npos也表示sizt_t的最大值
     if (str.find("xxx") == string::npos)
     {
@@ -229,15 +318,12 @@ void unsigned_test(string str)
     }
 }
 
-/*
- * 打印调试信息
- */
+// 打印信息
 void debugLog(const char * FileName, int Line, const char * msg, ...)
 {
 	FILE *fp;
 	char ViewStr[4096] = { 0 };
 	char bufStr[10240] = { 0 };
-	// char TmpBuff[4096] = { 0 };
 	char szOccurTime[32 + 1] = { 0 };
 
 	va_list arg_ptr;
@@ -248,11 +334,10 @@ void debugLog(const char * FileName, int Line, const char * msg, ...)
 	time_t timep;
 	time(&timep);
 	strftime(szOccurTime, sizeof(szOccurTime), "%Y-%m-%d %H:%M:%S", localtime(&timep));
-	// g_clRuntimeMsg.GetDBTimestamp(szOccurTime, sizeof(szOccurTime) - 1);
 
 	sprintf(bufStr, "[Time:%s][File:%s][Line:%d][%s]\n", szOccurTime, FileName, Line, ViewStr);
 
-	fp = fopen("../../debug.log", "a+");
+	fp = fopen("./debug.log", "a+");
 	if (fp == NULL)
 	{
 		printf("open file error\n");
@@ -267,7 +352,7 @@ void debugLog(const char * FileName, int Line, const char * msg, ...)
 int main( )
 {
     cout << "----------- 正则表达式 -----------" << endl;
-    char str_email[] = "fasdf2@qq.com";
+    char str_email[] = "fasdf2@aa.com";
     email_check(str_email);
 
     cout << "----------- string函数 -----------" << endl;
@@ -277,10 +362,6 @@ int main( )
     string str_src = "abcdefghijklmn";
     unsigned_test(str_src);
 
-    cout << "----------- 变长参数 -----------" << endl;
-    int sum  =  0;
-    va_sum(sum,1,2,3,4,5,6,7,8,9,END);
-    cout << "va_sum:" << sum << endl;
 
     unsigned int val = -1; 
     cout << val << endl;

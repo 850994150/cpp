@@ -49,9 +49,11 @@ class CConstTest
     CConstTest(/* args */);
     ~CConstTest();
 
-    int &get();            // const修饰返回值: const int &get() { return i; }
+    int &get();
+    // const修饰返回值: const int &get() { return i; }
+
     int get_const() const; // const 修饰函数; 只有类成员函数才能这样用
-                           // 修饰后，该函数不能对类的成员变量进行任何修改, 当可以访问, 而且只能调用const成员函数
+                           // 修饰后，该函数不能对类的成员变量进行任何修改, 但可以访问, 而且只能调用const成员函数
                            // const 对象仅可访问const函数，这个好像是与this指针有关
     void StringCopy(char *dest, const char *src); // const 确保传入的src不会被StringCopy内部修改
 };
@@ -68,6 +70,8 @@ CConstTest::~CConstTest()
 {
 }
 
+
+// const int &CConstTest::get()//  编译报错
 int &CConstTest::get()
 {
     return i;

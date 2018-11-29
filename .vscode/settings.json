@@ -42,7 +42,8 @@
         "xstring": "cpp",
         "xutility": "cpp",
         "string": "cpp",
-        "list": "cpp"
+        "list": "cpp",
+        "xiosbase": "cpp"
     },
     "files.exclude": {
         "**/.git": true,
