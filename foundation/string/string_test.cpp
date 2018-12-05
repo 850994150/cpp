@@ -1,11 +1,11 @@
-#include <iostream>
 #include <regex>
 #include <vector>
+#include <time.h>
+#include <stdio.h>
+#include <assert.h>
 #include <stdarg.h>
 #include <string.h>
-#include <stdio.h>
-#include <time.h>
-#include <assert.h>
+#include <iostream>
 using namespace std;
 
 // http://blog.csdn.net/eager7/article/details/8131437
@@ -39,18 +39,19 @@ void MyStrcpy(char* dest, const char* src)
 void MyStrncpy(char*dest, const char* src, int len)
 {
     assert((dest!=NULL)&&(src!=NULL));
-	char *cp = dest;
-	while( len && (*cp++ = *src++) != '\0')
-	{
-		len--;
-	}
-	if(len)
-	{
-		while(--len)
-		*cp++='\0';
+    char *cp = dest;
+    while( len && (*cp++ = *src++) != '\0')
+    {
+        len--;
+    }
+    if(len)
+    {
+        while(--len)
+        *cp++='\0';
 	}
 }
 
+// memcpy(&ulVar, src, 8);
 void *MyMemcpy(void *dest, const void *src, size_t n)
 {
     char *dp = (char*)dest;
@@ -140,6 +141,50 @@ int MyStrlen(const char*src)
     return iLen;
 }
 
+
+vector<string> ReadLineToVec(char* pLineBuffer)
+{
+	char *pFileBuffer = NULL;
+	string sLine;
+	vector<string> vecStringLine;
+	vecStringLine.clear();
+
+	// char *strDelim = (char*)"\n";
+	char *strDelim = (char*)",";
+	char *strToken = NULL;
+	char *nextToken = NULL;
+
+	strToken = strtok_r(pLineBuffer, strDelim, &nextToken);
+	while (strToken != NULL)
+	{
+		sLine.assign(strToken);
+		vecStringLine.push_back(sLine);
+		strToken = strtok_r(NULL, strDelim, &nextToken);
+	}
+	return vecStringLine;
+}
+
+vector<string> SplitString(string strOrig, string strSplit)
+{
+    char *pDelim = (char*)strSplit.c_str();
+    char *strToken = NULL;
+    char *nextToken = NULL;
+    string sLine;
+    vector <string> vecStringLine;
+    vecStringLine.clear();
+
+    strToken = strtok_r((char*)strOrig.c_str(), pDelim, &nextToken);
+    while (strToken != NULL)
+    {
+        sLine.assign(strToken);
+		vecStringLine.push_back(sLine);
+		strToken = strtok_r(NULL, pDelim, &nextToken);
+	}
+	return vecStringLine;
+}
+
+
+
 void string_stl()
 {
     printf(" \n---------------------- 字符数组初始化 ---------------------------\n");
@@ -199,7 +244,7 @@ void string_stl()
     const char* p_src = "asdfasdf\0 is a good boy";
     char dest[20], Mydest[0], vardst[30];
 
-    strcpy(dest, p_src); // 从源串的开始到结尾（’\0’)完全拷贝到目标串地址
+    strcpy(dest, p_src); // 从源串的开始到结尾（'\0')完全拷贝到目标串地址
     cout << "strcpy: " << dest << endl;
     MyStrcpy(Mydest, p_src);
     cout << "MyStrcpy: " << Mydest << endl;
@@ -211,9 +256,17 @@ void string_stl()
     cout << "MyStrncpy: " << vardst << endl;
 
 
-
     printf(" \n----------------- memcpy / memmove -----------------\n");
+    // memcpy功能是将内存块的内容复制到另一个内存块, (dst和src内存区域不能重叠), 入参就是内存开始的地址和要复制的长度
     // 相对于strncpy, memcpy 可以拷贝任意类型, 按字节拷贝不会遇到\0而停止
+    // Q: 如果把"001"字符串进行memcpy到一个int变量, 那么该变量是否就是001呢? 
+    // A: 不是, 这里是对内存进行拷贝, 字符'0'拷贝到 unsigned long 后也并非数字0了, 而是0的ascii码
+    unsigned long ulVar = 0;
+    int iVar(0);
+    char *src = "00000001";
+    memcpy(&ulVar, src, 8);
+    MyMemcpy(&ulVar, src, 8);
+    cout << "src: " << src << "\tulVar: " << ulVar << endl;
 
 
     printf(" \n----------------- 格式化字符串 sprintf / snprintf / vsprintf ---------------------------\n");
@@ -251,6 +304,24 @@ void string_stl()
     printf(" \n-------------------------- char *a / char a[] / string ---------------------------\n");
     string str = "abcdef";
     // char *p_str = (char * )str.c_str();
+
+    printf(" \n-------------------------- strtok ---------------------------\n");
+    // 
+
+    // vector<string> vecstrResult;
+    // char* pBuffer = "asdf1,asdf2,asdf3,asdf4,asdf5"; strtok 用char* 会报错
+    // char pBuffer[] = "asdf1,asdf2,asdf3,asdf4,asdf5";
+    // vecstrResult = ReadLineToVec(pBuffer);
+
+    vector<string> vecstrResult;
+    string strStrtok = "asdf1,asdf2,asdf3,asdf4,asdf5";
+    vecstrResult = SplitString(strStrtok, ",");
+
+    for(auto i : vecstrResult)
+    {
+        cout << i << "\t";
+    }
+    cout << endl;
 }
 
 /*
@@ -366,7 +437,7 @@ int main( )
     unsigned int val = -1; 
     cout << val << endl;
 
-    debugLog(__FILE__, __LINE__, "TEST");
+    // debugLog(__FILE__, __LINE__, "TEST");
 
     return 0;
 }
