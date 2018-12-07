@@ -12,6 +12,7 @@ using namespace std;
 
 void debugLog(const char *, int , const char * , ...);
 
+
 struct  stuff
 {
     char job[20];
@@ -19,7 +20,7 @@ struct  stuff
     float height;
 };
 
-// 用vsprintf 实现snprintf
+
 // snprintf(char*res, sizeof(res), char*formate, ...);
 int MySnprintf(char *dest, int size, char *formate, ...)
 {
@@ -31,10 +32,12 @@ int MySnprintf(char *dest, int size, char *formate, ...)
     return iRst;
 }
 
+
 void MyStrcpy(char* dest, const char* src)
 {
     while ((*dest++ = *src++) != '\0') ;
 }
+
 
 void MyStrncpy(char*dest, const char* src, int len)
 {
@@ -51,7 +54,14 @@ void MyStrncpy(char*dest, const char* src, int len)
 	}
 }
 
+
 // memcpy(&ulVar, src, 8);
+/*
+ * memcpy功能是将内存块的内容复制到另一个内存块, (dst和src内存区域不能重叠), 入参就是内存开始的地址和要复制的长度
+ * 相对于strncpy, memcpy 可以拷贝任意类型, 按字节拷贝不会遇到\0而停止
+ * Q: 如果把"001"字符串进行memcpy到一个int变量, 那么该变量是否就是001呢? 
+ * A: 不是, 这里是对内存进行拷贝, 字符'0'拷贝到 unsigned long 后也并非数字0了, 而是0的ascii码
+ */
 void *MyMemcpy(void *dest, const void *src, size_t n)
 {
     char *dp = (char*)dest;
@@ -63,8 +73,9 @@ void *MyMemcpy(void *dest, const void *src, size_t n)
     return dest;
 }
 
-// char *strchr_res = strchr(ch_str, ch);
-char* MyStrchr(const char*src, char ch)
+
+// char* strchr(const char* src, char c);
+char* MyStrchr(const char* src, char ch)
 {
     assert(src != nullptr);
     const char*cp = src;
@@ -76,6 +87,7 @@ char* MyStrchr(const char*src, char ch)
         }
     }
 }
+
 
 // char *strrchr_res = strrchr(ch_str, ch);
 char* MyStrrchr(const char*src, char ch)
@@ -93,8 +105,9 @@ char* MyStrrchr(const char*src, char ch)
     return ret;
 }
 
-// char *strstr_res = strstr(ch_str, "az");
-char* MyStrstr(char* str1, char* str2)
+
+// char* strstr(char* str1, const char* str2)
+char* MyStrstr(char* str1, const char* str2)
 {
     const char* s1 = str1;
     const char* s2 = str2;
@@ -117,6 +130,7 @@ char* MyStrstr(char* str1, char* str2)
     return NULL;
 }
 
+
 // char *strcat_res = strcat(ch_str, "+strcat");
 char* MyStrcat(char* dst, const char* src)
 {
@@ -132,6 +146,7 @@ char* MyStrcat(char* dst, const char* src)
     return dst;
 }
 
+
 // int len = strlen(str);
 int MyStrlen(const char*src)
 {
@@ -142,6 +157,7 @@ int MyStrlen(const char*src)
 }
 
 
+// strtok
 vector<string> ReadLineToVec(char* pLineBuffer)
 {
 	char *pFileBuffer = NULL;
@@ -164,6 +180,59 @@ vector<string> ReadLineToVec(char* pLineBuffer)
 	return vecStringLine;
 }
 
+
+// char* strtok(char* str, const char* delimiters);
+/*
+ * 从str中把delimiters中**包含**的字符替换成'\0', 注意包含的字符都会被替换, 而不是替换整个delimiters
+ * 第一次调用必需入参str, 往后调用则将该参数设置为NULL，因为第一次分割后str被破坏了, 变成了分割后的第一
+ * 个字符串, 剩余的字符串保存到了static变量中(所以多线程不安全)
+ * 每次调用成功返回指向被分割出的片段的指针
+ * https://blogs.csdn.net/hustfoxy/article/details/23473805
+ */
+char* MyStrtok(char* str, const char* delimeter)
+{
+    static char* strStatic = NULL; // 保存str分割的后面部分
+    const char* pDelimeter = NULL; // 始终指向分隔符的指针
+    char* pRetStr = NULL;          // 保存结果
+    bool bFind = false;            // 标志是否查找到分隔符
+    
+    if (str!=NULL)
+    {
+        strStatic  = str;
+    }
+    
+    if (*strStatic == '\0')
+    {
+        return NULL;
+    }
+    pRetStr = strStatic;
+    
+    while(*strStatic != '\0')
+    {
+        for(pDelimeter = delimeter; *pDelimeter != '\0'; pDelimeter++)
+        {
+            if (*pRetStr == *pDelimeter)
+            {
+                pRetStr++;
+                break;
+            }
+            if (*strStatic == *pDelimeter)
+            {
+                bFind = true;
+                *strStatic = '\0';
+            }
+        }
+        strStatic++;
+        
+        if (bFind)
+        {
+            break;
+        }
+    }
+    return pRetStr;
+}
+
+
 vector<string> SplitString(string strOrig, string strSplit)
 {
     char *pDelim = (char*)strSplit.c_str();
@@ -184,6 +253,105 @@ vector<string> SplitString(string strOrig, string strSplit)
 }
 
 
+/*
+void email_check2(char * szEmail, const char * szEmailChkRegexp)
+{
+    if (strlen(szEmail) > 0)
+    {
+        regex_t reg;
+        regmatch_t pmatch[1];
+        int cflags = REG_EXTENDED;
+
+        const char* pattern = szEmailChkRegexp;
+        const size_t nmatch = 1;
+        char * buf = szEmail;
+        regcomp(&reg, pattern, cflags);
+        if(regexec(&reg, szEmail, nmatch, pmatch, 0))
+        {
+            printf("Email格式[%s]无效\n", szEmail);
+        }
+        regfree(&reg);
+    }
+}
+*/
+
+
+void email_check(char str[])
+{
+
+    regex reg("\\w[-\\w.+]*@([a-za-z0-9][-a-za-z0-9]+\\.)+[a-za-z]{2,14}");
+    // const char* pattern = "^[a-z0-9A-Z]+([a-z0-9A-Z._-]+)?[a-z0-9A-Z]+@([a-z0-9A-Z])+(-[a-z0-9A-Z]+)?.)+[a-zA-Z]{2,}$";
+    // string str1="8701.31615@qq.com";
+    smatch r1;
+    if (regex_match(str,reg))
+    {
+        cout << "邮箱格式正确" <<endl;
+    }
+    else
+    {
+        cout << "邮箱格式有误" <<endl;
+    }
+}
+
+
+/* 
+ 无符号数陷阱
+ http://blog.csdn.net/jiejinquanil/article/details/51789682
+ http://blog.csdn.net/songbai_pu/article/details/9172689
+ */
+void unsigned_test(string str)
+{
+    // 错误写法:
+    if(str.find("xxx") < 0)
+    {
+        cout << "not found" << endl;
+    }
+    /* 正确写法: 
+     * find 函数找不到指定值的时候，会返回string::npos,表示字符串的结束
+     * npos也表示sizt_t的最大值
+    if (str.find("xxx") == string::npos)
+    {
+        cout << "not found till npos" << endl;
+    }
+     */
+    else // err
+    {
+        cout << "found" << endl;
+    }
+}
+
+
+// 打印信息
+void debugLog(const char * FileName, int Line, const char * msg, ...)
+{
+	FILE *fp;
+	char ViewStr[4096] = { 0 };
+	char bufStr[10240] = { 0 };
+	char szOccurTime[32 + 1] = { 0 };
+
+	va_list arg_ptr;
+	va_start(arg_ptr, msg);
+	vsprintf(ViewStr, msg, arg_ptr); // sprintf(ViewStr, msg, arg_ptr);
+	va_end(arg_ptr);
+
+	time_t timep;
+	time(&timep);
+	strftime(szOccurTime, sizeof(szOccurTime), "%Y-%m-%d %H:%M:%S", localtime(&timep));
+
+	sprintf(bufStr, "[Time:%s][File:%s][Line:%d][%s]\n", szOccurTime, FileName, Line, ViewStr);
+
+	fp = fopen("./debug.log", "a+");
+	if (fp == NULL)
+	{
+		printf("open file error\n");
+		return;
+	}
+	fprintf(fp, "%s\n", bufStr);
+	fclose(fp);
+	printf("%s", bufStr);
+	return;
+}
+
 
 void string_stl()
 {
@@ -199,6 +367,7 @@ void string_stl()
     printf("str6[0]:%c,%c",str6[0],str6[1]);
     */
     printf(" \n---------------------- char* 加减 ---------------------------\n");
+    // 不就是指针加减嘛
 
     printf(" \n---------------------- strchr / strrchr / strstr / strcat / strcmp ----------------------\n");
     char ch_str[] = "asdfasdzfasdfaz-=-=-=-=azsdfz-=";
@@ -257,10 +426,6 @@ void string_stl()
 
 
     printf(" \n----------------- memcpy / memmove -----------------\n");
-    // memcpy功能是将内存块的内容复制到另一个内存块, (dst和src内存区域不能重叠), 入参就是内存开始的地址和要复制的长度
-    // 相对于strncpy, memcpy 可以拷贝任意类型, 按字节拷贝不会遇到\0而停止
-    // Q: 如果把"001"字符串进行memcpy到一个int变量, 那么该变量是否就是001呢? 
-    // A: 不是, 这里是对内存进行拷贝, 字符'0'拷贝到 unsigned long 后也并非数字0了, 而是0的ascii码
     unsigned long ulVar = 0;
     int iVar(0);
     char *src = "00000001";
@@ -270,7 +435,6 @@ void string_stl()
 
 
     printf(" \n----------------- 格式化字符串 sprintf / snprintf / vsprintf ---------------------------\n");
-
     // char sprintf_str[10] = {0};
     // int sprintf_res  = sprintf(sprintf_str, "I'm %d years old!",10);
     // 返回实际写入的字符串长度，不会进行越界判断，会直接对之后的内存进行覆盖
@@ -306,7 +470,22 @@ void string_stl()
     // char *p_str = (char * )str.c_str();
 
     printf(" \n-------------------------- strtok ---------------------------\n");
-    // 
+    char date[20] = "salfgdfogffhe";
+    // char* result = strtok(date, "gd");
+    char* result = MyStrtok(date, "gd");
+    cout << result << endl; // 第一次分割
+    
+    while(result != NULL)
+    {
+        result = MyStrtok(NULL, "gd");
+        // result = strtok(NULL, "gd");
+        if (result != NULL)
+        {
+            cout << result << endl;
+        }
+    }
+    cout << endl;
+    
 
     // vector<string> vecstrResult;
     // char* pBuffer = "asdf1,asdf2,asdf3,asdf4,asdf5"; strtok 用char* 会报错
@@ -324,101 +503,6 @@ void string_stl()
     cout << endl;
 }
 
-/*
-void email_check2(char * szEmail, const char * szEmailChkRegexp)
-{
-    if (strlen(szEmail) > 0)
-    {
-        regex_t reg;
-        regmatch_t pmatch[1];
-        int cflags = REG_EXTENDED;
-
-        const char* pattern = szEmailChkRegexp;
-        const size_t nmatch = 1;
-        char * buf = szEmail;
-        regcomp(&reg, pattern, cflags);
-        if(regexec(&reg, szEmail, nmatch, pmatch, 0))
-        {
-            printf("Email格式[%s]无效\n", szEmail);
-        }
-        regfree(&reg);
-    }
-}
-*/
-
-void email_check(char str[])
-{
-
-    regex reg("\\w[-\\w.+]*@([a-za-z0-9][-a-za-z0-9]+\\.)+[a-za-z]{2,14}");
-    // const char* pattern = "^[a-z0-9A-Z]+([a-z0-9A-Z._-]+)?[a-z0-9A-Z]+@([a-z0-9A-Z])+(-[a-z0-9A-Z]+)?.)+[a-zA-Z]{2,}$";
-    // string str1="8701.31615@qq.com";
-    smatch r1;
-    if (regex_match(str,reg))
-    {
-        cout << "邮箱格式正确" <<endl;
-    }
-    else
-    {
-        cout << "邮箱格式有误" <<endl;
-    }
-}
-
-/* 
- 无符号数陷阱
- http://blog.csdn.net/jiejinquanil/article/details/51789682
- http://blog.csdn.net/songbai_pu/article/details/9172689
- */
-void unsigned_test(string str)
-{
-    // 错误写法:
-    if(str.find("xxx") < 0)
-    {
-        cout << "not found" << endl;
-    }
-    /* 正确写法: 
-     * find 函数找不到指定值的时候，会返回string::npos,表示字符串的结束
-     * npos也表示sizt_t的最大值
-    if (str.find("xxx") == string::npos)
-    {
-        cout << "not found till npos" << endl;
-    }
-     */
-    else // err
-    {
-        cout << "found" << endl;
-    }
-}
-
-// 打印信息
-void debugLog(const char * FileName, int Line, const char * msg, ...)
-{
-	FILE *fp;
-	char ViewStr[4096] = { 0 };
-	char bufStr[10240] = { 0 };
-	char szOccurTime[32 + 1] = { 0 };
-
-	va_list arg_ptr;
-	va_start(arg_ptr, msg);
-	vsprintf(ViewStr, msg, arg_ptr); // sprintf(ViewStr, msg, arg_ptr);
-	va_end(arg_ptr);
-
-	time_t timep;
-	time(&timep);
-	strftime(szOccurTime, sizeof(szOccurTime), "%Y-%m-%d %H:%M:%S", localtime(&timep));
-
-	sprintf(bufStr, "[Time:%s][File:%s][Line:%d][%s]\n", szOccurTime, FileName, Line, ViewStr);
-
-	fp = fopen("./debug.log", "a+");
-	if (fp == NULL)
-	{
-		printf("open file error\n");
-		return;
-	}
-	fprintf(fp, "%s\n", bufStr);
-	fclose(fp);
-	printf("%s", bufStr);
-	return;
-}
 
 int main( )
 {

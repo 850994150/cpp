@@ -23,7 +23,8 @@
      * 一样可以用sizeof(指针类型)测出来,指针存的就是地址啊，一个字节8位，所以在32位系统里，是4个字节长度
 
  * 5、指针的算术运算
-     * 指针变量 +1 相当于变量所存地址向高方向加4字节 * 而*ptr是下一个数值
+     * 指针变量 +1 ; (p+1) 相当于变量所存地址向高方向加4字节
+     * 指针的值 +1 ; (*p+1) 而*ptr是下一个数值
      * 一个指针ptrold加/减一个整数n后，结果是一个新的指针ptrnew
 
  * 6、运算符&(取地址)和*(间接运算符)
@@ -152,7 +153,15 @@ int main()
     cout << q->a << endl; //通过q访问成员变量(正确)
 
     cout << *pstr << endl; //通过pstr访问成员变量(欠妥)
-    cout << *(pstr+1) << endl;
+
+    // 指针运算
+    cout << "++++++++" << endl;
+    // char test[3] = {'a', 'b', 'c'};
+    string test = "abcdef";
+    char* pTest = (char*)test.c_str();
+    cout << *pTest << endl; 
+    cout << *(pTest+1) << endl; // 访问pTest + sizeof(char)地址的值
+    cout << *pTest + 1 << endl; // 实际为ascii码+1
 
 
     cout << "----------------------------" << endl;
