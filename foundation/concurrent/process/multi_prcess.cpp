@@ -11,6 +11,7 @@
 #include <sys/types.h> 
 using namespace std;
 
+FILE* fpInsert;
 int iCommitCnt = 500;
 int g_nCommitCount =0;
 
@@ -72,7 +73,8 @@ void SqlCommit(int iCommitCnt, const char* pcszSql)
 {
     int iRetCode = 0;
 
-    debugLog(__FILE__, __LINE__, "%s", pcszSql);
+    fprintf(fpInsert, "%s", pcszSql);
+    fflush(fpInsert);
 
     if (0 != iRetCode)
     {
@@ -83,7 +85,8 @@ void SqlCommit(int iCommitCnt, const char* pcszSql)
     g_nCommitCount++;
     if (g_nCommitCount % iCommitCnt == 0)
     {
-        debugLog(__FILE__, __LINE__, "process:%d  - %d Commit", getpid(), g_nCommitCount);
+        fprintf(fpInsert, "sub process %d commit\n", getpid());
+        fflush(fpInsert);
     }
 }
 
@@ -115,6 +118,12 @@ int main(int argc, char const *argv[])
     string path = "./file";
     GetAllFile(path.c_str(), vecFileList);
 
+    fpInsert = fopen("./insert.log", "w+");
+    if (!fpInsert)
+    {
+        return -1;
+    }
+
     int status,i;	
     for (i = 0; i < vecFileList.size(); i++)
     {
@@ -131,26 +140,30 @@ int main(int argc, char const *argv[])
         printf("fork error\n");
     }
     else if (status == 0) // 每一个子进程都会运行的代码	
-    {	
+    {
         // sub process
+        // 每次fork完成i会加一, 所以这里i就是要处理的那个文件的编号
         printf("sub process:%d\t%d\t%s\n", getpid(), i, vecFileList[i].c_str());
         ReadFile(vecFileList[i].c_str(), iCommitCnt, SqlCommit);
         // printf("in sub process: %d\t parent process: %d\n", getpid(), getppid());
         if (g_nCommitCount <  iCommitCnt || g_nCommitCount % iCommitCnt >0)
         {	
-            debugLog(__FILE__, __LINE__, "process:%d - %d Commit", getpid(), g_nCommitCount);
+            fprintf(fpInsert, "sub process %d commit\n", getpid());
+            fflush(fpInsert);
         }
-        debugLog(__FILE__, __LINE__, "%d exit(0)", getpid());
+        printf("sub process %d exited - par process is: %d\n", getpid(), getppid());
         exit(0);
     }
     else
     {
         // parent process
+        // 这里父进程先于子进程退出, 子进程会编程孤儿进程, 并被init进程接管, 来完成后续清理工作
         printf("par process:%d\t%d\t\n", getpid(), i);
-        debugLog(__FILE__, __LINE__, "parent process:%d\t%d\n", getpid(), i);
+        printf("par process %d exited\n", getpid());
     }
     return 0;
 } 
+
 /*
 多进程：
 Tue Dec  4 17:27:51 DST 2018
@@ -167,5 +180,7 @@ A1: https://blog.csdn.net/AJDJ26/article/details/84322198
 
 Q3: 怎么让进程结束? 比如我的程序是一个进程处理一个文件. 那么怎么让子进程处理完自己的文件就退出呢?
 A3:
+
+Q4: 父进程下的子进程提交数据库, 不能共用父进程中打开的那个连接,必须每个进程单独打开一个连接, 否则会导致锁表 
 
 */

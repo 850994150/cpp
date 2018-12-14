@@ -1,3 +1,13 @@
+/*
+ **********************************************************
+ * Author       : M_Kepler
+ * EMail        : m_kepler@foxmail.com
+ * Last modified: 2018-12-06 19:51:03
+ * Filename     : thread.cpp
+ * Description  :
+ * 线程间通信
+ ***********************************************************
+ */
 #include <iostream>
 #include <vector>
 #include <algorithm> // for_each 头文件
@@ -53,6 +63,7 @@ void func_mutex(void)
         */
 
         // 死锁
+
         /*
         产生原因：
         陷入互相等待的状态
@@ -139,11 +150,14 @@ void threadSwap(void)
 
 int main(int argc, char const *argv[])
 {
+    /*
     vector<int> vecTest;
     vecTest.push_back(1);
     vecTest.push_back(2);
     vecTest.push_back(3);
     vecTest.push_back(4);
+    */
+    vector<int> vecTest{1,2,3,4};
     
     for(auto i : vecTest)
     {

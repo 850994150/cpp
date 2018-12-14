@@ -79,7 +79,7 @@ void SqlCommit(int iCommitCnt, const char* pcszSql)
         printf("insert failed! iRetCode:%d\n", iRetCode);
     }
 
-    // 多进程还有这个吗?
+    // 多进程与全局变量 (http://bbs.chinaunix.net/thread-3746905-1-1.html)
     g_nCommitCount++;
     if (g_nCommitCount % iCommitCnt == 0)
     {

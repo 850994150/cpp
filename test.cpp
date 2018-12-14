@@ -20,6 +20,12 @@ int main(int argc, char const *argv[])
     strcpy( a+1,b+2);
     puts( strcat( a,c+1));
 
+
+    char szTest[14] = "??";
+    // cout << "length" << szTest.length() << endl;
+    cout << "length: " << sizeof(szTest)/sizeof(char) << endl;
+    cout << "length: " << strlen(szTest) << endl;
+
     return 0;
 }
 
