@@ -4,7 +4,9 @@
  * EMail        : m_kepler@foxmail.com
  * Last modified: 2018-08-20 14:06:33
  * Filename     : customer.cpp
- * Description  :
+ * Description  : 
+ * 功能: 读出文件内容, 若文件file_name有增长就输出最后一行
+ * 使用: [exec.out] file_name
  ***********************************************************
  */
 
@@ -14,17 +16,14 @@
 #include <unistd.h>
 
 using namespace std;
-static int last_position = 0;//记录当前已经处理掉的文件位置
+static int last_position = 0; //记录当前已经处理掉的文件位置
 
 void doSomething(string line)
 {
     std::cout <<  line  << std::endl;
 }
 
-/*
- * 增量读入文件最末行
- * 自带的额库函数 getline 是从文件头读到文件尾的 
-*/
+
 void find_last_line(ifstream &infile)
 {
     infile.seekg(0, ios::end);

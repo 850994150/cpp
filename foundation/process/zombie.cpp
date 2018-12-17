@@ -128,6 +128,7 @@ int zombie()
     return 0;
 }
 
+
 int orphan()
 {
     pid_t id = fork();

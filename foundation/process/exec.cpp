@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include <sys/wait.h>
 #include <string.h>
@@ -15,7 +16,6 @@ int main(int argc, char const *argv[])
     
     while(fgets(buf, MAXLINE, stdin) != NULL)
     {
-        
         if (buf[strlen(buf) - 1] == '\n')
         {
             buf[strlen(buf) - 1] = 0;
@@ -31,6 +31,7 @@ int main(int argc, char const *argv[])
             std::cerr << "couldn't execute: " << buf << std::endl;
             exit(127);
         }
+
         if ((pid = waitpid(pid, &status, 0)) < 0)
         {
             std::cerr << "waitpid error" << std::endl;

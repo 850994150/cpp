@@ -4,7 +4,9 @@
  * EMail        : m_kepler@foxmail.com
  * Last modified: 2018-08-20 14:06:23
  * Filename     : creator.cpp
- * Description  :
+ * Description  : 
+ * 功能: 没ms毫秒往file_name写入一行; 使用uuid生成随机码  
+ * 使用: [exec.out] file_name ms
  ***********************************************************
  */
 
@@ -22,7 +24,9 @@ using namespace std;
 void uuid2string(const uuid_t uu, char* const str)
 {
     for ( int i = 0; i < 16; ++i )
+    {
         sprintf(str+i*2, "%02X", uu[i]);
+    }
 }
 
 // void GenUuid(char* dest, int len)
@@ -44,19 +48,6 @@ time_t GetCurrTimeMs()
     return currTime*1000;
 }
 
-
-void GenMsgId(char* dest, int n)
-{
-    int i, randno;
-    char stardstring[63] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    for (i = 0; i < n; ++i)
-    {
-        randno = rand() % 62;
-        *dest = stardstring[randno];
-        dest++;
-    }
-    dest = '\0';
-}
 
 int main(int argc, const char *argv[])
 {
