@@ -31,18 +31,23 @@ int main(void)
         exit(1);
     }
     else if(p>0)
+    {
         exit(0);
+    }
     setsid(); //为新进程创建一个回话
     chdir("/tmp"); //
     umask(0);
-    for(i=0;i<MAXFILE;i++)
+    for (i = 0; i < MAXFILE; i++)
+    {
         close(i);
+    }
 
     if((fd=open("dameon.log",O_CREAT|O_WRONLY|O_TRUNC,0600))<0)
     {
         perror("open:");
         exit(1);
-    }else
+    }
+    else
     {
         while(1)
         {

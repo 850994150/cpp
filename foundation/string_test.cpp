@@ -425,13 +425,17 @@ void string_stl()
     cout << "MyStrncpy: " << vardst << endl;
 
 
-    printf(" \n----------------- memcpy / memmove -----------------\n");
+    printf(" \n----------------- memset / memcpy / memmove -----------------\n");
     unsigned long ulVar = 0;
     int iVar(0);
     char *src = "00000001";
+
+    char buff[64];
+    memset((void *)buff, 0x00, sizeof(buff));
+
     memcpy(&ulVar, src, 8);
     MyMemcpy(&ulVar, src, 8);
-    cout << "src: " << src << "\tulVar: " << ulVar << endl;
+    cout << "src: " << src << "\nulVar: " << ulVar << endl;
 
 
     printf(" \n----------------- 格式化字符串 sprintf / snprintf / vsprintf ---------------------------\n");

@@ -25,7 +25,11 @@ volatile int counter(0);
 mutex g_lock;
 const int NUM = 100;
 
-
+/*
+ * @brief	: 互斥锁
+ * @param	: 
+ * @return	: 
+ */
 void func_mutex(void)
 {
     for(size_t i = 0; i < NUM; i++)
@@ -52,7 +56,7 @@ void func_mutex(void)
         }
         */
 
-        // 3. try_lock
+        // 3. try_lock?
         /*
         if (g_lock.try_lock())
         {

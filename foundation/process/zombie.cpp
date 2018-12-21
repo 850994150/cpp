@@ -2,8 +2,8 @@
  **********************************************************
  * Author       : M_Kepler
  * EMail        : m_kepler@foxmail.com
- * Last modified: 2018-12-14 15:58:09
- * Filename     :
+ * Last modified: 2018-12-17 09:59:12
+ * Filename     : zombie.cpp
  * Description  :
  * 僵尸进程: 父进程还在运行, 而子进程挂了, 但父进程没有使用wait来清理子进程的进程信息
     * 导致子进程虽然运行实体已消失, 但是仍在黑河进程表中占有数据, 造成资源浪费

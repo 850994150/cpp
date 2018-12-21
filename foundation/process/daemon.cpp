@@ -2,7 +2,7 @@
  **********************************************************
  * Author       : M_Kepler
  * EMail        : m_kepler@foxmail.com
- * Last modified: 2018-12-17 15:15:08
+ * Last modified: 2018-12-15 09:59:33
  * Filename     : daemon.cpp
  * Description  : 守护进程
 	* https://blog.csdn.net/u013485792/article/details/51507685
