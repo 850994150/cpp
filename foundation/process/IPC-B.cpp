@@ -58,7 +58,7 @@ int MsgQueueRead()
 	int running = 1;
 	int msgid = -1;
 	struct msg_st data;
-	long int msgtype = 0; //注意1
+	long int msgtype = 0;
 
 	key_t key = ftok("./", 88); // 1. ftok 产生key
 	printf("key:%x\n", key);

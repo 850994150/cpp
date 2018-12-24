@@ -12,7 +12,7 @@
 using namespace std;
 
 FILE* fpInsert;
-int iCommitCnt = 500;
+int iCommitCnt = 2000;
 int g_nCommitCount =0;
 
 typedef void (*pLineCallback)(int iCnt, const char *pcszContent);
@@ -82,10 +82,12 @@ void SqlCommit(int iCommitCnt, const char* pcszSql)
     }
 
     // 多进程还有这个吗?
+    // TODO write
     g_nCommitCount++;
+    // TODO read
     if (g_nCommitCount % iCommitCnt == 0)
     {
-        fprintf(fpInsert, "sub process %d commit\n", getpid());
+        fprintf(fpInsert, "sub process %d - g_nCommitCount = %d commit\n", getpid(), g_nCommitCount);
         fflush(fpInsert);
     }
 }
@@ -145,10 +147,11 @@ int main(int argc, char const *argv[])
         // 每次fork完成i会加一, 所以这里i就是要处理的那个文件的编号
         printf("sub process:%d\t%d\t%s\n", getpid(), i, vecFileList[i].c_str());
         ReadFile(vecFileList[i].c_str(), iCommitCnt, SqlCommit);
-        // printf("in sub process: %d\t parent process: %d\n", getpid(), getppid());
+
+        // TODO read
         if (g_nCommitCount <  iCommitCnt || g_nCommitCount % iCommitCnt >0)
-        {	
-            fprintf(fpInsert, "sub process %d commit\n", getpid());
+        {
+            fprintf(fpInsert, "sub process %d - g_nCommitCount = %d commit\n", getpid(), g_nCommitCount);
             fflush(fpInsert);
         }
         printf("sub process %d exited - par process is: %d\n", getpid(), getppid());
