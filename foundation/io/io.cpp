@@ -13,11 +13,66 @@
     *
  ***********************************************************
  */
-
+#include <vector>
 #include <iostream>
 #include <fstream> //含文件流操作头文件
 #include <stdlib.h>
 using namespace std;
+
+/*
+ * @brief       获取文件最后n行(兼容单行和行尾有空行的情况)
+ * @param[in]   file			已打开的文件
+ * @param[in]   iLineNu			需要获取的行数
+ * @param[in]	vector<string>&	保存了从后往前的n行的vector
+ * @return      错误码
+ */
+int TailLine(ifstream &file, int iLineNum, vector<string>& vecRetStr)
+{
+    int i;
+    string strLine;
+    streampos nCurentPos;
+
+    if (!file)
+    {
+        return -1;
+    }
+
+    // file.seekg(-2, file.cur);
+    file.seekg(-2, ios::end); //倒回最后两个字符处
+
+    for (i = 0; i < iLineNum; i++)
+    {
+        while (file.peek() != file.widen('\n'))
+        {
+            nCurentPos = file.tellg();
+            if (nCurentPos == 0)
+            {
+                break;
+            }
+            file.seekg(-1, file.cur);
+        }
+        //读到"\n"标识 ，表示已经有一行了
+        if (nCurentPos != 0)//倒回文件的开头，停止倒退
+        {
+            file.seekg(-1, file.cur);
+        }
+        else
+        {
+            break;
+        }
+    }
+    if (nCurentPos != 0)
+    {
+        file.seekg(2, file.cur);
+    }
+
+    while (getline(file, strLine))
+    {
+        vecRetStr.push_back(strLine);
+    }
+    return 0;
+}
+
 int main()
 {
     int a, mymax = -9999;

@@ -334,23 +334,23 @@ int SharedMemoryWithSema()
             printf("\tLast Operator PID: %d\n", dsbuf.shm_lpid); /* 输出上一次操作共享内存进程的标识符 */
             printf("Received message : %s\n", (char *)shmp);     /* 从共享内存中读取数据 */
         }
-        if (shmdt((void *)shmp) < 0) //使共享内存脱离进程地址空间
+        if (shmdt((void *)shmp) < 0) // 使共享内存脱离进程地址空间
         {
             perror("shmdt");
             exit(0);
         }
-        ret = semop(sme_id, &unlock, 1); //解锁临界资源
+        ret = semop(sme_id, &unlock, 1); // 解锁临界资源
         if (ret == -1)
         {
             perror("semop unlock");
             exit(0);
         }
-        if (shmctl(shm_id, IPC_RMID, NULL) < 0) /* 删除前面创建的共享内存 */
+        if (shmctl(shm_id, IPC_RMID, NULL) < 0) // 删除前面创建的共享内存
         {
             perror("shmctl");
             exit(0);
         }
-        ret = semctl(sme_id, 0, IPC_RMID, NULL); //删除信号量
+        ret = semctl(sme_id, 0, IPC_RMID, NULL); // 删除信号量
         if (ret == -1)
         {
             perror("semctl");

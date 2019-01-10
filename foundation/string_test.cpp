@@ -233,6 +233,30 @@ char* MyStrtok(char* str, const char* delimeter)
 }
 
 
+/* ---- === --- === --- === --- === --- === --- === --- === --- === -- === --- ===  */
+
+/*
+ * @brief	: 去除string首尾空格
+ * @param	: 原字符串
+ * @return	: 去除空格后字符串 
+ */
+string& StringTrim( string &str)
+{
+    if (str.empty())
+    {
+        return str;
+    }
+    str.erase(0, str.find_first_not_of(" "));
+    str.erase(str.find_last_not_of(" ") + 1);
+    return str;
+}
+
+/*
+ * @brief       切割字符串
+ * @param[in]   strOrig			原始字符串
+ * @param[in]   strSplit		分隔符/串
+ * @return      vector<string>	返回子串
+ */
 vector<string> SplitString(string strOrig, string strSplit)
 {
     char *pDelim = (char*)strSplit.c_str();
@@ -488,14 +512,18 @@ void string_stl()
             cout << result << endl;
         }
     }
-    cout << endl;
-    
 
+    printf(" \n--- === --- === --- === --- === --- === --- === --- === --- === -- === --- === ---\n");
+
+    printf(" \n-------------------------- StringTrim ---------------------------\n");
+    string strTest = " L0000504cpp ";
+    cout << StringTrim(strTest) << endl;
+
+    printf(" \n-------------------------- SplitString ---------------------------\n");
     // vector<string> vecstrResult;
     // char* pBuffer = "asdf1,asdf2,asdf3,asdf4,asdf5"; strtok 用char* 会报错
     // char pBuffer[] = "asdf1,asdf2,asdf3,asdf4,asdf5";
     // vecstrResult = ReadLineToVec(pBuffer);
-
     vector<string> vecstrResult;
     string strStrtok = "asdf1,asdf2,asdf3,asdf4,asdf5";
     vecstrResult = SplitString(strStrtok, ",");

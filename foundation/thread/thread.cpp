@@ -152,6 +152,15 @@ void threadSwap(void)
 }
 
 
+/*
+ * @brief	: 线程状态迁移
+ * @param	: 
+ * @return	: 
+ */
+void threadmanager(void)
+{
+}
+
 int main(int argc, char const *argv[])
 {
     /*
