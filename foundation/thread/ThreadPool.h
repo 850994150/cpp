@@ -1,3 +1,7 @@
+/*
+ * 基于 C++11 的线程池
+ */
+
 #pragma once
 #ifndef THREAD_POOL_H
 #define THREAD_POOL_H

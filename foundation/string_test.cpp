@@ -1,3 +1,74 @@
+/*
+ **********************************************************
+ * Author       : M_Kepler
+ * EMail        : m_kepler@foxmail.com
+ * Last modified: 2019-01-14 17:44:41
+ * Filename     : string_test.cpp
+ * Description  :
+ * ---- === --- === --- === --- === --- === --- === --- === --- === -- === --- ===
+ * string 类方法
+ * ---- === --- === --- === --- === --- === --- === --- === --- === -- === --- ===
+ 
+    * str.find(str2, 7) // 在str中从指定位置从前向后查找子串,
+                        // 成功返回str2首个字符在str中的地址, 否则返回npos, rfind则从后往前找
+    * str.find_first_of(str2, 7) / str.find_first_not_of /  str.find_last_of / str.find_last_not_of
+                        // 在str中指定位置开始查找str2, 只要str中找到str2的任意字符, 就返回该字符位置
+
+ * ---- === --- === --- === --- === --- === --- === --- === --- === -- === --- ===
+ * 字符处理函数 https://blog.csdn.net/frecon/article/details/79605941
+ * #include <string.h>
+ * ---- === --- === --- === --- === --- === --- === --- === --- === -- === --- ===
+  
+ * strlen /strnlen
+    * int strlen ( const char *str )
+    * 返回字符串的实际长度，不含 '\0'
+    * int strlrn ( const char *str, size_t maxlen )
+    * 区别: 能防止某些字符串不以'\0'结束而引发的错误
+     
+ * strcpy
+    * char *strcpy( char *dest, const char *src )
+        * 从源串的开始拷贝字符到目标串地址, 遇到’\0’结束;
+        * 不安全: 如果src长度比dst长度大时, 会栈溢出或覆盖其他变量的内存
+    * char *strncpy(char *dest, const char *src, size_t n)
+        * 从源串的开始拷贝n个字符到目标串地址，n大于源串长度时，遇到 '\0' 结束;
+            * 1. dst是否足够空间容纳src
+            * 2. dst末尾是否补\0
+            * 3. 一般定义 n = strlen(dst) = strlen(src) + 1
+            * 4. strncpy不负责在目标串末尾补充'\0' 字符 
+            * 5. 当strlen(dst)远大于n时效率低下, 不如用snprintf
+        * strlen(dst) = n <= strlen(src), n小于源串长度时, 只拷贝到第n个, 如果是等式, 此时dst已经没有地方放\0了
+        * strlen(dst) = n > strlen(src), n大于源串长度时，遇到’\0’结束; dst剩余字节都用’\0’填充
+        * strlen(dst) > n >= strlen(src), n大于源串长度时，遇到’\0’结束; dst剩余字节都用’\0’填充
+        * strlen(dst) < n, 会破坏dst后面的内存, 输出的值不确定
+    * 入参错误的情况: 
+    char * sss1;
+    // char sss2[20] = "abcd1234"; // 运行时错误segment fault
+    char *sss2 = "abcd1234";       // 运行正常
+    strncpy(sss1, sss2, 4);
+    printf("%s\n", sss2);
+     
+ * strcmp / strncmp
+    * int strcmp( char *str1, char *str2 )
+    * 相等返回0, str1大于str2返回1, str1小于str2返回-1
+    * int strncmp( char *str1, char *str2, size_t n )
+    * 区别: 只比较前n个
+     
+ * strcat / strncat
+    * char *strcat(char *dest, const char *src)
+    * 将参数src字符串拷贝到参数dest所指的字符串尾; 第一个参数dest要有足够的空间来容纳要拷贝的字符串
+    * char *strncat(char *dest, const char *src, size_t n);
+    * 区别: 只拷贝前n个
+     
+ * strchr / strrchr
+ * strstr
+ * strtok / strtok_r
+ * memset / memcpy / memccpy / memmove
+    * 都是拷贝一定长度的内存内容
+    * 当内存发生重叠时, memcpy不能保证拷贝的正确性, memmove可以保证
+ * 
+ ***********************************************************
+ */
+
 #include <regex>
 #include <vector>
 #include <time.h>
@@ -21,6 +92,10 @@ struct  stuff
 };
 
 
+/* ---- === --- === --- === --- === --- === --- === --- === --- === -- === --- ===  */
+/* ---- === --- === --- === --- == 字符处理库函数 == --- === --- === -- === --- ===  */
+/* ---- === --- === --- === --- === --- === --- === --- === --- === -- === --- ===  */
+
 // snprintf(char*res, sizeof(res), char*formate, ...);
 int MySnprintf(char *dest, int size, char *formate, ...)
 {
@@ -38,41 +113,115 @@ void MyStrcpy(char* dest, const char* src)
     while ((*dest++ = *src++) != '\0') ;
 }
 
-
-void MyStrncpy(char*dest, const char* src, int len)
+void MyStrncpy(char *dest, const char *src, int len)
 {
     assert((dest!=NULL)&&(src!=NULL));
     char *cp = dest;
+    int offset = len;
+
+    // 当len = dest的时候, 需要手动给dest补充\0
+
     while( len && (*cp++ = *src++) != '\0')
     {
         len--;
     }
+    // sizeof(dst) > len > sizeof(src) dst后面填\0
     if(len)
     {
         while(--len)
         *cp++='\0';
 	}
+    // len >= sizeof(dst) 会破坏dst后面的内存
+    if (offset >= strlen(dest))
+    {
+        *(cp + len - 1) = '\0';
+    }
+    
 }
 
 
-// memcpy(&ulVar, src, 8);
 /*
  * memcpy功能是将内存块的内容复制到另一个内存块, (dst和src内存区域不能重叠), 入参就是内存开始的地址和要复制的长度
  * 相对于strncpy, memcpy 可以拷贝任意类型, 按字节拷贝不会遇到\0而停止
  * Q: 如果把"001"字符串进行memcpy到一个int变量, 那么该变量是否就是001呢? 
  * A: 不是, 这里是对内存进行拷贝, 字符'0'拷贝到 unsigned long 后也并非数字0了, 而是0的ascii码
+ * 1. 栈空间的生长方向是高地址向低地址生长的
  */
 void *MyMemcpy(void *dest, const void *src, size_t n)
 {
-    char *dp = (char*)dest;
+    char *dp = (char*)dest; // 不能对void*指针进行算术操作
     const char *sp = (const char*)src;
-    while (n--)
+
+    bool flag1 = (sp >= dp && sp < dp + n); // dst地址比src地址低 且发生重叠 (安全)
+    // <低地址> dst: [1][2][3][4][5] // 初始为null
+    // <低地址>          src: [1][2][3][4][5]
+    bool flag2 = (dp >= sp && dp < sp + n); // dst地址比src地址高 且发生重叠 (不安全)
+    // <低地址>          dst: [1][2][3][1][2] // 末尾应为4,5, 现在为1,2了
+    // <低地址> src: [1][2][3][4][5]
+
+    if (flag2) // 倒序拷贝
     {
-        *dp++ = *sp++;
+        printf("内存覆盖\n");
+        dp += n - 1;
+        sp += n - 1;
+        while (n--)
+        {
+            *dp-- = *sp--;
+        }
+    }
+    else // 正序拷贝
+    {
+        while (n--)
+        {
+            *dp++ = *sp++;
+        }
     }
     return dest;
 }
 
+void *MyMemcpyOptimised(void *dest, const void *src, size_t n)
+{
+    assert(src != NULL);
+
+    int wordnum = n / 4; // 
+    int slice = n % 4;
+
+    // 转化为整型, 这样一次性就可以拷贝四个字节(32位机器)
+    int *psrc = (int*) src;
+    int *pdest = (int*) dest;
+
+    while(wordnum--)
+        *pdest++ = *psrc++;
+
+    while(slice--)
+        *((char *)pdest++) = *((char *)psrc++);
+    return dest;
+}
+
+void *MyMemmove(void *dst, const void *src, size_t n)
+{
+    char *pdst = (char *)dst;
+    const char *psrc = (const char *)src;
+
+    if (pdst < psrc) // 正序拷贝
+    {
+        while (n--)
+        {
+            *(pdst++) = *(psrc++);
+        }
+    }
+    else // 倒序拷贝
+    {
+        pdst += n-1;
+        psrc += n-1;
+        while (n--)
+        {
+            *(pdst--) = *(psrc--);
+        }
+        
+    }
+    return pdst;
+}
 
 // char* strchr(const char* src, char c);
 char* MyStrchr(const char* src, char ch)
@@ -233,6 +382,8 @@ char* MyStrtok(char* str, const char* delimeter)
 }
 
 
+/* ---- === --- === --- === --- === --- === --- === --- === --- === -- === --- ===  */
+/* ---- === --- === --- === --- = string类成员函数 = --- === --- === -- === --- ===  */
 /* ---- === --- === --- === --- === --- === --- === --- === --- === -- === --- ===  */
 
 /*
@@ -428,39 +579,48 @@ void string_stl()
         printf("相等");
     }
     
-
-    printf(" \n----------------- strlen / strcpy / strncpy -----------------\n");
+    printf(" \n----------------- strlen / strnlen / strcpy / strncpy -----------------\n");
     char sss[] = "aaaaaa";
     cout << "strlen: " << strlen(sss) << endl;
+    cout << "strnlen: " << strnlen(sss, 1) << endl;
     cout << "MyStrlen: " << MyStrlen(sss) << endl;
 
-    const char* p_src = "asdfasdf\0 is a good boy";
-    char dest[20], Mydest[0], vardst[30];
+    // const char* p_src = "asdfasdf\0 is a good boy";
+    const char* p_src = "asdfasdf is a good boy"; // 用strcpy不安全
+    char dest[20], Mydest[20], vardst[22 + 1];
 
-    strcpy(dest, p_src); // 从源串的开始到结尾（'\0')完全拷贝到目标串地址
+    strcpy(dest, p_src);
     cout << "strcpy: " << dest << endl;
     MyStrcpy(Mydest, p_src);
     cout << "MyStrcpy: " << Mydest << endl;
 
-    // strncpy(vardst, p_src, sizeof(vardest)); // 从源串的开始拷贝n个字符到目标串地址，n大于源串长度时，遇到’\0’结束;
-    strncpy(vardst, p_src, 3); // n小于源串长度时，到第n个字符结束，但不会在目标串尾补’\0’
+    strncpy(vardst, p_src, strlen(p_src));
     cout << "strncpy: " << vardst << endl;
-    MyStrncpy(vardst, p_src, 3);
+    MyStrncpy(vardst, p_src, strlen(p_src));
     cout << "MyStrncpy: " << vardst << endl;
 
 
     printf(" \n----------------- memset / memcpy / memmove -----------------\n");
-    unsigned long ulVar = 0;
-    int iVar(0);
-    char *src = "00000001";
+    const char *src = "abcdefghijklmnopqrstuvwxyz";
+    int len = strlen(src);
+    char dst[64];
+    memset((void *)dst, 0x00, sizeof(dst));
 
-    char buff[64];
-    memset((void *)buff, 0x00, sizeof(buff));
+    memcpy(&dst, src, len);
+    cout << "memcpy:\n\tsrc: " << src << "\t dst: " << dst << endl;
+    MyMemcpy(&dst, src, len);
+    cout << "MyMemcpy:\n\tsrc: " << src << "\t dst: " << dst << endl;
+    MyMemcpyOptimised(&dst, src, len);
+    cout << "MyMemcpyOptimised:\n\tsrc: " << src << "\t dst: " << dst << endl;
 
-    memcpy(&ulVar, src, 8);
-    MyMemcpy(&ulVar, src, 8);
-    cout << "src: " << src << "\nulVar: " << ulVar << endl;
+    printf("\n---===---===---=== strcpy/strcat/memcpy都会有内存重叠的情况 ===---===---===---\n");
 
+    char c1[] = "0123456789";
+    MyMemcpy(c1, c1 + 4, sizeof(char) * 5); // 对应flag1: 4567856789
+    // MyMemcpy(c1 + 4, c1, sizeof(char) * 5); // 对应flag2
+    // memcpy(c1 + 4, c1, sizeof(char) * 5);  // 把MyMemcpy防重叠部分注释掉就可重现了; 这里用memcpy函数无法重现
+    // 重现的话应该是 0123012309; 正确的话和memmove一样是: 0123012349
+    printf("memcpy 内存重叠: %p\t%p\t%s\n", c1, c1 + 4, c1);
 
     printf(" \n----------------- 格式化字符串 sprintf / snprintf / vsprintf ---------------------------\n");
     // char sprintf_str[10] = {0};
@@ -471,7 +631,7 @@ void string_stl()
     char snprintf_str[10] = {0};
     // int snprintf_res = snprintf(snprintf_str, sizeof(snprintf_str), "I'm %d years old!",10);
     // 相比snprintf多个第二个缓存的参数，返回欲写入的长度, 但是只拷贝了n-1个, 就在末尾自动加上'\0'
-    int snprintf_res = snprintf(snprintf_str, 20, "I'm %d years old!",10);
+    int snprintf_res = snprintf(snprintf_str, 20, "I'm %d years old!", 10);
     // int snprintf_res = MySnprintf(snprintf_str, sizeof(snprintf_str), "I'm %d years old!",10);
     printf("snprintf_str:%s\t snprintf_res:%d\n", snprintf_str, snprintf_res);
 
@@ -487,15 +647,12 @@ void string_stl()
     char *a = (char*)"abcdef";  // 字符指针指向常量字符串 // c语言允许直接将字符串赋值给字符指针，但是c++会报警告,这里用类型强转就没事了 
     char b[] = "abcdef";        // 字符数组，以字符串的形式给字符数组赋值,字符串末尾自动添加\0
     char c[] = {'a','b','c','d','e','f'}; // 字符数组，以单个元素的形式赋值,没有\0,strlen返回的值不确定
-    printf("strlen(\"Wha\\0t?\"):%lld\t sizeof(char str2[10]):%lld\n", strlen(ch_str2), sizeof(ch_str2));
-    printf("sizeof(字符指针):%lld\t strlen(字符指针):%lld\n", sizeof(a), strlen(a));
-    printf("sizeof(字符数组):%lld\t strlen(字符数组):%lld\n", sizeof(b), strlen(b));
-    printf("sizeof(字符数组):%lld\t strlen(字符数组):%lld\n", sizeof(c), strlen(c));
+    printf("strlen(\"Wha\\0t?\"):%Zu\t sizeof(char str2[10]):%Zu\n", strlen(ch_str2), sizeof(ch_str2));
+    printf("sizeof(字符指针):%Zu\t strlen(字符指针):%Zu\n", sizeof(a), strlen(a));
+    printf("sizeof(字符数组):%Zu\t strlen(字符数组):%Zu\n", sizeof(b), strlen(b));
+    printf("sizeof(字符数组):%Zu\t strlen(字符数组):%Zu\n", sizeof(c), strlen(c));
 
 
-    printf(" \n-------------------------- char *a / char a[] / string ---------------------------\n");
-    string str = "abcdef";
-    // char *p_str = (char * )str.c_str();
 
     printf(" \n-------------------------- strtok ---------------------------\n");
     char date[20] = "salfgdfogffhe";

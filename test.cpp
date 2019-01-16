@@ -5,6 +5,10 @@
 #include <string.h>
 #include <time.h>
 using namespace std;
+// typedef void (*pLineCallback)(int iCnt, const char *pcszContent);
+typedef void (pLineCallback)(string strContent);
+
+const int iCommitCnt = 100;
 
 time_t GetCurrentTimeMs()
 {
@@ -13,7 +17,29 @@ time_t GetCurrentTimeMs()
     return currTime * 1000 + clock();
 }
 
-int main(int argc, char const *argv[])
+
+void ReadFile(const std::string &strFile, int iCommitCnt, pLineCallback pf)
+{
+    FILE *fp;
+    char *line = NULL;
+    size_t len = 0;
+    size_t read;
+
+    fp = fopen(strFile.c_str(), "r");
+    assert(fp);
+
+    while ((read = getline(&line, &len, fp)) != -1)
+    {
+        pf(line);
+    }
+
+    if (line)
+    {
+        free(line);
+    }
+}
+
+void test()
 {
     vector<string> vecInt{"a", "b", "c", "d"};
     printf("%s\n", vecInt[0].c_str());
@@ -39,7 +65,7 @@ int main(int argc, char const *argv[])
     time_t nowMs = GetCurrentTimeMs();
     cout << "nowMs: " << nowMs << endl;
 
-    /* c++11 时间 */
+    /* c++11  */
     auto time_now = chrono::system_clock::now();
     auto duration_in_ms = chrono::duration_cast<chrono::milliseconds>(time_now.time_since_epoch());
     cout << "chrono: " << duration_in_ms.count() << endl;
@@ -59,6 +85,29 @@ int main(int argc, char const *argv[])
     szCurrTime[8] = '\0';
     cout << szCurrTime << endl;
 
-    return 0;
 }
 
+void print(string line)
+{
+    printf("%s\n", line.c_str());
+}
+
+
+int main(int argc, char const *argv[])
+{
+    char chstr[] = "abcde";
+    cout << chstr << endl;
+    cout << *chstr << endl;
+    cout << *chstr+1 << endl;
+    cout << *(chstr+1) << endl;
+
+    char *p ="abcdef";
+    // p[3] = 'b'; // error
+    p = "edf"; // succ
+    cout << p << endl;
+
+
+
+    // ReadFile("./sql_0000.sql", iCommitCnt, print);
+    return 0;
+}
