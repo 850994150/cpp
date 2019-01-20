@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <string.h>
 #include <time.h>
+#include <stdarg.h>
 using namespace std;
 // typedef void (*pLineCallback)(int iCnt, const char *pcszContent);
 typedef void (pLineCallback)(string strContent);
@@ -57,7 +58,7 @@ void test()
     puts( strcat( a,c+1));
 
 
-    char szTest[14] = "中国";
+    char szTest[14] = "ä¸­å›½";
     // cout << "length" << szTest.length() << endl;
     cout << "length: " << sizeof(szTest)/sizeof(char) << endl;
     cout << "length: " << strlen(szTest) << endl;
@@ -92,6 +93,15 @@ void print(string line)
     printf("%s\n", line.c_str());
 }
 
+void SetMsgText(char *szMsgText, int p_iMsgCode, ...)
+{
+    char szErrorMsg[4096];
+    va_list lpvlArgPtr;
+    va_start(lpvlArgPtr, p_iMsgCode);
+    vsnprintf(szErrorMsg, sizeof(szErrorMsg) - 1, szMsgText, lpvlArgPtr);
+    va_end(lpvlArgPtr);
+    cout << szErrorMsg << endl;
+}
 
 int main(int argc, char const *argv[])
 {
@@ -101,12 +111,30 @@ int main(int argc, char const *argv[])
     cout << *chstr+1 << endl;
     cout << *(chstr+1) << endl;
 
-    char *p ="abcdef";
-    // p[3] = 'b'; // error
-    p = "edf"; // succ
+    /*字符常量不可更改*/
+    char *p = (char *)"qwertyuiop";
+    // p[3] = 'b'; // error 
+    // *p = 'b'; // error
+    // *p++; // success
+    // p = "edf"; // success
+
+    while (*p)
+    {
+        printf("%c ", *p);
+        p++;
+    }
+    
     cout << p << endl;
 
 
+    int iRetCode = 100199;
+    char szMsgText[] = "没有查询到客户[%lld]征信信息"; 
+    cout << &szMsgText << endl;
+    // SetMsgText(szMsgText, iRetCode, 170005578);
+    SetMsgText(szMsgText, iRetCode, "打");
+
+    int iArray[4] = {1, 2, 3, 4};
+    cout << sizeof(iArray) / sizeof(int) << endl;
 
     // ReadFile("./sql_0000.sql", iCommitCnt, print);
     return 0;

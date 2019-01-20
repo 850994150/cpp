@@ -1,1 +1,1 @@
-bash -c "rm -f %2 && g++ --std=c++11 -g %1 -o %2 -lpthread"
+bash -c "rm -f %2 && g++ --std=c++11 -g %1 -o %2 -lpthread && clear && time %2"

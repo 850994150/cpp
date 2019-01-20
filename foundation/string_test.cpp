@@ -19,13 +19,15 @@
  * #include <string.h>
  * ---- === --- === --- === --- === --- === --- === --- === --- === -- === --- ===
   
- * strlen /strnlen
+ * strlen /strnlen / sizeof
     * int strlen ( const char *str )
-    * 返回字符串的实际长度，不含 '\0'
-    * int strlrn ( const char *str, size_t maxlen )
-    * 区别: 能防止某些字符串不以'\0'结束而引发的错误
+        * 返回字符串的实际长度，不含 '\0'
+        * int strnlen ( const char *str, size_t maxlen )
+        * 区别: 能防止某些字符串不以'\0'结束而引发的错误
+    * sizeof
+        * 计算字符数组长度时, 会把\0计算进去
      
- * strcpy
+ * 【拷贝】: strcpy / strncpy / memcpy / memccpy / memmove / strdup / strndup
     * char *strcpy( char *dest, const char *src )
         * 从源串的开始拷贝字符到目标串地址, 遇到’\0’结束;
         * 不安全: 如果src长度比dst长度大时, 会栈溢出或覆盖其他变量的内存
@@ -46,25 +48,55 @@
     char *sss2 = "abcd1234";       // 运行正常
     strncpy(sss1, sss2, 4);
     printf("%s\n", sss2);
+
+ *  memcpy / memccpy / memmove
+    * 都是拷贝一定长度的内存内容
+    * 当内存发生重叠时, memcpy不能保证拷贝的正确性, memmove可以保证
+    * memset  void *memset(void *s, int ch, size_t n);
+        * 用来初始化内存, **逐字节拷贝**, 对于单字节数据类型（char）可以初始化为任意支持的值，都没有问题，
+        * 但是对于非多字节数据类型只能初始化为0，而不能初始化成别的初值，
+        * 因为对所有字节按任意顺序赋值0的结果都是0，而如果初始化为其他的值，就会一个字节一个字节的进行赋值，从而出现奇怪的结果
+        * memset中的第三个参数一定要使用sizeof操作符，因为每个系统下对类型长度的定义可能不一样。
+        * memset中的第一个参数一定要是一个已知的、已经被分配内存的地址，否则会出错。
+ 
+ * strdup / strndup /strdupa / strndupa
+    * strdup 可以把src复制给没有初始化的dst, 而strcpy的dst一定是已分配内存的
+    * strdup 不是标准C函数(不在stdio.h)里
+    * strdup 在堆上申请了strlen(src)+1的内存, 用完需要释放内存
+    * strdup 会在末尾加\0, strcpy也会把src的\0拷贝给dst
+    * strndup 不需事先分配内存, 所以strndpy的n>strlen(src)时, 返回的行字符串末尾是有\0的; strncpy则不会
+    * strdupa/strndupa 和strdupa一样, 只是内存分配是用 alloc 分配在栈上
      
- * strcmp / strncmp
+ * 【比较】: strcmp / strncmp / strcasecmp / strncasecmp
     * int strcmp( char *str1, char *str2 )
-    * 相等返回0, str1大于str2返回1, str1小于str2返回-1
+        * 相等返回0, str1大于str2返回1, str1小于str2返回-1
     * int strncmp( char *str1, char *str2, size_t n )
-    * 区别: 只比较前n个
+        * 区别: 只比较前n个
+    * linux下的strcasecmp 区别是: 不区分大小写 (windows下为stricmp)
      
  * strcat / strncat
     * char *strcat(char *dest, const char *src)
-    * 将参数src字符串拷贝到参数dest所指的字符串尾; 第一个参数dest要有足够的空间来容纳要拷贝的字符串
+        * 将参数src字符拷贝到参数dest所指的字符串尾, 遇到src的\0则停止拷贝, 第一个参数dest要有足够的空间容纳src和末尾的\0; strlen(src)+1
+        * strcat 字符串拼接, dst和src不能有内存重叠; dst必需有足够空间容纳src; 感觉不安全
     * char *strncat(char *dest, const char *src, size_t n);
-    * 区别: 只拷贝前n个
+        * 区别: 只拷贝前n个
      
- * strchr / strrchr
- * strstr
- * strtok / strtok_r
- * memset / memcpy / memccpy / memmove
-    * 都是拷贝一定长度的内存内容
-    * 当内存发生重叠时, memcpy不能保证拷贝的正确性, memmove可以保证
+ * strchr / strchrnul / strrchr / memchr / memrchr / strstr
+    * strchr 如果找到指定字符, 则返回该字符所在地址, 否则返回NULL
+    * memchr 区别是memchr针对内存操作不受\0的限制, strchr 针对字符串操作
+    * strstr 在字符串中查找子串（不匹配'\0'），如果找到，返回needle第一次出现的位置的指针，如果没找到则返回NULL
+ 
+ * 【其他】
+ * strfry
+    * 随机打乱字符串, 因为会改变原串, 所以用char* src = "xx" 会报错
+ * size_t strspn(const char* key, const char* src);
+    * 返回key中第一个不在src中的字符的下标, 如果全都在则返回key的长度
+ * size_t strcspn(const char* key, const char* src);
+    * 返回key中第一个在src中的字符的[下标], 如果全都不在则返回key的长度
+ * char *strpbrk(const char *s1, const char *s2);
+    * 返回s1中第一个在s2中的字符的[指针] strpbrk("abczz", "deb"); // 返回czz
+ * 
+ * strsep / strtok / strtok_r
  * 
  ***********************************************************
  */
@@ -77,6 +109,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <iostream>
+#include <ctype.h>
 using namespace std;
 
 // http://blog.csdn.net/eager7/article/details/8131437
@@ -84,7 +117,7 @@ using namespace std;
 void debugLog(const char *, int , const char * , ...);
 
 
-struct  stuff
+struct stuff
 {
     char job[20];
     int age;
@@ -97,7 +130,7 @@ struct  stuff
 /* ---- === --- === --- === --- === --- === --- === --- === --- === -- === --- ===  */
 
 // snprintf(char*res, sizeof(res), char*formate, ...);
-int MySnprintf(char *dest, int size, char *formate, ...)
+int MyVsnprintf(char *dest, int size, char *formate, ...)
 {
     int iRst;
     va_list ap;
@@ -139,6 +172,15 @@ void MyStrncpy(char *dest, const char *src, int len)
     
 }
 
+// 设置内存位置v开始的n个元素值为c
+void *MyMemset(void *v, int c, size_t n)
+{
+    char*p;
+    int m;
+    while (--m >= 0)
+        *p++ = c;
+    return v;
+}
 
 /*
  * memcpy功能是将内存块的内容复制到另一个内存块, (dst和src内存区域不能重叠), 入参就是内存开始的地址和要复制的长度
@@ -179,7 +221,12 @@ void *MyMemcpy(void *dest, const void *src, size_t n)
     return dest;
 }
 
-void *MyMemcpyOptimised(void *dest, const void *src, size_t n)
+/*
+ * memcpy的效率优化(只优化, 没有加入内存重叠处理)
+ * 原: 逐字节拷贝
+ * 现: 按照计算机字长来进行整体拷贝, 不满足字长的才逐一拷贝
+ */
+void *MemcpyOptimised(void *dest, const void *src, size_t n)
 {
     assert(src != NULL);
 
@@ -223,18 +270,76 @@ void *MyMemmove(void *dst, const void *src, size_t n)
     return pdst;
 }
 
-// char* strchr(const char* src, char c);
+
+char *MyStrdup(const char* src)
+{
+    int len = strlen(src) + 1;
+
+    if (src == NULL)
+    {
+        return NULL;
+    }
+    char *newptr = (char *)malloc(len); // 用完后记得 delete
+    strcpy(newptr, src);
+    return newptr;
+}
+
+int MyStrcmp(const char* str1, const char* str2)
+{
+    if (str1 == NULL || str2 == NULL)
+        return -1;
+    while ((*str1++ == *str2++) && *str1 && *str2)
+    {
+        printf("%c\t%c\n", *str1, *str2);
+    }
+    // 循环结束后, *str1,*str2指向不同的那个字符的位置
+    // 所以比较  前  的时候要先回退一位(--str1), 用str--结果是错的
+    int result = *(--str1) == *(--str2) ? 0 : (*(--str1) > *(--str2) ? 1 : -1);
+}
+
+int MyStrncmp(const char *str1, const char *str2, size_t n)
+{
+    if (str1 == NULL || str2 == NULL)
+        return -1;
+    // 这里--n和n--是不一样的
+    // 用--n是因为str的下标是到n-1比较到str[5]而不是str[6]
+    while ((*str1++ == *str2++) && *str1 && *str2 && --n)
+        ;
+    return *(--str1) == *(--str2) ? 0 : (*(--str1) > *(--str2) ? 1 : -1);
+}
+
+// 实现和 MyStrcmp 一样, 只不过用了 tolower 把字符全转为小写
+int MyStrcasecmp(const char* str1, const char* str2)
+{
+    if (str1 == NULL || str2 == NULL)
+        return -1;
+
+    while ((tolower(*str1++) == tolower(*str2++)) && *str1  && *str2)
+        ;
+    return tolower(*(--str1)) == tolower(*(str2--)) ? 0 : (tolower(*(--str1)) > tolower(*(--str2)) ? 1 : -1);
+}
+
+
 char* MyStrchr(const char* src, char ch)
 {
     assert(src != nullptr);
     const char*cp = src;
-    while(*cp++ !='\0')
+
+    while ((*cp++ != ch) && *cp)
+        ;
+    return (char *)(--cp);
+}
+
+
+void* MyMemchr(const void* src, int chr, size_t n)
+{
+
+    while (n && (*(unsigned char *)src != (unsigned char)chr))
     {
-        if (*cp == ch)
-        {
-            return (char*)cp;
-        }
+        src = (unsigned char *)src + 1;
+        n--;
     }
+    return (n ? (void *)src : NULL);
 }
 
 
@@ -254,9 +359,37 @@ char* MyStrrchr(const char*src, char ch)
     return ret;
 }
 
+char *MyStrstr(char *str1, const char *str2)
+{
+    assert(str1 != NULL);
+    assert(str2 != NULL);
 
-// char* strstr(char* str1, const char* str2)
-char* MyStrstr(char* str1, const char* str2)
+    if (*str2 == '\0')
+    {
+        return str1;
+    }
+    if (str1 == NULL)
+    {
+        return NULL;
+    }
+    while (*str1)
+    {
+        const char *cur = str2; // 因为要整串比较, 所以始终要从第一个字符开始
+        while (*str1++ == *cur++)
+            ;
+        if (*cur == '\0')
+        {
+            return str1 - strlen(str2); // 指针由于while循环比较已经往右移了, 现在往左退回第一个字符
+        }
+        if (*str1 == '\0')
+        {
+            return NULL;
+        }
+        str1++;
+    }
+}
+
+char* MyStrstr2(char* str1, const char* str2)
 {
     const char* s1 = str1;
     const char* s2 = str2;
@@ -279,8 +412,12 @@ char* MyStrstr(char* str1, const char* str2)
     return NULL;
 }
 
+char* MyStrspn()
+{
 
-// char *strcat_res = strcat(ch_str, "+strcat");
+}
+
+
 char* MyStrcat(char* dst, const char* src)
 {
     assert(dst != NULL);
@@ -289,9 +426,9 @@ char* MyStrcat(char* dst, const char* src)
         return dst;
     }
     int len = strlen(src);
-    char * tmp = dst + strlen(dst);
+    char * tmp = dst + strlen(dst); // tmp指向dst的\0字符处
 
-    while ((*tmp++ = *src++) != '\0') ;
+    while ((*tmp++ = *src++) != '\0'); // 退出的时已经拷贝\0了, 和strcpy一样
     return dst;
 }
 
@@ -301,7 +438,7 @@ int MyStrlen(const char*src)
 {
     int iLen = 0;
     assert(src != NULL);
-    while(*src++ != '\0' && ++iLen);
+    while ((*src++ != '\0') && ++iLen) ;
     return iLen;
 }
 
@@ -336,7 +473,7 @@ vector<string> ReadLineToVec(char* pLineBuffer)
  * 第一次调用必需入参str, 往后调用则将该参数设置为NULL，因为第一次分割后str被破坏了, 变成了分割后的第一
  * 个字符串, 剩余的字符串保存到了static变量中(所以多线程不安全)
  * 每次调用成功返回指向被分割出的片段的指针
- * https://blogs.csdn.net/hustfoxy/article/details/23473805
+ * https://blog.csdn.net/hustfoxy/article/details/23473805
  */
 char* MyStrtok(char* str, const char* delimeter)
 {
@@ -469,31 +606,7 @@ void email_check(char str[])
 }
 
 
-/* 
- 无符号数陷阱
- http://blog.csdn.net/jiejinquanil/article/details/51789682
- http://blog.csdn.net/songbai_pu/article/details/9172689
- */
-void unsigned_test(string str)
-{
-    // 错误写法:
-    if(str.find("xxx") < 0)
-    {
-        cout << "not found" << endl;
-    }
-    /* 正确写法: 
-     * find 函数找不到指定值的时候，会返回string::npos,表示字符串的结束
-     * npos也表示sizt_t的最大值
-    if (str.find("xxx") == string::npos)
-    {
-        cout << "not found till npos" << endl;
-    }
-     */
-    else // err
-    {
-        cout << "found" << endl;
-    }
-}
+
 
 
 // 打印信息
@@ -544,46 +657,84 @@ void string_stl()
     printf(" \n---------------------- char* 加减 ---------------------------\n");
     // 不就是指针加减嘛
 
-    printf(" \n---------------------- strchr / strrchr / strstr / strcat / strcmp ----------------------\n");
-    char ch_str[] = "asdfasdzfasdfaz-=-=-=-=azsdfz-=";
+    printf("\n---------------------- =========================================== ----------------------\n");
+    printf("---------------------- strchr / strrchr / strstr / strspn / strpbrk / strcat / strcmp ----------------------\n");
+    printf("---------------------- =========================================== ----------------------\n\n");
+    char strchr_ch[] = "asdfasdzfasdfazazsdfz== ";
     char ch = 'z';
 
-    char *strchr_res = strchr(ch_str, ch);       // strchr 返回指向第一次出现字符ch的指针
+    char *strchr_res = strchr(strchr_ch, ch); // strchr 返回指向第一次出现字符ch的指针
     printf("strchr: %s\n", strchr_res);
-    char *strchr_rest = MyStrchr(ch_str, ch);
+    char *strchr_rest = MyStrchr(strchr_ch, ch);
     printf("MyStrchr: %s\n", strchr_rest);
 
-    char *strrchr_res = strrchr(ch_str, ch);     // strrchr 返回指向最后出现字符ch的指针
+    char *strrchr_res = strrchr(strchr_ch , ch);     // strrchr 返回指向最后出现字符ch的指针
     printf("strrchr: %s\n", strrchr_res);
-    char *strrchr_rest = MyStrrchr(ch_str, ch);
+    char *strrchr_rest = MyStrrchr(strchr_ch, ch);
     printf("MyStrrchr: %s\n", strrchr_rest);
 
-    char *strstr_res = strstr(ch_str, "fz");     // strstr 返回str2中str1第一次出现的位置，返回指针，否则返回 NULL; strrstr返回最后一次出现
+    char *strstr_res = strstr(strchr_ch, "fz");     // strstr 返回str2中str1第一次出现的位置，返回指针，否则返回 NULL; strrstr返回最后一次出现
     printf("strstr: %s\n", strstr_res);
-    char *strstr_rest = MyStrstr(ch_str, "fz");
+    char *strstr_rest = MyStrstr(strchr_ch, "fz");
     printf("Mystrstr: %s\n", strstr_rest);
 
-    char *strcat_res = strcat(ch_str, "+strcat"); // strcat 字符串拼接, dst和src不能有内存重叠; dst必需有足够空间容纳src; 感觉不安全
+    char strfry_str[] = "huangjinjie";
+    printf("strfry: %s\n", strfry(strfry_str));
+
+    char *strspn_key = "xxhuangyyyyjinjie";
+    char *strspn_source = "huang0jinjie";
+    cout << "strspn: " << strspn(strspn_key, strspn_source) << endl;
+    cout << "strpbrk: " << strpbrk(strspn_key, strspn_source) << endl;
+    cout << "strcspn: " << strcspn(strspn_key, strspn_source) << endl;
+
+
+    char *strcat_res = strcat(strchr_ch, "+strcat");
     printf("strcat: %s\n", strcat_res);
-    char *strcat_rest = MyStrcat(ch_str, "-strcat");
+    char *strcat_rest = MyStrcat(strchr_ch, "-strcat");
     printf("MyStrcat: %s\n", strcat_rest);
 
-    char strsrc[] = "asdfasdzfasdfaz-=-=-=-=azsdfz-="; // strcmp
-    char strdst[] = "asdfasdzfasdfaz-=-=-=-=azsdfz-=";
-    if (strcmp(strsrc, strdst) != 0)
-    {
+    char strcmp1[] = "asdfasd=";
+    char strcmp2[] = "asdfasd=";
+    char strcasecmp1[] = "asdf=Aesd";
+    char strcasecmp2[] = "asdf=ADsd";
+    // if (strcmp(strcmp1, strcmp2) != 0)
+    // if (MyStrcmp(strcasecmp1, strcasecmp2) != 0)
+    // if (strncmp(strcmp1, strcmp2, 6) != 0)
+    // if (MyStrncmp(strcmp1, strcmp2, 6) != 0)
+    // if (strcasecmp(strcasecmp1, strcasecmp2) != 0)
+    if (MyStrcasecmp(strcasecmp1, strcasecmp2) != 0)
         printf("不相等");
-    }
     else
-    {
         printf("相等");
-    }
-    
-    printf(" \n----------------- strlen / strnlen / strcpy / strncpy -----------------\n");
-    char sss[] = "aaaaaa";
-    cout << "strlen: " << strlen(sss) << endl;
-    cout << "strnlen: " << strnlen(sss, 1) << endl;
-    cout << "MyStrlen: " << MyStrlen(sss) << endl;
+
+    printf("\n----------------- =============== ---------------------------\n");
+    printf("----------------- strlen / sizeof ---------------------------\n");
+    printf("----------------- =============== ---------------------------\n\n");
+
+    char strlen_str[] = "aaaaaa";
+    cout << "strlen: " << strlen(strlen_str) << endl;
+    cout << "sizeof: " << sizeof(strlen_str) << endl;
+    cout << "strnlen: " << strnlen(strlen_str, 3) << endl;
+    cout << "MyStrlen: " << MyStrlen(strlen_str) << endl;
+    /* 
+     * https://www.cnblogs.com/carekee/articles/1630789.html
+     * strlen 函数，求字符串开始到结束符的长度（字符串以\0结尾）；运行时计算值，参数必须是char * 类型(当数组名作为参数，实际数组是退化成指针了)
+     * sizeof 运算符，求类型所占大小；编译时计算值, 参数可以是数组、指针、类型、对象、函数等
+    */
+    char ch_str2[10] = "Wha\0t?";
+    char *a = (char*)"abcdef";
+    char b[] = "abcdef";        // 字符数组，以字符串的形式给字符数组赋值,字符串末尾自动添加\0
+    char c[] = {'a','b','c','d','e','f'}; // 字符数组，以单个元素的形式赋值,没有\0,strlen返回的值不确定
+    printf("strlen(\"Wha\\0t?\"):%Zu\t sizeof(char str2[10]):%Zu\n", strlen(ch_str2), sizeof(ch_str2));
+    printf("sizeof(字符指针):%Zu\t strlen(字符指针):%Zu\n", sizeof(a), strlen(a));
+    printf("sizeof(字符数组):%Zu\t strlen(字符数组):%Zu\n", sizeof(b), strlen(b));
+    printf("sizeof(字符数组):%Zu\t strlen(字符数组):%Zu\n", sizeof(c), strlen(c));
+
+
+
+    printf("\n----------------- ======================================================== -----------------\n");
+    printf("----------------- strcpy / strncpy / mmecpy / memccpy / memset / / memmove -----------------\n");
+    printf("----------------- ======================================================== -----------------\n\n");
 
     // const char* p_src = "asdfasdf\0 is a good boy";
     const char* p_src = "asdfasdf is a good boy"; // 用strcpy不安全
@@ -600,20 +751,25 @@ void string_stl()
     cout << "MyStrncpy: " << vardst << endl;
 
 
-    printf(" \n----------------- memset / memcpy / memmove -----------------\n");
     const char *src = "abcdefghijklmnopqrstuvwxyz";
     int len = strlen(src);
     char dst[64];
-    memset((void *)dst, 0x00, sizeof(dst));
+    memset((void *)dst, 0x00, sizeof(dst)); // 因为是逐字节拷贝, 所以初始化为非0的值时会得到奇怪结果
+
+    char *memset_pBuf = (char *)malloc(sizeof(char) * 10);
+    memset(memset_pBuf, 0, sizeof(char) * 10); // 0或者'\0'是等价的
+    // MyMemset((void *)memset_str, '1', sizeof(memset_str));
+    printf("%s, strlen: %Zu, sizeof:%Zu\n", memset_pBuf, strlen(memset_pBuf), sizeof(memset_pBuf));
 
     memcpy(&dst, src, len);
     cout << "memcpy:\n\tsrc: " << src << "\t dst: " << dst << endl;
     MyMemcpy(&dst, src, len);
     cout << "MyMemcpy:\n\tsrc: " << src << "\t dst: " << dst << endl;
-    MyMemcpyOptimised(&dst, src, len);
-    cout << "MyMemcpyOptimised:\n\tsrc: " << src << "\t dst: " << dst << endl;
+    MemcpyOptimised(&dst, src, len);
+    cout << "MemcpyOptimised:\n\tsrc: " << src << "\t dst: " << dst << endl;
 
-    printf("\n---===---===---=== strcpy/strcat/memcpy都会有内存重叠的情况 ===---===---===---\n");
+
+    printf("\n===---=== strcpy/strcat/memcpy都会有内存重叠的情况 ===---===\n");
 
     char c1[] = "0123456789";
     MyMemcpy(c1, c1 + 4, sizeof(char) * 5); // 对应flag1: 4567856789
@@ -622,7 +778,19 @@ void string_stl()
     // 重现的话应该是 0123012309; 正确的话和memmove一样是: 0123012349
     printf("memcpy 内存重叠: %p\t%p\t%s\n", c1, c1 + 4, c1);
 
-    printf(" \n----------------- 格式化字符串 sprintf / snprintf / vsprintf ---------------------------\n");
+    char c2[] = "abcdefghijklmn";
+    char *c22 = strdup(c2);
+    // char * c22 = MyStrdup(c2);
+    // char *c22 = strndup(c2, strlen(c2) + 1);
+    printf("strdup:%s\n", c22);
+    free(c22);
+    c22 = NULL;
+    printf("strdup:%s\n", c22);
+
+
+    printf("\n------------------- ========================================== ---------------------------\n");
+    printf("------------------- 格式化字符串 sprintf / snprintf / vsprintf ---------------------------\n");
+    printf("------------------- ========================================== ---------------------------\n\n");
     // char sprintf_str[10] = {0};
     // int sprintf_res  = sprintf(sprintf_str, "I'm %d years old!",10);
     // 返回实际写入的字符串长度，不会进行越界判断，会直接对之后的内存进行覆盖
@@ -636,25 +804,23 @@ void string_stl()
     printf("snprintf_str:%s\t snprintf_res:%d\n", snprintf_str, snprintf_res);
 
 
+    printf("\n------------------- ==== ---------------------------\n");
+    printf("------------------- 其他 ---------------------------\n");
+    printf("------------------- ==== ---------------------------\n\n");
+    // 字符常量不可更改
+    char *p = (char *)"qwertyuiop";
+    // p[3] = 'b'; // error
+    // *p = 'b'; // error
+    // (*p)++; // error
+    // *p++; // success
+    // p = "edf"; // success
+    while (*p)
+    {
+        printf("%c ", *p);
+        p++;
+    }
 
-    printf(" \n----------------- strlen / sizeof  ---------------------------\n");
-    /* 
-     * https://www.cnblogs.com/carekee/articles/1630789.html
-     * strlen 函数，求字符串开始到结束符的长度（字符串以\0结尾）；运行时计算值，参数必须是char * 类型(当数组名作为参数，实际数组是退化成指针了)
-     * sizeof 运算符，求类型所占大小；编译时计算值, 参数可以是数组、指针、类型、对象、函数等
-    */
-    char ch_str2[10] = "Wha\0t?";
-    char *a = (char*)"abcdef";  // 字符指针指向常量字符串 // c语言允许直接将字符串赋值给字符指针，但是c++会报警告,这里用类型强转就没事了 
-    char b[] = "abcdef";        // 字符数组，以字符串的形式给字符数组赋值,字符串末尾自动添加\0
-    char c[] = {'a','b','c','d','e','f'}; // 字符数组，以单个元素的形式赋值,没有\0,strlen返回的值不确定
-    printf("strlen(\"Wha\\0t?\"):%Zu\t sizeof(char str2[10]):%Zu\n", strlen(ch_str2), sizeof(ch_str2));
-    printf("sizeof(字符指针):%Zu\t strlen(字符指针):%Zu\n", sizeof(a), strlen(a));
-    printf("sizeof(字符数组):%Zu\t strlen(字符数组):%Zu\n", sizeof(b), strlen(b));
-    printf("sizeof(字符数组):%Zu\t strlen(字符数组):%Zu\n", sizeof(c), strlen(c));
-
-
-
-    printf(" \n-------------------------- strtok ---------------------------\n");
+    printf("\n-------------------------- strtok ---------------------------\n");
     char date[20] = "salfgdfogffhe";
     // char* result = strtok(date, "gd");
     char* result = MyStrtok(date, "gd");
@@ -670,13 +836,12 @@ void string_stl()
         }
     }
 
-    printf(" \n--- === --- === --- === --- === --- === --- === --- === --- === -- === --- === ---\n");
 
-    printf(" \n-------------------------- StringTrim ---------------------------\n");
+    printf("\n-------------------------- StringTrim ---------------------------\n");
     string strTest = " L0000504cpp ";
     cout << StringTrim(strTest) << endl;
 
-    printf(" \n-------------------------- SplitString ---------------------------\n");
+    printf("\n-------------------------- SplitString ---------------------------\n");
     // vector<string> vecstrResult;
     // char* pBuffer = "asdf1,asdf2,asdf3,asdf4,asdf5"; strtok 用char* 会报错
     // char pBuffer[] = "asdf1,asdf2,asdf3,asdf4,asdf5";
@@ -690,22 +855,37 @@ void string_stl()
         cout << i << "\t";
     }
     cout << endl;
-}
 
+    /* 无符号数陷阱
+     http://blog.csdn.net/jiejinquanil/article/details/51789682
+     http://blog.csdn.net/songbai_pu/article/details/9172689
+     */
+    // 错误写法:
+    string str_npos = "abcdefghijklmn";
+    if(str_npos.find("xxx") < 0)
+    {
+        cout << "not found" << endl;
+    }
+    /* 正确写法: 
+     * find 函数找不到指定值的时候，会返回string::npos,表示字符串的结束
+     * npos也表示sizt_t的最大值
+    if (str.find("xxx") == string::npos)
+    {
+        cout << "not found till npos" << endl;
+    }
+     */
+    else // err
+    {
+        cout << "found" << endl;
+    }
+}
 
 int main( )
 {
-    cout << "----------- 正则表达式 -----------" << endl;
     char str_email[] = "fasdf2@aa.com";
     email_check(str_email);
 
-    cout << "----------- string函数 -----------" << endl;
     string_stl();
-
-    cout << "----------- 无符号陷阱 -----------" << endl;
-    string str_src = "abcdefghijklmn";
-    unsigned_test(str_src);
-
 
     unsigned int val = -1; 
     cout << val << endl;
