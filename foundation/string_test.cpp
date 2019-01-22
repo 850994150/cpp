@@ -5,20 +5,20 @@
  * Last modified: 2019-01-14 17:44:41
  * Filename     : string_test.cpp
  * Description  :
+  
  * ---- === --- === --- === --- === --- === --- === --- === --- === -- === --- ===
- * string 类方法
- * ---- === --- === --- === --- === --- === --- === --- === --- === -- === --- ===
- 
-    * str.find(str2, 7) // 在str中从指定位置从前向后查找子串,
-                        // 成功返回str2首个字符在str中的地址, 否则返回npos, rfind则从后往前找
-    * str.find_first_of(str2, 7) / str.find_first_not_of /  str.find_last_of / str.find_last_not_of
-                        // 在str中指定位置开始查找str2, 只要str中找到str2的任意字符, 就返回该字符位置
-
- * ---- === --- === --- === --- === --- === --- === --- === --- === -- === --- ===
- * 字符处理函数 https://blog.csdn.net/frecon/article/details/79605941
+ * 【字符处理函数】
+ * https://blog.csdn.net/frecon/article/details/79605941
  * #include <string.h>
  * ---- === --- === --- === --- === --- === --- === --- === --- === -- === --- ===
   
+ * memset  void *memset(void *s, int ch, size_t n);
+    * 用来初始化内存, **逐字节拷贝**, 对于单字节数据类型（char）可以初始化为任意支持的值，都没有问题，
+    * 但是对于非多字节数据类型只能初始化为0，而不能初始化成别的初值，
+    * 因为对所有字节按任意顺序赋值0的结果都是0，而如果初始化为其他的值，就会一个字节一个字节的进行赋值，从而出现奇怪的结果
+    * memset中的第三个参数一定要使用sizeof操作符，因为每个系统下对类型长度的定义可能不一样。
+    * memset中的第一个参数一定要是一个已知的、已经被分配内存的地址，否则会出错。
+     
  * strlen /strnlen / sizeof
     * int strlen ( const char *str )
         * 返回字符串的实际长度，不含 '\0'
@@ -27,7 +27,8 @@
     * sizeof
         * 计算字符数组长度时, 会把\0计算进去
      
- * 【拷贝】: strcpy / strncpy / memcpy / memccpy / memmove / strdup / strndup
+ * 【拷贝】
+    * strcpy / strncpy / memcpy / memccpy / memmove / strdup / strndup
     * char *strcpy( char *dest, const char *src )
         * 从源串的开始拷贝字符到目标串地址, 遇到’\0’结束;
         * 不安全: 如果src长度比dst长度大时, 会栈溢出或覆盖其他变量的内存
@@ -42,62 +43,78 @@
         * strlen(dst) = n > strlen(src), n大于源串长度时，遇到’\0’结束; dst剩余字节都用’\0’填充
         * strlen(dst) > n >= strlen(src), n大于源串长度时，遇到’\0’结束; dst剩余字节都用’\0’填充
         * strlen(dst) < n, 会破坏dst后面的内存, 输出的值不确定
-    * 入参错误的情况: 
-    char * sss1;
-    // char sss2[20] = "abcd1234"; // 运行时错误segment fault
-    char *sss2 = "abcd1234";       // 运行正常
-    strncpy(sss1, sss2, 4);
-    printf("%s\n", sss2);
 
- *  memcpy / memccpy / memmove
-    * 都是拷贝一定长度的内存内容
-    * 当内存发生重叠时, memcpy不能保证拷贝的正确性, memmove可以保证
-    * memset  void *memset(void *s, int ch, size_t n);
-        * 用来初始化内存, **逐字节拷贝**, 对于单字节数据类型（char）可以初始化为任意支持的值，都没有问题，
-        * 但是对于非多字节数据类型只能初始化为0，而不能初始化成别的初值，
-        * 因为对所有字节按任意顺序赋值0的结果都是0，而如果初始化为其他的值，就会一个字节一个字节的进行赋值，从而出现奇怪的结果
-        * memset中的第三个参数一定要使用sizeof操作符，因为每个系统下对类型长度的定义可能不一样。
-        * memset中的第一个参数一定要是一个已知的、已经被分配内存的地址，否则会出错。
- 
- * strdup / strndup /strdupa / strndupa
-    * strdup 可以把src复制给没有初始化的dst, 而strcpy的dst一定是已分配内存的
-    * strdup 不是标准C函数(不在stdio.h)里
-    * strdup 在堆上申请了strlen(src)+1的内存, 用完需要释放内存
-    * strdup 会在末尾加\0, strcpy也会把src的\0拷贝给dst
-    * strndup 不需事先分配内存, 所以strndpy的n>strlen(src)时, 返回的行字符串末尾是有\0的; strncpy则不会
-    * strdupa/strndupa 和strdupa一样, 只是内存分配是用 alloc 分配在栈上
-     
- * 【比较】: strcmp / strncmp / strcasecmp / strncasecmp
+    *  memcpy / memccpy / memmove
+        * 都是拷贝一定长度的内存内容
+        * 当内存发生重叠时, memcpy不能保证拷贝的正确性, memmove可以保证
+         
+    * strdup / strndup /strdupa / strndupa
+        * strdup 可以把src复制给没有初始化的dst, 而strcpy的dst一定是已分配内存的
+        * strdup 不是标准C函数(不在stdio.h)里
+        * strdup 在堆上申请了strlen(src)+1的内存, 用完需要释放内存
+        * strdup 会在末尾加\0, strcpy也会把src的\0拷贝给dst
+        * strndup 不需事先分配内存, 所以strndpy的n>strlen(src)时, 返回的行字符串末尾是有\0的; strncpy则不会
+        * strdupa/strndupa 和strdupa一样, 只是内存分配是用 alloc 分配在栈上
+
+ * 【比较】
+    * strcmp / strncmp / strcasecmp / strncasecmp
     * int strcmp( char *str1, char *str2 )
         * 相等返回0, str1大于str2返回1, str1小于str2返回-1
+        * linux下的strcasecmp 区别是: 不区分大小写 (windows下为stricmp)
+         
     * int strncmp( char *str1, char *str2, size_t n )
         * 区别: 只比较前n个
-    * linux下的strcasecmp 区别是: 不区分大小写 (windows下为stricmp)
-     
- * strcat / strncat
-    * char *strcat(char *dest, const char *src)
-        * 将参数src字符拷贝到参数dest所指的字符串尾, 遇到src的\0则停止拷贝, 第一个参数dest要有足够的空间容纳src和末尾的\0; strlen(src)+1
-        * strcat 字符串拼接, dst和src不能有内存重叠; dst必需有足够空间容纳src; 感觉不安全
-    * char *strncat(char *dest, const char *src, size_t n);
-        * 区别: 只拷贝前n个
-     
- * strchr / strchrnul / strrchr / memchr / memrchr / strstr
-    * strchr 如果找到指定字符, 则返回该字符所在地址, 否则返回NULL
-    * memchr 区别是memchr针对内存操作不受\0的限制, strchr 针对字符串操作
-    * strstr 在字符串中查找子串（不匹配'\0'），如果找到，返回needle第一次出现的位置的指针，如果没找到则返回NULL
+ * 【定位】
+    * strchr / strchrnul / strrchr / memchr / memrchr / strstr
+        * strchr 如果找到指定字符, 则返回该字符所在地址, 否则返回NULL
+        * memchr 区别是memchr针对内存操作不受\0的限制, strchr 针对字符串操作
+        * strstr 在字符串中查找子串（不匹配'\0'），如果找到，返回needle第一次出现的位置的指针，如果没找到则返回NULL
+
+    * size_t strspn(const char* key, const char* src); (span: 跨越)
+        * 返回key中第一个不在src中的字符的下标, 如果全都在则返回key的长度
+    * size_t strcspn(const char* key, const char* src); (complementary: 互补)
+        * 返回key中第一个在src中的字符的[下标], 如果全都不在则返回key的长度
+    * char *strpbrk(const char *s1, const char *s2);
+        * strpbrk: string pointer break. because it returns a pointer to the first of the separator ("break") characters
+        * 返回s1中第一个在s2中的字符的[指针] strpbrk("abczz", "deb"); // 返回czz
+ * 【变化】
+    * strfry (fry:炒)
+        * 随机打乱字符串, 因为会改变原串, 所以用char* src = "xx" 会报错
+        
+    * strcat / strncat
+        * char *strcat(char *dest, const char *src)
+            * 将参数src字符拷贝到参数dest所指的字符串尾, 遇到src的\0则停止拷贝, 第一个参数dest要有足够的空间容纳src和末尾的\0; strlen(src)+1
+            * strcat 字符串拼接, dst和src不能有内存重叠; dst必需有足够空间容纳src; 感觉不安全
+        * char *strncat(char *dest, const char *src, size_t n);
+            * 区别: 只拷贝前n个
+
+    * strtok (token: 标记) / strtok_r / strsep (seperate: 分离) 
+        * char* strtok(char* str, const char* delimiters);
+            * 维护一个静态变量(【线程不安全】的原因)来保存第一次传入的str; 后续如果发现传入str是NULL, 就知道要继续处理上次的字符串;
+            * 如果传入的str不为NULL，则知道要处理一个新的字符串, 所以静态变量始终保存着未处理完的字符串的剩下部分
+            * 第一次调用入参str, 一次性把【str中包含的delimiters所有字符都替换成'\0'】(多个分割符算一个\0), 往后调用则将该参数设置为NULL, strtok会把NULL 换成\0
+            * 因为第一次分割后str被破坏了, 变成了分割后的第一个字符串, 剩余的字符串保存到了static变量中(所以多线程不安全)
+            * 每次调用成功返回指向被分割出的片段的指针
+            * https://blog.csdn.net/hustfoxy/article/details/23473805
+            
+        * char *strtok_r(char *str, const char *delim, char **saveptr);
+            * 知道了不安全的原因, 只要不使用静态变量就行了; 增加一个参数来指向分割后的字符串, 不同线程使用不同的saveptr指针即可
+    
+        * char *strsep(char **stringp, const char *delim);
+            * strsep会挨个替换delim的字符，且几个分割字符连续的话(多个分隔符连续算n个\0)他会挨个返回空字符串
+            * 第一个参数设为二级指针(所以不能是char str[] = "xx",
+            * 但是因为strsep会破坏原串又不能用char*str = "xx") 可以用strdup/strcpy把字符常量拷贝到栈上的变量
+            * 字符串中所有的第二个参数（子串）最后会被替代成'\0'
+
+ * ---- === --- === --- === --- === --- === --- === --- === --- === -- === --- ===
+ * string 类方法
+ * #include <string>
+ * ---- === --- === --- === --- === --- === --- === --- === --- === -- === --- ===
  
- * 【其他】
- * strfry
-    * 随机打乱字符串, 因为会改变原串, 所以用char* src = "xx" 会报错
- * size_t strspn(const char* key, const char* src);
-    * 返回key中第一个不在src中的字符的下标, 如果全都在则返回key的长度
- * size_t strcspn(const char* key, const char* src);
-    * 返回key中第一个在src中的字符的[下标], 如果全都不在则返回key的长度
- * char *strpbrk(const char *s1, const char *s2);
-    * 返回s1中第一个在s2中的字符的[指针] strpbrk("abczz", "deb"); // 返回czz
- * 
- * strsep / strtok / strtok_r
- * 
+    * str.find(str2, 7) // 在str中从指定位置从前向后查找子串,
+                        // 成功返回str2首个字符在str中的地址, 否则返回npos, rfind则从后往前找
+    * str.find_first_of(str2, 7) / str.find_first_not_of /  str.find_last_of / str.find_last_not_of
+                        // 在str中指定位置开始查找str2, 只要str中找到str2的任意字符, 就返回该字符位置
  ***********************************************************
  */
 
@@ -443,46 +460,16 @@ int MyStrlen(const char*src)
 }
 
 
-// strtok
-vector<string> ReadLineToVec(char* pLineBuffer)
-{
-	char *pFileBuffer = NULL;
-	string sLine;
-	vector<string> vecStringLine;
-	vecStringLine.clear();
-
-	// char *strDelim = (char*)"\n";
-	char *strDelim = (char*)",";
-	char *strToken = NULL;
-	char *nextToken = NULL;
-
-	strToken = strtok_r(pLineBuffer, strDelim, &nextToken);
-	while (strToken != NULL)
-	{
-		sLine.assign(strToken);
-		vecStringLine.push_back(sLine);
-		strToken = strtok_r(NULL, strDelim, &nextToken);
-	}
-	return vecStringLine;
-}
 
 
-// char* strtok(char* str, const char* delimiters);
-/*
- * 从str中把delimiters中**包含**的字符替换成'\0', 注意包含的字符都会被替换, 而不是替换整个delimiters
- * 第一次调用必需入参str, 往后调用则将该参数设置为NULL，因为第一次分割后str被破坏了, 变成了分割后的第一
- * 个字符串, 剩余的字符串保存到了static变量中(所以多线程不安全)
- * 每次调用成功返回指向被分割出的片段的指针
- * https://blog.csdn.net/hustfoxy/article/details/23473805
- */
 char* MyStrtok(char* str, const char* delimeter)
 {
-    static char* strStatic = NULL; // 保存str分割的后面部分
+    static char* strStatic = NULL;
     const char* pDelimeter = NULL; // 始终指向分隔符的指针
     char* pRetStr = NULL;          // 保存结果
     bool bFind = false;            // 标志是否查找到分隔符
-    
-    if (str!=NULL)
+
+    if (str != NULL)
     {
         strStatic  = str;
     }
@@ -542,6 +529,7 @@ string& StringTrim( string &str)
 /*
  * @brief       切割字符串
  * @param[in]   strOrig			原始字符串
+ *              strtok会改变原串, 如果入参是char*的话会报错
  * @param[in]   strSplit		分隔符/串
  * @return      vector<string>	返回子串
  */
@@ -681,8 +669,8 @@ void string_stl()
     char strfry_str[] = "huangjinjie";
     printf("strfry: %s\n", strfry(strfry_str));
 
-    char *strspn_key = "xxhuangyyyyjinjie";
-    char *strspn_source = "huang0jinjie";
+    char *strspn_key = (char *)"xxhuangyyyyjinjie";
+    char *strspn_source = (char *)"huang0jinjie";
     cout << "strspn: " << strspn(strspn_key, strspn_source) << endl;
     cout << "strpbrk: " << strpbrk(strspn_key, strspn_source) << endl;
     cout << "strcspn: " << strcspn(strspn_key, strspn_source) << endl;
@@ -807,7 +795,7 @@ void string_stl()
     printf("\n------------------- ==== ---------------------------\n");
     printf("------------------- 其他 ---------------------------\n");
     printf("------------------- ==== ---------------------------\n\n");
-    // 字符常量不可更改
+    // 字符常量不可更改 // 如果想要修改应: char p[] = "qwertyuiop";
     char *p = (char *)"qwertyuiop";
     // p[3] = 'b'; // error
     // *p = 'b'; // error
@@ -820,49 +808,83 @@ void string_stl()
         p++;
     }
 
-    printf("\n-------------------------- strtok ---------------------------\n");
-    char date[20] = "salfgdfogffhe";
-    // char* result = strtok(date, "gd");
-    char* result = MyStrtok(date, "gd");
-    cout << result << endl; // 第一次分割
-    
-    while(result != NULL)
-    {
-        result = MyStrtok(NULL, "gd");
-        // result = strtok(NULL, "gd");
-        if (result != NULL)
-        {
-            cout << result << endl;
-        }
-    }
+    printf("\n\n-------------------------- =============== ---------------------------\n");
+    printf("-------------------------- strtok / strsep ---------------------------\n");
+    printf("-------------------------- =============== ---------------------------\n");
+    char date[64] = "home/m_kepler/project:/home/m_kepler:/home/git:"; // 字符串不能为常量，所以strdup
+    // char *date = "salfgdfogffhe"; // error
+    char* token;
+    char delim[] = ":/";
 
+    /*
+    token = MyStrtok(date, ":/");
+    while(token != NULL)
+    {
+        token = MyStrtok(NULL, ":/");
+        // token = strtok(NULL, "gd");
+        if (token != NULL)
+            printf("%s", token);
+    }
+    cout << endl;
+    */
+
+    for (token = strtok(date, delim); token != NULL; token = strtok(NULL, delim))
+    {
+        printf("%s", token);
+		printf("+");
+    }
+    cout << endl;
+
+    // strsep
+    char *orgstr = strdup("home/m_kepler/project:/home/m_kepler:/home/git:"); // 字符串不能为常量，所以strdup
+    // char orgstr[] = "In the galaxy far far away."; // 这是字符数组, 不是指针
+    /*
+    char *seps = NULL;
+    while ((seps = strsep(&orgstr, ":/")) != NULL)
+    {
+        printf("%s+", seps);
+    }
+    free(orgstr);
+    cout << endl;
+    */
+
+    for (token = strsep(&orgstr, delim); token != NULL; token = strsep(&orgstr, delim))
+    {
+        printf("%s", token);
+        printf("+");
+    }
+    free(orgstr);
+    cout << endl;
+
+
+    vector<string> vecstrResult;
+    char *pBuffer = (char *)"asdf1,asdf2,asdf3,asdf4,asdf5";
+    // char pBuffer[] = "asdf1,asdf2,asdf3,asdf4,asdf5";
+    string strStrtok = "asdf1,asdf2,asdf3,asdf4,asdf5";
+    vecstrResult = SplitString(pBuffer, ",");
+
+    for(auto i : vecstrResult)
+    {
+        cout << i << " ";
+    }
+    cout << endl;
 
     printf("\n-------------------------- StringTrim ---------------------------\n");
     string strTest = " L0000504cpp ";
     cout << StringTrim(strTest) << endl;
 
-    printf("\n-------------------------- SplitString ---------------------------\n");
-    // vector<string> vecstrResult;
-    // char* pBuffer = "asdf1,asdf2,asdf3,asdf4,asdf5"; strtok 用char* 会报错
-    // char pBuffer[] = "asdf1,asdf2,asdf3,asdf4,asdf5";
-    // vecstrResult = ReadLineToVec(pBuffer);
-    vector<string> vecstrResult;
-    string strStrtok = "asdf1,asdf2,asdf3,asdf4,asdf5";
-    vecstrResult = SplitString(strStrtok, ",");
 
-    for(auto i : vecstrResult)
-    {
-        cout << i << "\t";
-    }
-    cout << endl;
 
+    printf("\n-------------------------- ========= ---------------------------\n");
+    printf("-------------------------- std::npos ---------------------------\n");
+    printf("-------------------------- ========= ---------------------------\n\n");
     /* 无符号数陷阱
      http://blog.csdn.net/jiejinquanil/article/details/51789682
      http://blog.csdn.net/songbai_pu/article/details/9172689
      */
     // 错误写法:
     string str_npos = "abcdefghijklmn";
-    if(str_npos.find("xxx") < 0)
+    if (str_npos.find("xxx") < 0)
     {
         cout << "not found" << endl;
     }
@@ -878,6 +900,9 @@ void string_stl()
     {
         cout << "found" << endl;
     }
+    cout << str_npos.find("xxx") << endl;
+    unsigned int val = -1;
+    cout << val << endl;
 }
 
 int main( )
@@ -886,9 +911,6 @@ int main( )
     email_check(str_email);
 
     string_stl();
-
-    unsigned int val = -1; 
-    cout << val << endl;
 
     // debugLog(__FILE__, __LINE__, "TEST");
 
