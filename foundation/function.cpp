@@ -69,7 +69,7 @@
 
 #include <iostream>
 #include <algorithm> // for_each
-#include <stdarg.h> // va_list
+#include <stdarg.h>  // va_list
 #include <assert.h>
 #include <vector>
 
@@ -78,7 +78,7 @@ using namespace std;
 #define END 0
 
 //内联函数定义
-inline double square(double x){ return x*x; }
+inline double square(double x) { return x * x; }
 
 // 函数模板定义
 template <class T> //或者template <typename T>
@@ -88,7 +88,6 @@ void Swap(T &a, T &b)
     temp = a;
     a = b;
     b = temp;
-
 }
 
 // https://blog.csdn.net/fengidea/article/details/30237233
@@ -100,7 +99,7 @@ void change_val(int n)
 }
 
 //将实际参数的地址传递给函数，只是相当于实际参数的一个别名，会影响到实参 //允许被调用的函数能够访问调用函数中的变量
-void change_quote(int& n)
+void change_quote(int &n)
 {
     cout << "引用传递\t函数操作地址:" << &n << endl;
     n++;
@@ -110,12 +109,11 @@ void change_quote(int& n)
 void change_pointer(int *n)
 {
     cout << "指针传递\t函数操作地址:" << n << endl;
-    *n = *n+1;
+    *n = *n + 1;
 }
 
-
 // 定义带参回调函数
-void PrintfText(char * s)
+void PrintfText(char *s)
 {
     cout << s;
     cout << "函数调用函数dosomething()" << endl;
@@ -143,7 +141,7 @@ void LambdaSample()
         data.push_back(i);
     }
     // sort(data.begin(), data.end(), cmp);
-    sort(data.begin(), data.end(), [](int& a, int& b)->bool{ return a > b; });
+    sort(data.begin(), data.end(), [](int &a, int &b) -> bool { return a > b; });
 
     for (int i = 0; i < data.size(); ++i)
     {
@@ -166,13 +164,13 @@ int LambdaSample2()
             result.push_back(elem);
     });
 
-    for_each(result.begin(), result.end(), [] (int &elem) {
+    for_each(result.begin(), result.end(), [](int &elem) {
         cout << elem << "\t";
     });
     cout << endl;
 
     // 迭代器遍历
-    for( int value : result)
+    for (int value : result)
     {
         cout << value << "\t";
     }
@@ -193,18 +191,17 @@ int LambdaSample2()
     return 0;
 }
 
-
 // 闭包?
 // 体现了捕获列表的作用了, counterGreator函数的参数在GreatCounter里用上了
 // 可以不通过传参获取调用者上下文环境(意思是通过传参也是可以的了,见下面注释部分)
-template<typename U>
+template <typename U>
 // int GreatCounter(vector<int>& vecNumber, int y, U filter)
-int GreatCounter(vector<int>& vecNumber, U filter)
+int GreatCounter(vector<int> &vecNumber, U filter)
 {
     int count = 0;
-    for(auto& x:vecNumber)
+    // 用引用会改变 vecNumber 的值, 比如线程vector中, 就要用引用才能正常join
+    for (auto &x : vecNumber)
     {
-        
         // if (filter(x,y) == 1)
         if (filter(x) == 1)
         {
@@ -214,21 +211,19 @@ int GreatCounter(vector<int>& vecNumber, U filter)
     return count;
 }
 
-int counterGreator(vector<int> & vecNumber, int y)
+int counterGreator(vector<int> &vecNumber, int y)
 {
     // 捕获列表捕获lambda所在函数体的局部变量y
     // return GreatCounter(vecNumber, y, [](int x, int &y){return x>y;});
-    return GreatCounter(vecNumber, [=](int x){return x>y;});
+    return GreatCounter(vecNumber, [=](int x) { return x > y; });
 }
-
 
 // const放在函数名前
 // const int& constFunc(int a)
-int& constFunc(int &a)
+int &constFunc(int &a)
 {
     return a;
 }
-
 
 void NullPtr(int a)
 {
@@ -241,14 +236,14 @@ void NullPtr(int *ptr)
     cout << ptr << endl;
 }
 
-void va_sum (int &sum, ...)
+void va_sum(int &sum, ...)
 {
     va_list ap;
     va_start(ap, sum);
     int temp = 0;
-    while((temp = va_arg(ap, int)) != END)
+    while ((temp = va_arg(ap, int)) != END)
     {
-        sum  += temp;
+        sum += temp;
     }
     va_end(ap);
 }
@@ -259,25 +254,23 @@ int main()
     int &m = n;
     int *ptr = &n;
     vector<int> vecIntNumber;
-    
-    for(size_t i = 0; i < 10; i++)
+
+    for (size_t i = 0; i < 10; i++)
     {
         vecIntNumber.push_back(i);
     }
-    
 
     cout << " \n---------------- for_each -----------------\n";
     // c++98初始化 int a = 10;
-    vector<int> vecInt = {1,2,3,4,5};
+    vector<int> vecInt = {1, 2, 3, 4, 5};
     // c++11初始化 int a(10);
-    vector<int> vecIntNew{1,2,3,4,5};
+    vector<int> vecIntNew{1, 2, 3, 4, 5};
 
-    for_each(begin(vecIntNew), end(vecIntNew),[](int a) { cout << a << " ";});
+    for_each(begin(vecIntNew), end(vecIntNew), [](int a) { cout << a << " "; });
     cout << endl;
 
-
     cout << " \n----------------参数传递-----------------\n";
-    cout << "实参地址:\t"  << &n << endl;
+    cout << "实参地址:\t" << &n << endl;
     change_val(n);
     cout << "按值传递:\tn=" << n << endl;
     change_quote(m);
@@ -286,16 +279,15 @@ int main()
     cout << "指针传递:\tn=" << n << endl;
 
     cout << " \n----------------内联函数----------------\n";
-    double a,b;
+    double a, b;
     double c = 13.0;
     a = square(5.0);
     b = square(4.5 + 7.5);
-    cout << "a = " << a << ", b = " << b ;
+    cout << "a = " << a << ", b = " << b;
     cout << ", c = " << c << endl;
 
     cout << " \n----------------回调函数----------------\n";
-    CallPrintfText(PrintfText, (char * )"Hello World!\n");
-
+    CallPrintfText(PrintfText, (char *)"Hello World!\n");
 
     cout << " \n---------------- lambda ----------------\n";
     LambdaSample();
@@ -305,13 +297,13 @@ int main()
     // 这里是怎么给lambda形参入参的?
     // 相当与每个vecIntNumber的元素对lambda表达式入参
     // for_each里用的是逗号
-    for_each(begin(vecIntNumber), end(vecIntNumber), [](int i){
+    for_each(begin(vecIntNumber), end(vecIntNumber), [](int i) {
         std::cout << i << " ";
     });
     cout << endl;
 
     int total = 0;
-    for_each(begin(vecIntNumber), end(vecIntNumber), [&total](int i){
+    for_each(begin(vecIntNumber), end(vecIntNumber), [&total](int i) {
         total += i;
     });
     cout << total << endl;
@@ -324,18 +316,17 @@ int main()
     }
     cout << total << endl;
     */
-    
 
     cout << " \n--------------- nullptr ---------------\n";
     int *p = nullptr;
     int *q = NULL;
     bool equal = (p == q); // nullptr 和 NULL 都可以定义空指针
-    NullPtr(0); // c++98编译失败, 存在二义性
+    NullPtr(0);            // c++98编译失败, 存在二义性
     NullPtr(p);
 
     cout << " \n--------------- 变长参数 ---------------\n";
-    int sum  =  0;
-    va_sum(sum,1,2,3,4,5,6,7,8,9,END);
+    int sum = 0;
+    va_sum(sum, 1, 2, 3, 4, 5, 6, 7, 8, 9, END);
     cout << "va_sum:" << sum << endl;
 
     cout << " \n---------------const和函数---------------\n";

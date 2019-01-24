@@ -20,6 +20,10 @@
     * memset中的第一个参数一定要是一个已知的、已经被分配内存的地址，否则会出错。
      
  * strlen /strnlen / sizeof
+    * https://www.cnblogs.com/carekee/articles/1630789.html
+    * strlen 函数，求字符串开始到结束符的长度（字符串以\0结尾）, 运行时计算值，参数必须是char * 类型(当数组名作为参数，实际数组是退化成指针了)
+    * sizeof 运算符，求类型所占大小; 编译时计算值, 参数可以是数组、指针、类型、对象、函数等
+    * 
     * int strlen ( const char *str )
         * 返回字符串的实际长度，不含 '\0'
         * int strnlen ( const char *str, size_t maxlen )
@@ -111,10 +115,10 @@
  * #include <string>
  * ---- === --- === --- === --- === --- === --- === --- === --- === -- === --- ===
  
-    * str.find(str2, 7) // 在str中从指定位置从前向后查找子串,
-                        // 成功返回str2首个字符在str中的地址, 否则返回npos, rfind则从后往前找
+    * str.find(str2, 7)
+        * 在str中从指定位置从前向后查找子串, 成功返回str2首个字符在str中的地址, 否则返回npos, rfind则从后往前找
     * str.find_first_of(str2, 7) / str.find_first_not_of /  str.find_last_of / str.find_last_not_of
-                        // 在str中指定位置开始查找str2, 只要str中找到str2的任意字符, 就返回该字符位置
+        * 在str中指定位置开始查找str2, 只要str中找到str2的任意字符, 就返回该字符位置
  ***********************************************************
  */
 
@@ -629,7 +633,7 @@ void debugLog(const char * FileName, int Line, const char * msg, ...)
 }
 
 
-void string_stl()
+void cString()
 {
     printf(" \n---------------------- 字符数组初始化 ---------------------------\n");
     /* 
@@ -699,20 +703,20 @@ void string_stl()
     printf("----------------- strlen / sizeof ---------------------------\n");
     printf("----------------- =============== ---------------------------\n\n");
 
+    char str[20] = "0123456789";
+    cout << strlen(str) << endl;
+    cout << sizeof(str) << endl;
+
     char strlen_str[] = "aaaaaa";
     cout << "strlen: " << strlen(strlen_str) << endl;
     cout << "sizeof: " << sizeof(strlen_str) << endl;
     cout << "strnlen: " << strnlen(strlen_str, 3) << endl;
     cout << "MyStrlen: " << MyStrlen(strlen_str) << endl;
-    /* 
-     * https://www.cnblogs.com/carekee/articles/1630789.html
-     * strlen 函数，求字符串开始到结束符的长度（字符串以\0结尾）；运行时计算值，参数必须是char * 类型(当数组名作为参数，实际数组是退化成指针了)
-     * sizeof 运算符，求类型所占大小；编译时计算值, 参数可以是数组、指针、类型、对象、函数等
-    */
+
     char ch_str2[10] = "Wha\0t?";
     char *a = (char*)"abcdef";
-    char b[] = "abcdef";        // 字符数组，以字符串的形式给字符数组赋值,字符串末尾自动添加\0
-    char c[] = {'a','b','c','d','e','f'}; // 字符数组，以单个元素的形式赋值,没有\0,strlen返回的值不确定
+    char b[] = "abcdef";                       // 字符数组，以字符串的形式给字符数组赋值,字符串末尾自动添加\0
+    char c[] = {'a', 'b', 'c', 'd', 'e', 'f'}; // 字符数组，以单个元素的形式赋值,没有\0,strlen返回的值不确定
     printf("strlen(\"Wha\\0t?\"):%Zu\t sizeof(char str2[10]):%Zu\n", strlen(ch_str2), sizeof(ch_str2));
     printf("sizeof(字符指针):%Zu\t strlen(字符指针):%Zu\n", sizeof(a), strlen(a));
     printf("sizeof(字符数组):%Zu\t strlen(字符数组):%Zu\n", sizeof(b), strlen(b));
@@ -868,12 +872,69 @@ void string_stl()
         cout << i << " ";
     }
     cout << endl;
-
-    printf("\n-------------------------- StringTrim ---------------------------\n");
-    string strTest = " L0000504cpp ";
-    cout << StringTrim(strTest) << endl;
+}
 
 
+
+/*
+ * @brief	从行中查找key("="号左边)对应的value("="号右边)值; 非限定'='符,也可以是":"
+ * @param	strOrig			待分割的字符串
+ * @param	strKey			待查找的key
+ * @param	strSplit		截取符(从key开始出现的第一个strSplit)
+ * @return	strRetValue		查找成功返回value,查找失败返回空字符串;
+							若从key到结束都没找到str_split,则返回key开始到字符串结束
+ */
+string GetMsgValue(string strOrig, string strKey, string strSplit = ",")
+{
+	int iStrOrigLen;
+	int iStrKeyLen;
+	size_t uiPosKeyBegin;
+	size_t uiPosKeyEnd;
+	size_t uiPosStrSplit;
+	string strRetValue = "";
+
+	iStrOrigLen = strOrig.length();
+	iStrKeyLen = strKey.length();
+	uiPosKeyBegin = strOrig.find(strKey);
+
+	if (uiPosKeyBegin != string::npos)
+	{
+		// 从key的位置开始,第一次出现 str_split 的位置
+		uiPosStrSplit =  strOrig.substr(uiPosKeyBegin).find(strSplit);
+		if (uiPosStrSplit != string::npos)
+		{
+			uiPosKeyEnd = uiPosKeyBegin + uiPosStrSplit;
+		}
+		else
+		{
+			uiPosKeyEnd = iStrOrigLen;
+		}
+		int pos_begin = uiPosKeyBegin + iStrKeyLen + 1; // +1 跳过'='字符
+		int value_len = uiPosKeyEnd - pos_begin;
+		strRetValue = strOrig.substr(pos_begin, value_len);
+		return strRetValue;
+	}
+	return strRetValue;
+}
+
+void cppString()
+{
+    string strReq = "20180202-091346-640257 18226    99 Req: LBM:L0301042,MsgId=0000000100F464531E4D4B4A,Len=283,Buf=_ENDIAN=0&F_OP_USER=9999&F_OP_ROLE=2&F_SESSION=0123456789&F_OP_SITE=0050569e247d&F_OP_BRANCH=999&F_CHANNEL=0&USE_NODE_FUNC=106127&CUST_CODE=150165853";
+    string str = " L0000504cpp ";
+    string str2(3,'a'); // 相当于 str3 = "aaa";
+    char chs[20];
+    str.copy(chs, str.size());
+    cout << "copy: [" << chs << "] sizeof:" << sizeof(chs) << " strlen:" << strlen(chs) << endl;
+
+    cout << str.at(1) << endl; // 类似数组下标, 越界报错
+    cout << str[20] << endl; // 类似数组下标, 越界不报错
+
+    // size和length是一样的, size是为了和其他容器保持一致, 都是返回字符串长度;
+    // capacity(容量)返回该string对象已分配大小即string中不必增加内存即可存放的元素个数, max_size 返回string对象可容纳的最大字符串长度
+    printf("size: %Zu, length: %Zu\nmax_size: %Zu, capacity: %Zu\n", str.size(), str.length(), str.max_size(), str.capacity());
+
+    cout << "GetMsgValue: " << GetMsgValue(str, "LBM") << endl;
+    cout << "StringTrim: " << StringTrim(str2) << endl;
 
     printf("\n-------------------------- ========= ---------------------------\n");
     printf("-------------------------- std::npos ---------------------------\n");
@@ -910,7 +971,17 @@ int main( )
     char str_email[] = "fasdf2@aa.com";
     email_check(str_email);
 
-    string_stl();
+    printf("\n\n-------------------------- ================== ---------------------------\n");
+    printf("-------------------------- #inclde <string.h> ---------------------------\n");
+    printf("-------------------------- ================== ---------------------------\n\n");
+
+    cString();
+
+    printf("\n\n-------------------------- ================ ---------------------------\n");
+    printf("-------------------------- #inclde <string> ---------------------------\n");
+    printf("-------------------------- ================ ---------------------------\n\n");
+
+    cppString();
 
     // debugLog(__FILE__, __LINE__, "TEST");
 

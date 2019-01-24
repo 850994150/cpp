@@ -5,11 +5,53 @@
 #include <string.h>
 #include <time.h>
 #include <stdarg.h>
+#include <iostream>   // std::cout
+#include <functional> // std::ref
+#include <thread>     // std::thread
+#include <future>     // std::promise, std::future
 using namespace std;
 // typedef void (*pLineCallback)(int iCnt, const char *pcszContent);
-typedef void (pLineCallback)(string strContent);
+typedef void(pLineCallback)(string strContent);
 
 const int iCommitCnt = 100;
+
+void SwapNeighbourCharacters(string str_swap)
+{
+    int i = 0;
+    char tmp = {0};
+    // string str_swap = "HuangJinJie";
+    char *pData = (char *)str_swap.c_str();
+    char *pCur = (char *)str_swap.c_str();
+
+    // 1.
+    while (*pCur != '\0' && i != str_swap.length() - 1)
+    {
+        tmp = *pCur;
+        *(pData + i) = *(pCur + 1);
+        *(pData + i + 1) = tmp;
+        pCur = pData + i + 2;
+        i += 2;
+    }
+    std::string strResult;
+    strResult = pData;
+    cout << strResult << endl;
+
+    int len = str_swap.length();
+    char chTmp[len];
+    str_swap.copy(chTmp, len, 0);
+
+    // 2.
+    for (size_t i = 0; i < len - 1; i = i + 2)
+    {
+        tmp = chTmp[i];
+        chTmp[i] = chTmp[i + 1];
+        chTmp[i + 1] = tmp;
+    }
+    chTmp[len] = '\0';
+    strResult = chTmp;
+
+    cout << strResult << endl;
+}
 
 time_t GetCurrentTimeMs()
 {
@@ -17,7 +59,6 @@ time_t GetCurrentTimeMs()
     currTime = time(NULL);
     return currTime * 1000 + clock();
 }
-
 
 void ReadFile(const std::string &strFile, int iCommitCnt, pLineCallback pf)
 {
@@ -51,16 +92,15 @@ void test()
     int i = 5;
     int *p = &i;
     p++;
-    cout << *p <<endl;
+    cout << *p << endl;
 
     char a[10] = "abc", b[10] = "012", c[10] = "xyz";
-    strcpy( a+1,b+2);
-    puts( strcat( a,c+1));
-
+    strcpy(a + 1, b + 2);
+    puts(strcat(a, c + 1));
 
     char szTest[14] = "ä¸­å›½";
     // cout << "length" << szTest.length() << endl;
-    cout << "length: " << sizeof(szTest)/sizeof(char) << endl;
+    cout << "length: " << sizeof(szTest) / sizeof(char) << endl;
     cout << "length: " << strlen(szTest) << endl;
 
     time_t nowMs = GetCurrentTimeMs();
@@ -74,18 +114,17 @@ void test()
     char szLBM[32 + 1];
     memset((void *)szLBM, 0x00, sizeof(szLBM));
     string strLbm = "L1100125";
-    char * p_szLbm = (char*)strLbm.c_str();
+    char *p_szLbm = (char *)strLbm.c_str();
     cout << atol(p_szLbm) << endl;
 
     char szCurrTime[64] = {0};
     // char *F_RUNTIME = "123123";
     string strNowTime = "2018-12-20-14.11.42.333333";
-    char *F_RUNTIME = (char*)strNowTime.c_str();
+    char *F_RUNTIME = (char *)strNowTime.c_str();
     cout << F_RUNTIME + 11 << endl;
     strncpy(szCurrTime, F_RUNTIME + 11, sizeof(szCurrTime));
     szCurrTime[8] = '\0';
     cout << szCurrTime << endl;
-
 }
 
 void print(string line)
@@ -103,17 +142,17 @@ void SetMsgText(char *szMsgText, int p_iMsgCode, ...)
     cout << szErrorMsg << endl;
 }
 
-int main(int argc, char const *argv[])
+int test20190124()
 {
     char chstr[] = "abcde";
     cout << chstr << endl;
     cout << *chstr << endl;
-    cout << *chstr+1 << endl;
-    cout << *(chstr+1) << endl;
+    cout << *chstr + 1 << endl;
+    cout << *(chstr + 1) << endl;
 
     /*字符常量不可更改*/
     char *p = (char *)"qwertyuiop";
-    // p[3] = 'b'; // error 
+    // p[3] = 'b'; // error
     // *p = 'b'; // error
     // *p++; // success
     // p = "edf"; // success
@@ -123,12 +162,11 @@ int main(int argc, char const *argv[])
         printf("%c ", *p);
         p++;
     }
-    
+
     cout << p << endl;
 
-
     int iRetCode = 100199;
-    char szMsgText[] = "没有查询到客户[%lld]征信信息"; 
+    char szMsgText[] = "没有查询到客户[%lld]征信信息";
     cout << &szMsgText << endl;
     // SetMsgText(szMsgText, iRetCode, 170005578);
     SetMsgText(szMsgText, iRetCode, "打");
@@ -136,6 +174,47 @@ int main(int argc, char const *argv[])
     int iArray[4] = {1, 2, 3, 4};
     cout << sizeof(iArray) / sizeof(int) << endl;
 
+    int timems = 1548232725;
+    cout << timems % 100 << endl;
+
+    SwapNeighbourCharacters("HuangJinJie");
+
+    int array[] = {2, 4, 6, 8};
+    // 用引用会改变array里的值
+    for (auto &x : array)
+    {
+        x++;
+    }
+    for (auto x : array)
+    {
+        cout << x;
+    }
+    cout << endl;
+
     // ReadFile("./sql_0000.sql", iCommitCnt, print);
+    return 0;
+}
+
+void setValue(std::future<int> &fut, int value)
+{
+    std::promise<int> prom;                   // 生成一个 std::promise<int> 对象.
+    fut = prom.get_future();                  // 和 future 关联.
+    prom.set_value(value);                    // 设置共享状态的值, 此处和线程t保持同步.
+}
+
+void printValue(std::future<int> &fut)
+{
+    int x = fut.get();                   // 获取共享状态的值.
+    std::cout << "value: " << x << '\n'; // 打印 value: 10.
+}
+
+int main()
+{
+    std::future<int> fut;
+    std::thread set_thread(setValue, std::ref(fut), 10);  // 将 future 交给另外一个线程t.
+    std::thread print_thread(printValue, std::ref(fut));  // 将 future 交给另外一个线程t.
+
+    set_thread.join();
+    print_thread.join();
     return 0;
 }

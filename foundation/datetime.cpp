@@ -9,9 +9,37 @@
  */
 
 #include <time.h>
-#include <sys/timeb.h>
 #include <string>
+#include <chrono>
+#include <sys/timeb.h>
 using namespace std;
+
+/*
+ * @brief       毫秒字符串转成日期格式
+ * @param[in]   strMs			毫秒字符串
+ * @return      return			return_command
+ */
+string Ms2DateTime(string strMs)
+{
+	char now[64];
+	time_t tt;
+	struct tm *ttime;
+	tt = atol(strMs.substr(0, 10).c_str());
+	ttime = localtime(&tt);
+	strftime(now, sizeof(now), "%Y-%m-%d %H:%M:%S", ttime);
+	return now;
+}
+
+/*
+ * @brief       获取当前时间(毫秒)
+ * @return      __int64				time_t
+ */
+time_t GetCurrentTimeMs()
+{
+	auto time_now = chrono::system_clock::now();
+	auto duration_in_ms = chrono::duration_cast<chrono::milliseconds>(time_now.time_since_epoch());
+	return duration_in_ms.count();
+}
 
 /*
  * @brief			获取当前系统日期时间
@@ -26,6 +54,7 @@ typedef struct CurrentSysTime
 	char pTimeMs[4];	//毫秒
 }CurrentSysTime, *pCurrSysTime;
 CurrentSysTime m_stCurrSysTime;
+
 void SysNowTime(const char* pDataFormat, const char* pTimeFormat)
 {
     time_t timep;
