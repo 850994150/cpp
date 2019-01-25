@@ -5,7 +5,7 @@
  * Last modified: 2018-12-06 19:51:03
  * Filename     : thread.cpp
  * Description  :
-	* 线程创建 * 线程参数 * mutex锁 * 线程管理 * 异步同步
+	* 线程创建 * 线程参数 * mutex锁 * 线程管理
  ***********************************************************
  */
 #include <iostream>
@@ -13,37 +13,45 @@
 #include <vector>
 #include <algorithm> // for_each 头文件
 #include <chrono>
-// c++11 多线程相关头文件
+// c++11 支持多线程的相关头文件
 #include <thread>
-#include <mutex>
+#include <mutex> // lock、unlock、call_once
 #include <atomic>
 #include <future>         // std::promise, std::future
 #include <condition_variable>
 
 using namespace std;
 
-
 volatile int counter(0);
 mutex g_lock;
-const int NUM = 100;
+std::condition_variable iMsg;
+const int NUM = 10000;
 
-/*
- * @brief	: 互斥锁
- * @param	: 
- * @return	: 
- */
+
+// 线程锁
 void func_mutex(void)
 {
 	for(size_t i = 0; i < NUM; i++)
 	{
 		// mutex
-		// mutex是一个类对象, 其中包含成员函数lock、unlock
+		// mutex是一个类对象, 其中包含成员函数lock、unlock、try_lock
 		// 有lock一定要有unlock, 否则会导致程序异常
-		// 1. lock、unlock
+		// try_lock: 尝试锁住互斥量, 如果互斥量已经被别的线程锁住了也不阻塞
+		// 1. lock、unlock、try_lock
+		/*
 		g_lock.lock();
 		++counter;
 		// ... do_something
 		g_lock.unlock();
+		*/
+
+		/*
+		if (g_lock.try_lock()) // 适合定时执行一个job的场景, 一个线程执行就可以, 可以用更新时间戳辅助
+		{
+			++counter;
+			g_lock.unlock();
+		}
+		*/
 
 		// 2. lock_guard
 		// 是一个类模板，可替代lock、unlock，有了guard就不能出现lock、unlock了，它会自动加解锁
@@ -58,15 +66,19 @@ void func_mutex(void)
 		}
 		*/
 
-		// 3. try_lock?
-		/*
-		if (g_lock.try_lock())
-		{
-			++counter;
-			// ... do_something
-			g_lock.unlock();
-		}
-		*/
+		// 3. unique_lock
+		// lock_guard限制得太死了, 只有构造时加锁和析构时解锁, 我们要尽可能的减小锁定的区域，也就是锁的颗粒度。
+		// std:unique_lock模板类, 具有lock_guard的所有功能, 而且更加灵活地提供lock和unlock函数,能记录现在处于上锁还是没上锁状态,
+		// 因此可以在适当的时候加解锁, 在析构的时候，会根据锁的状态来决定是否要进行解锁（lock_guard就一定会解锁)
+		// unique_lock还支持同时锁定多个互斥量, 避免死锁问题
+		// 参数 adopt_lock 表示构造函数不加锁, 但是必需在unique_lock之前上锁, 否则结果会错误;
+		// 参数 defer_lock 表示不进行上锁的操作, unique_lock对象可以更灵活地控制加解锁
+
+		// g_lock.lock(); // while using adopt_lock
+		std::unique_lock<std::mutex> my_unique_lock(g_lock, std::defer_lock);
+		my_unique_lock.lock(); // while using defer_lock
+		++counter;
+		my_unique_lock.unlock();
 
 		// 死锁
 
@@ -86,11 +98,10 @@ void func_mutex(void)
 		   缺点:
 		   lock()解决死锁的痛点在于存在忘记unlock的危险，而lock_guard刚好可以自动unlock，可否两者优点都有呢？
 		3. lock() 和 lock_guard
-		   使用lock_guard的adopt_lock参数可以做到，让guard构造的时候不lock
+		   使用lock_guard的adopt_lock参数可以做到，让lock_guard构造的时候不lock, 但是必需在lock_guard之前加锁
 		   std:lock（mutex1,mutex2)
 		   lock_guard<mutex>lock_guard(mutex1, adopt_lock)
 		*/
-
 	}
 }
 
@@ -112,7 +123,7 @@ void ThreadMutex()
 	cout << "counter = " << counter << endl;
 }
 
-
+// 将线程转移到另一个线程, 线程只能转移, 不能被复制
 void ThreadMove(void)
 {
 	int a = 1;
@@ -164,12 +175,16 @@ class CThread
 	{
 		for (int i = 0; i < m_iCommand; i++)
 		{
-			m_mutexs.lock();
+			// m_mutexs.lock();
+			std::unique_lock<std::mutex> my_unique_lock(m_mutexs);
 
 			cout << "inMsgRecvQueue(): " << i << endl;
 			msgRecvQueue.push_back(i);
 
-			m_mutexs.unlock();
+			// m_mutexs.unlock();
+
+			my_unique_lock.unlock();
+			iMsg.notify_one();
 		}
 	}
 
@@ -177,7 +192,8 @@ class CThread
 	{
 		for (int i = 0; i < m_iCommand; i++)
 		{
-			m_mutexs.lock();
+			// m_mutexs.lock();
+			std::unique_lock<std::mutex> my_unique_lock(m_mutexs);
 			if (!msgRecvQueue.empty())
 			{
 				int command = msgRecvQueue.front();
@@ -186,23 +202,31 @@ class CThread
 			}
 			else
 			{
+				iMsg.wait(my_unique_lock);
 				cout << "outMsgRecvQueue(), msgRecvQueue is empty" << endl;
 				i--; // 为了保证全部输出, 如果queue没有数据要返回一次循环次数
 			}
-			m_mutexs.unlock();
+			my_unique_lock.unlock();
+
+			// m_mutexs.unlock();
 		}
 	}
 	list<int> msgRecvQueue; // 竞争资源
   private:
 	mutex m_mutexs;
-	const int m_iCommand = 10000;
+	const int m_iCommand = NUM;
 };
 
 void ThreadLock()
 {
 	CThread clThread;
-	thread myInThread = thread(&CThread::inMsgRecQueue, &clThread); // 生产
+
+	// 如果生产者产生得很慢, (比如消费者线程先执行)消费者的循环次数就会增加, 而且都在做无用功;
+	// condition_variable可解决(配合unique_lock), 当队列中没有数据时用wait()让线程进入休眠状态,不继续循环;
+	// notify_once()唤醒处于wait中的其中一个条件变量（可能当时有很多条件变量都处于wait状态）
 	thread myOutThread = thread(&CThread::outMsgRecvQueue, &clThread); // 消费
+	thread myInThread = thread(&CThread::inMsgRecQueue, &clThread); // 生产
+
 	myInThread.join();
 	myOutThread.join();
 }
@@ -305,11 +329,11 @@ void ThreadFuture()
 int main(int argc, char const *argv[])
 {
 	// ThreadCreate();
-	// ThreadLock();
+	ThreadLock();
 	// ThreadMutex();
+	// ThreadFuture();
 	// ThreadMove();
 	// ThreadSwap();
-	ThreadFuture();
 
 	return 0;
 }
