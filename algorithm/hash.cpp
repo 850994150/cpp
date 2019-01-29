@@ -14,6 +14,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <thread>
 #include <set>
 #include <vector>
 #include <algorithm>  // find
@@ -23,14 +24,16 @@ using namespace std;
 
 //[a,b]
 #define random(a, b) ((rand() % (b - a + 1)) + a)
-#define N 500000
-#define PER_FILE_SIZE 10000
+#define N 50000
+#define PER_FILE_SIZE 1000
 string url = "-0123456789abcdefghijklmnopqrstuvwxyz";
+
+typedef bool (*pCallBack)(string suffix, string store_path, unsigned long count_to_split, string line);
 
 // 1 产生N个URL
 void generateUrl(string file)
 {
-    ofstream out(file);
+    ofstream out(file, ios::ate);
     int n = 0;
     if (out.is_open())
     {
@@ -54,16 +57,50 @@ void generateUrl(string file)
 // 2.1 字符串哈希函数BKDRHash
 unsigned long bkdr_hash(const char *str)
 {
-    unsigned int seed = 131;
+    unsigned int seed = 131; // 也可以是 31、131、1313、13131、131313..
     unsigned int hash = 0;
     while (*str)
     {
         hash = hash * seed + (*str++);
     }
-    return (hash & 0x7FFFFFFF);
+    return (hash & 0x7FFFFFFF); // 对一个大的素数取余
 }
 
-bool split_big_file(string file_name, string suffix, string store_path, unsigned long count_to_split)
+void hash_big_file(string filepath, pCallBack pf, string suffix, string store_path, unsigned long count_to_split)
+{
+    ifstream infile(filepath);
+    string line;
+    infile.seekg(0, ios::end);
+    int last_position = 0; //记录当前已经处理掉的文件位置
+    int filesize = infile.tellg();
+    for(int n = last_position; n < filesize; n++)
+    {
+        infile.seekg(last_position, ios::beg);
+        getline(infile, line);
+        pf(suffix, store_path, count_to_split, line);
+        if (infile.tellg() > 0) // 这里必须加入这个判断，因为在频繁更新目标文件时，会导致该函数返回-1
+        {
+            n = last_position = infile.tellg();
+        }
+    }
+}
+
+bool split_big_file(string suffix, string store_path, unsigned long count_to_split, string line)
+{
+    string split_file_name = store_path;
+    split_file_name += to_string(bkdr_hash(line.c_str()) % count_to_split); // 哈希的值作为文件名
+    split_file_name += suffix;
+    ofstream out(split_file_name, ios::app);
+    if (!out.is_open())
+    {
+        return false;
+    }
+    out << line << endl; // 把记录存储到文件中
+    out.close();
+    return true;
+}
+
+bool split_big_file_old(string file_name, string suffix, string store_path, unsigned long count_to_split)
 {
     string line;
     if (!file_name.size())
@@ -77,7 +114,7 @@ bool split_big_file(string file_name, string suffix, string store_path, unsigned
         return false;
     }
 
-    while (getline(in, line))
+    while (getline(in, line)) // 这里肯定要花不少时间, 越到后面越久
     {
         string split_file_name = store_path;
         split_file_name += to_string(bkdr_hash(line.c_str()) % count_to_split); // 哈希的值作为文件名
@@ -94,6 +131,7 @@ bool split_big_file(string file_name, string suffix, string store_path, unsigned
     in.close();
     return true;
 }
+
 
 // 3.1 获取文件大小
 unsigned long get_file_size(string file_name)
@@ -189,8 +227,8 @@ bool write_same_url_to_file(string folder_a, string folder_b, string same_url_fi
 }
 
 int main(int argc, char const *argv[])
-{
-    unsigned long count_to_split = 10000;
+{ 
+    unsigned long count_to_split = 1000;
     string strFilePath_a ="./url_a.txt";
     string strFilePath_b ="./url_b.txt";
     string strSubUrlFileSuffix_a = "_a.txt";
@@ -199,17 +237,30 @@ int main(int argc, char const *argv[])
     string strSubUrlFilePath_b = "./url_b/";
     string strSameUrlFilePath = "./url_same.txt";
 
-    printf("===---===---=== 生成url_a ===---===---===\n");
-    generateUrl(strFilePath_a);
-    printf("===---===---=== 生成url_b ===---===---===\n");
-    generateUrl(strFilePath_b);
+    printf("===---===---=== generate url ===---===---===\n");
 
-    printf("===---===---=== 哈希 url_a 到文件 ===---===---===\n");
-    split_big_file(strFilePath_a, strSubUrlFileSuffix_a, strSubUrlFilePath_a, count_to_split);
-    printf("===---===---=== 哈希 url_b 到文件 ===---===---===\n");
-    split_big_file(strFilePath_b, strSubUrlFileSuffix_b, strSubUrlFilePath_b, count_to_split);
+    // generateUrl(strFilePath_a);
+    // generateUrl(strFilePath_b);
 
-    printf("===---===---=== 取每对小文件的交集 ===---===---===\n");
+    thread gen_a(generateUrl, strFilePath_a);
+    thread gen_b(generateUrl, strFilePath_b);
+    gen_a.join();
+    gen_b.join();
+
+    printf("===---===---=== hash url to file ===---===---===\n");
+
+    // hash_big_file(strFilePath_a, split_big_file, strSubUrlFileSuffix_a, strSubUrlFilePath_a, count_to_split);
+    // hash_big_file(strFilePath_b, split_big_file, strSubUrlFileSuffix_b, strSubUrlFilePath_b, count_to_split);
+
+    // split_big_file_old(strFilePath_a, strSubUrlFileSuffix_a, strSubUrlFilePath_a, count_to_split);
+    // split_big_file_old(strFilePath_b, strSubUrlFileSuffix_b, strSubUrlFilePath_b, count_to_split);
+
+    thread hash_a(hash_big_file, strFilePath_a, split_big_file, strSubUrlFileSuffix_a, strSubUrlFilePath_a, count_to_split);
+    thread hash_b(hash_big_file, strFilePath_b, split_big_file, strSubUrlFileSuffix_b, strSubUrlFilePath_b, count_to_split);
+    hash_a.join();
+    hash_b.join();
+
+    printf("===---===---=== find each file's same url ===---===---===\n");
     write_same_url_to_file(strSubUrlFilePath_a, strSubUrlFilePath_b, strSameUrlFilePath);
 
     return 0;

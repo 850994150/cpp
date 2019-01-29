@@ -115,8 +115,8 @@
  * #include <string>
  * ---- === --- === --- === --- === --- === --- === --- === --- === -- === --- ===
  
-    * str.find(str2, 7)
-        * 在str中从指定位置从前向后查找子串, 成功返回str2首个字符在str中的地址, 否则返回npos, rfind则从后往前找
+    * str.find(str2, "hello")
+        * 在str中从指定位置从前向后查找整个子串, 成功返回str2首个字符在str中的地址, 否则返回npos, rfind则从后往前找
     * str.find_first_of(str2, 7) / str.find_first_not_of /  str.find_last_of / str.find_last_not_of
         * 在str中指定位置开始查找str2, 只要str中找到str2的任意字符, 就返回该字符位置
  ***********************************************************

@@ -159,11 +159,9 @@ int fork4(int num = 4)
 
 int main( int argc, char **argv )
 {
-    // fork1();
+    fork1();
     // fork2(atoi(argv[1]));
-    fork3();
+    // fork3();
     // fork4();
     return 0;
 }
-
-

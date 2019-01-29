@@ -14,7 +14,8 @@
         * 捕获列表为空表示该lambda不使用**它所在函数中的任何局部变量**
         * 捕获参数列表形式：[]、[=]、[&]、[=,&x]、[this]
         * 匿名函数不支持默认参数、不支持可变参数、所有参数必须有参数名
-        * 
+    * 尾置返回类型
+        * 函数的返回值类型尾置，即放在函数的参数列表后面; 其基本形式为：在形参列表后面并以一个->符号开始。
     * 仿函数 functor
     * 值传递、引用传递、指针传递
         * 如果参数采用指针传递或引用传递，那么加上`const` 可以防止意外地改动该指针，起到保护作用 
@@ -265,6 +266,8 @@ int main()
     vector<int> vecInt = {1, 2, 3, 4, 5};
     // c++11初始化 int a(10);
     vector<int> vecIntNew{1, 2, 3, 4, 5};
+    vector<int> vecIntNew2(3);    // 相当于三个0
+    vector<int> vecIntNew3(3, 9); // 相当于三个9
 
     for_each(begin(vecIntNew), end(vecIntNew), [](int a) { cout << a << " "; });
     cout << endl;

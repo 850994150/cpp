@@ -16,7 +16,6 @@
 
 using namespace std;
 
-
 int main( int argc, char **argv )
 {
 
@@ -107,8 +106,6 @@ int main( int argc, char **argv )
     printf( "------------- 删除 -------------\n" );
     printf( "--------------------------------\n" );
     mapStudent.clear();
-
-
 
     return 0;
 }

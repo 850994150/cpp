@@ -14,6 +14,7 @@ using namespace std;
 typedef void(pLineCallback)(string strContent);
 
 const int iCommitCnt = 100;
+#define MAX 40000
 
 void SwapNeighbourCharacters(string str_swap)
 {
@@ -106,7 +107,7 @@ void test()
     time_t nowMs = GetCurrentTimeMs();
     cout << "nowMs: " << nowMs << endl;
 
-    /* c++11  */
+    /* c++11 */
     auto time_now = chrono::system_clock::now();
     auto duration_in_ms = chrono::duration_cast<chrono::milliseconds>(time_now.time_since_epoch());
     cout << "chrono: " << duration_in_ms.count() << endl;
@@ -197,9 +198,9 @@ int test20190124()
 
 void setValue(std::future<int> &fut, int value)
 {
-    std::promise<int> prom;                   // 生成一个 std::promise<int> 对象.
-    fut = prom.get_future();                  // 和 future 关联.
-    prom.set_value(value);                    // 设置共享状态的值, 此处和线程t保持同步.
+    std::promise<int> prom;  // 生成一个 std::promise<int> 对象.
+    fut = prom.get_future(); // 和 future 关联.
+    prom.set_value(value);   // 设置共享状态的值, 此处和线程t保持同步.
 }
 
 void printValue(std::future<int> &fut)
@@ -208,13 +209,80 @@ void printValue(std::future<int> &fut)
     std::cout << "value: " << x << '\n'; // 打印 value: 10.
 }
 
-int main()
+int test_future()
 {
     std::future<int> fut;
-    std::thread set_thread(setValue, std::ref(fut), 10);  // 将 future 交给另外一个线程t.
-    std::thread print_thread(printValue, std::ref(fut));  // 将 future 交给另外一个线程t.
+    std::thread set_thread(setValue, std::ref(fut), 10); // 将 future 交给另外一个线程t.
+    std::thread print_thread(printValue, std::ref(fut)); // 将 future 交给另外一个线程t.
 
     set_thread.join();
     print_thread.join();
     return 0;
 }
+
+struct node
+{
+    char name[30];
+} que[MAX];
+/*
+BKDRHash函数的解析链接：
+http://blog.csdn.net/djinglan/article/details/8812934
+*/
+unsigned int BKDRHash(char *str)
+{
+    unsigned int seed = 131313; //也可以乘以31、131、1313、13131、131313..
+    unsigned int hash = 0;
+    while (*str)
+    {
+        hash = hash * seed + (*str++);
+    }
+
+    return hash % 32767; //最好对一个大的素数取余
+}
+int test_bkdr()
+{
+    int i = 0, n, t, j;
+    char a[MAX][30];
+    char temp[300];
+    memset(a, 0, sizeof(a));
+
+    cin >> n;
+    for (i = 0; i < n; i++)
+    {
+        cin >> que[i].name;
+        strcpy(a[BKDRHash(que[i].name)], que[i].name);
+    }
+    cout << "请输入要查找的字符串:";
+    while (~scanf("%s", temp))
+    {
+        if (strcmp(a[BKDRHash(temp)], temp) == 0)
+            cout << "yes" << endl;
+        else
+        {
+            cout << "no" << endl;
+            strcpy(a[BKDRHash(temp)], temp);
+            strcpy(que[i++].name, temp);
+        }
+    }
+    for (j = 0; j <= i; j++)
+    {
+        cout << que[j].name << endl; //含有的所有字符串
+    }
+    return 0;
+}
+
+auto testsum(int a, int b) -> decltype(a)
+{
+    int sum ;
+    sum = a + b;
+    return sum;
+}
+
+int main(int argc, char const *argv[])
+{
+    // test_bkdr();
+    vector<string> strvecMsg{"111", "222", "333", "444", "555", "666", "777", "888", "999"};
+    cout << strvecMsg[1];
+    return 0;
+}
+
