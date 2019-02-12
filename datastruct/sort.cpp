@@ -465,6 +465,7 @@ int main()
     cout<<endl;
 
     cout<<"\n分配排序:\n";
+    cout<<"\n桶排序:\n";
     cout<<"\n基数排序:\n";
 
     cout<<"\n其他:\n";

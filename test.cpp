@@ -281,8 +281,38 @@ auto testsum(int a, int b) -> decltype(a)
 int main(int argc, char const *argv[])
 {
     // test_bkdr();
-    vector<string> strvecMsg{"111", "222", "333", "444", "555", "666", "777", "888", "999"};
-    cout << strvecMsg[1];
+    int ii = 010;
+    cout << ii + 1 << endl;
+
+    int a = 1, b = 2, c = 2, t;
+    while (a < b < c)
+    {
+        t = a;
+        a = b;
+        b = t;
+        c--;
+    }
+    printf("%d,%d,%d\n", a, b, c); 
+    int n[3][3], i, j;
+    for (i = 0; i < 3; i++)
+        for (j = 0; j < 3; j++)
+            n[i][j] = i + j;
+
+    for (i = 0; i < 2; i++)
+        for (j = 0; j < 2; j++)
+            n[i + 1][j + 1] += n[i][j];
+
+    printf("%d\n", n[i][j]);
+
+    if (strcmp("20160301", "20090624") == 0)
+    {
+        cout << "same" << endl;
+    }
+    else
+    {
+        cout << "diff" << endl;
+    }
+    
     return 0;
 }
 

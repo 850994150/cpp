@@ -119,9 +119,16 @@ void Invoke(char * s);
 
 int main()
 {
-    int a[5] = {1,2,3,4,5};
+    int a[5] = {1, 2, 3, 4, 5};
     int *ptr = a;
-    cout << "a数组的地址：" << ptr << endl;
+    cout << "address of a: " << ptr << "\naddress of &a: " << &a << endl;
+    int *ptr2 = (int *)(&a + 1);
+    printf("%d", *(ptr-1));
+    /*
+    a 和 &a 是同一个地址, 但是其代表的含义不同;
+    *(a + 1)代表从a数组首地址跳跃一个int的长度; *(&a + 1)表示从a数组首地址跳跃一个数组的长度;
+    也就是指向a数组最后一个元素的下一个位置，因此*(ptr - 1)表示a数组的最后一个元素。
+    */
 
     // 这个循环把数组里每个值加一
     // for (int i = 0; i < 5; ++i) {

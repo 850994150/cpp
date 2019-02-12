@@ -636,7 +636,17 @@ void debugLog(const char * FileName, int Line, const char * msg, ...)
 void cString()
 {
     printf(" \n---------------------- 字符数组初始化 ---------------------------\n");
-    /* 
+    char str_ini1[] = "helloworld"; // 输出为helloworld
+    char str_ini2[2] = {"a"}; // 输出为a
+    // char str_ini3[2] = {"ab"}; // error, const char[3]类型不能用于初始化char[2]类型的实体, 因为字符串末尾会有一个'\0'结束符
+    // char str_ini4[2] = {"a", "b"}; // error, 初始值设定项太对, 因为是一维数组, 只能赋值一个字符串, 字符串末尾会默认加上'\0'结束符  
+
+    // char str_ini5[2][3] = {{'a', 'b'}, {'e', 'd'}, {'e', 'f'}}; // error, 维度错误
+    char str_ini6[2] = {'a', 'b'}; // 不能直接输出str_ini6, 因为字符串没有结尾, 这种方式赋值编译器不会加上'\0'
+    char str_ini7[2] = {'a', '\0'}; // 输出为a
+    // char str_ini8[] = {"a", "b"}; // error, 初始项设定太多, 这是一个以为数组, 只能放下一个字符串
+
+
     char str3[10] = {0};     // 元素均为'\0'
     char str4[10] = {'0'};   // 第一个元素为'0'，其他元素均为'\0'
     char str5[10] = {0,};    // 元素均为'\0'
@@ -644,8 +654,13 @@ void cString()
     printf("str3[0]:%c,%c",str3[0],str3[1]);
     printf("str4[0]:%c,%c",str4[0],str4[1]);
     printf("str5[0]:%c,%c",str5[0],str5[1]);
-    printf("str6[0]:%c,%c",str6[0],str6[1]);
-    */
+    printf("str6[0]:%c,%c\n",str6[0],str6[1]);
+
+    char octal[] = "123\0456"; // \0为字符串结束符, 但是\ddd中ddd是小于8, 则\ddd是一个8进制数
+    cout << "octal & char: " << octal << endl;
+    int octal_int = 010; // 0开头的是8进制 用%d(十进制输出)输出是8; 用%o(八进制输出):10
+    printf("octal_int: %d", octal_int++);
+
     printf(" \n---------------------- char* 加减 ---------------------------\n");
     // 不就是指针加减嘛
 
@@ -702,6 +717,7 @@ void cString()
     printf("\n----------------- =============== ---------------------------\n");
     printf("----------------- strlen / sizeof ---------------------------\n");
     printf("----------------- =============== ---------------------------\n\n");
+    // strlen计算直到第一个\0的长度, sizeof 计算的是占用内存的大小
 
     char str[20] = "0123456789";
     cout << strlen(str) << endl;
@@ -714,13 +730,15 @@ void cString()
     cout << "MyStrlen: " << MyStrlen(strlen_str) << endl;
 
     char ch_str2[10] = "Wha\0t?";
-    char *a = (char*)"abcdef";
-    char b[] = "abcdef";                       // 字符数组，以字符串的形式给字符数组赋值,字符串末尾自动添加\0
-    char c[] = {'a', 'b', 'c', 'd', 'e', 'f'}; // 字符数组，以单个元素的形式赋值,没有\0,strlen返回的值不确定
     printf("strlen(\"Wha\\0t?\"):%Zu\t sizeof(char str2[10]):%Zu\n", strlen(ch_str2), sizeof(ch_str2));
-    printf("sizeof(字符指针):%Zu\t strlen(字符指针):%Zu\n", sizeof(a), strlen(a));
-    printf("sizeof(字符数组):%Zu\t strlen(字符数组):%Zu\n", sizeof(b), strlen(b));
-    printf("sizeof(字符数组):%Zu\t strlen(字符数组):%Zu\n", sizeof(c), strlen(c));
+
+    char *a = (char *)"abcdef";                // 字符指针, sizeof大小为8(本机64位)
+    char b[] = "abcdef";                       // 字符数组，以字符串的形式给字符数组赋值, 字符串末尾自动添加\0; 所以sizeof为 6 + 1, strlen为6
+    char c[] = {'a', 'b', 'c', 'd', 'e', 'f'}; // 字符数组，以单个元素的形式赋值,没有\0, strlen会一直往后直到找到一个\0为止, 大小不确定
+
+    printf("\nchar *a = (char*)\"abcdef\";\tsizeof:%Zu\t strlen:%Zu\n", sizeof(a), strlen(a));
+    printf("char b[] = \"abcdef\";\tsizeof:%Zu\t strlen:%Zu\n", sizeof(b), strlen(b));
+    printf("char c[] = {'a', 'b', 'c', 'd', 'e', 'f'};\tsizeof:%Zu\t strlen:%Zu\n\n", sizeof(c), strlen(c));
 
 
 

@@ -145,6 +145,16 @@ void sizeofStruct()
     cout << "sizeof(test6): " << sizeof(test6) << endl;
 }
 
+// 对于union来说大小为成员定义里面最大的那个
+void sizeofUnion()
+{
+    union uu {
+        char ul[5];
+        int u2[2];
+    } ua;
+    cout << "sizeof(union) = " << sizeof(uu) << endl;
+}
+
 /*
 ===---=== sizeof struct ===---===
 sizeof(test1): 3
@@ -384,6 +394,9 @@ int main(int argc, char const *argv[])
 
     cout << "\n===---=== sizeof struct ===---===" << endl;
     sizeofStruct();
+
+    cout << "\n===---=== sizeof union ===---===" << endl;
+    sizeofUnion();
 
     cout << "\n===---=== sizeof char*/char [] ===---===" << endl;
     sizeofCharArray();

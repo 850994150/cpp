@@ -5,7 +5,7 @@
  * Last modified: 2018-12-06 19:51:03
  * Filename     : thread.cpp
  * Description  :
-	* 线程创建 * 线程参数 * mutex锁 * 线程管理
+	* 线程创建 * 线程参数 * mutex锁 * 线程管理 * 并发设计模式
  ***********************************************************
  */
 #include <iostream>
@@ -402,8 +402,6 @@ void ThreadAutomic()
 	}
 	cout << "g_atomic_counter = " << g_atomic_counter << endl;
 }
-
-
 
 int main(int argc, char const *argv[])
 {
