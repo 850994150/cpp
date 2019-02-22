@@ -93,21 +93,20 @@ void recv_thread()
 {
     // 每1秒轮询查看任务执行进度
     std::chrono::seconds tSpan(1);
-    // for (auto &&result : results) //通过future.get()获取返回值
     while(true)
     {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::this_thread::sleep_for(tSpan);
         for (auto result = results.begin(); result != results.end();)
         {
             if (result->wait_for(tSpan) != std::future_status::ready)
             {
-                std::cout << "sub thread result is not ready..." << std::endl;
+                std::cout << "【sub  thread】 result is not ready..." << std::endl;
                 continue;
             }
             if (result->wait_for(tSpan) == std::future_status::ready)
             {
                 // 获取执行结果
-                std::cout << "【sub thread】tasks is done, result: " << result->get() << std::endl;
+                std::cout << "【sub  thread】tasks is done, result: " << result->get() << std::endl;
                 result = results.erase(result);
             }
         }
@@ -116,17 +115,18 @@ void recv_thread()
 
 /*
  * @brief	: 线程异步接收消息
- *            主线程持续产生消息, 并通过线程池发消息, 开一个线程异步检测消息结果
+ *            主线程持续产生消息, 并往线程池发消息, 开一个线程异步检测消息结果
  *            只要在整个程序结束之前把线程join回来就行了
- * @return	: 
+ * @return	:
  */
 int async_send_msg()
 {
     cout << thread::hardware_concurrency() << endl;
     ThreadPool pool(4);
-    thread thread_recv(recv_thread);
+    // TODO
+    thread thread_recv(recv_thread); // 子线程监测future结果
 
-    vector<string > ivecMsg{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0"};
+    vector<string> ivecMsg{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0"};
     for (int i = 0; i < ivecMsg.size(); ++i)
     {
         results.emplace_back(
@@ -135,13 +135,14 @@ int async_send_msg()
                 return ivecMsg[i];
             }));
     }
+
     while (true)
     {
         std::this_thread::sleep_for(std::chrono::seconds(1));
         cout << "【main thread】dosomething..." << endl;
     }
-    // ...
 
+    // at the end of program
     thread_recv.join();
     return 0;
 }

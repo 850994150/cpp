@@ -18,10 +18,9 @@
  ***********************************************************
  */
 
-
-
 #include <iostream>
 using namespace std;
+#define MAXNAME 10
 
 template<typename T1,typename T2>
 class myClass
@@ -59,11 +58,8 @@ void myClass<T1,T2>::show()
 template<class T>
 T Max(T a,T b)
 {
-    return a>b?a:b;
+    return a > b ? a : b;
 }
-
-
-#define MAXNAME 10
 
 struct job
 {
@@ -93,6 +89,9 @@ template<> void swap<job>(job &a, job &b)
 
 int main()
 {
+    /* 函数模板 */
+    /* 类模板 */
+
     // 不用模板时: myClass class1(3, 5);
     myClass<int,int> class1(3,5);
     class1.show();

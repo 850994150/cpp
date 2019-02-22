@@ -13,10 +13,11 @@
                 "test.log",
                 "100"
             ],
-            "stopAtEntry": false,
-            "cwd": "/mnt/f/workspaces/c++/debug",
+            "stopAtEntry": true, // 设为true时程序将暂停在程序入口处
+            "cwd": "/mnt/f/workspaces/c++/debug", // 调试程序时的工作目录
             "environment": [],
-            "externalConsole": true,
+            "externalConsole": true, // 调试时是否显示控制台窗口，一般设置为true显示控制台
+            // "internalConsoleOptions":"openOnSessionStart",  // 如果不设为neverOpen，调试时会跳到“调试控制台”选项卡
             "sourceFileMap": {
                 "/mnt/f/workspaces/c++/":"${workspaceFolder}"
             },

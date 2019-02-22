@@ -5,32 +5,32 @@
  * Last modified: 2019-01-14 17:44:41
  * Filename     : string_test.cpp
  * Description  :
-  
+
  * ---- === --- === --- === --- === --- === --- === --- === --- === -- === --- ===
  * 【字符处理函数】
  * https://blog.csdn.net/frecon/article/details/79605941
  * #include <string.h>
  * ---- === --- === --- === --- === --- === --- === --- === --- === -- === --- ===
-  
+
  * memset  void *memset(void *s, int ch, size_t n);
     * 用来初始化内存, **逐字节拷贝**, 对于单字节数据类型（char）可以初始化为任意支持的值，都没有问题，
     * 但是对于非多字节数据类型只能初始化为0，而不能初始化成别的初值，
     * 因为对所有字节按任意顺序赋值0的结果都是0，而如果初始化为其他的值，就会一个字节一个字节的进行赋值，从而出现奇怪的结果
     * memset中的第三个参数一定要使用sizeof操作符，因为每个系统下对类型长度的定义可能不一样。
     * memset中的第一个参数一定要是一个已知的、已经被分配内存的地址，否则会出错。
-     
+
  * strlen /strnlen / sizeof
     * https://www.cnblogs.com/carekee/articles/1630789.html
     * strlen 函数，求字符串开始到结束符的长度（字符串以\0结尾）, 运行时计算值，参数必须是char * 类型(当数组名作为参数，实际数组是退化成指针了)
     * sizeof 运算符，求类型所占大小; 编译时计算值, 参数可以是数组、指针、类型、对象、函数等
-    * 
+    *
     * int strlen ( const char *str )
         * 返回字符串的实际长度，不含 '\0'
         * int strnlen ( const char *str, size_t maxlen )
         * 区别: 能防止某些字符串不以'\0'结束而引发的错误
     * sizeof
         * 计算字符数组长度时, 会把\0计算进去
-     
+
  * 【拷贝】
     * strcpy / strncpy / memcpy / memccpy / memmove / strdup / strndup
     * char *strcpy( char *dest, const char *src )
@@ -41,7 +41,7 @@
             * 1. dst是否足够空间容纳src
             * 2. dst末尾是否补\0
             * 3. 一般定义 n = strlen(dst) = strlen(src) + 1
-            * 4. strncpy不负责在目标串末尾补充'\0' 字符 
+            * 4. strncpy不负责在目标串末尾补充'\0' 字符
             * 5. 当strlen(dst)远大于n时效率低下, 不如用snprintf
         * strlen(dst) = n <= strlen(src), n小于源串长度时, 只拷贝到第n个, 如果是等式, 此时dst已经没有地方放\0了
         * strlen(dst) = n > strlen(src), n大于源串长度时，遇到’\0’结束; dst剩余字节都用’\0’填充
@@ -51,7 +51,7 @@
     *  memcpy / memccpy / memmove
         * 都是拷贝一定长度的内存内容
         * 当内存发生重叠时, memcpy不能保证拷贝的正确性, memmove可以保证
-         
+
     * strdup / strndup /strdupa / strndupa
         * strdup 可以把src复制给没有初始化的dst, 而strcpy的dst一定是已分配内存的
         * strdup 不是标准C函数(不在stdio.h)里
@@ -65,7 +65,7 @@
     * int strcmp( char *str1, char *str2 )
         * 相等返回0, str1大于str2返回1, str1小于str2返回-1
         * linux下的strcasecmp 区别是: 不区分大小写 (windows下为stricmp)
-         
+
     * int strncmp( char *str1, char *str2, size_t n )
         * 区别: 只比较前n个
  * 【定位】
@@ -84,7 +84,7 @@
  * 【变化】
     * strfry (fry:炒)
         * 随机打乱字符串, 因为会改变原串, 所以用char* src = "xx" 会报错
-        
+
     * strcat / strncat
         * char *strcat(char *dest, const char *src)
             * 将参数src字符拷贝到参数dest所指的字符串尾, 遇到src的\0则停止拷贝, 第一个参数dest要有足够的空间容纳src和末尾的\0; strlen(src)+1
@@ -92,7 +92,7 @@
         * char *strncat(char *dest, const char *src, size_t n);
             * 区别: 只拷贝前n个
 
-    * strtok (token: 标记) / strtok_r / strsep (seperate: 分离) 
+    * strtok (token: 标记) / strtok_r / strsep (seperate: 分离)
         * char* strtok(char* str, const char* delimiters);
             * 维护一个静态变量(【线程不安全】的原因)来保存第一次传入的str; 后续如果发现传入str是NULL, 就知道要继续处理上次的字符串;
             * 如果传入的str不为NULL，则知道要处理一个新的字符串, 所以静态变量始终保存着未处理完的字符串的剩下部分
@@ -100,10 +100,10 @@
             * 因为第一次分割后str被破坏了, 变成了分割后的第一个字符串, 剩余的字符串保存到了static变量中(所以多线程不安全)
             * 每次调用成功返回指向被分割出的片段的指针
             * https://blog.csdn.net/hustfoxy/article/details/23473805
-            
+
         * char *strtok_r(char *str, const char *delim, char **saveptr);
             * 知道了不安全的原因, 只要不使用静态变量就行了; 增加一个参数来指向分割后的字符串, 不同线程使用不同的saveptr指针即可
-    
+
         * char *strsep(char **stringp, const char *delim);
             * strsep会挨个替换delim的字符，且几个分割字符连续的话(多个分隔符连续算n个\0)他会挨个返回空字符串
             * 第一个参数设为二级指针(所以不能是char str[] = "xx",
@@ -114,7 +114,7 @@
  * string 类方法
  * #include <string>
  * ---- === --- === --- === --- === --- === --- === --- === --- === -- === --- ===
- 
+
     * str.find(str2, "hello")
         * 在str中从指定位置从前向后查找整个子串, 成功返回str2首个字符在str中的地址, 否则返回npos, rfind则从后往前找
     * str.find_first_of(str2, 7) / str.find_first_not_of /  str.find_last_of / str.find_last_not_of
@@ -190,7 +190,7 @@ void MyStrncpy(char *dest, const char *src, int len)
     {
         *(cp + len - 1) = '\0';
     }
-    
+
 }
 
 // 设置内存位置v开始的n个元素值为c
@@ -203,10 +203,18 @@ void *MyMemset(void *v, int c, size_t n)
     return v;
 }
 
+void *MyMemcpy1(void *dest, const void *src, size_t n)
+{
+    char* dp = (char*) dest;
+    const char* sp = (const char*) src;
+    while((*dp++ = *sp++) && *dp && *sp && --n) ;
+    return dest;
+}
+
 /*
  * memcpy功能是将内存块的内容复制到另一个内存块, (dst和src内存区域不能重叠), 入参就是内存开始的地址和要复制的长度
  * 相对于strncpy, memcpy 可以拷贝任意类型, 按字节拷贝不会遇到\0而停止
- * Q: 如果把"001"字符串进行memcpy到一个int变量, 那么该变量是否就是001呢? 
+ * Q: 如果把"001"字符串进行memcpy到一个int变量, 那么该变量是否就是001呢?
  * A: 不是, 这里是对内存进行拷贝, 字符'0'拷贝到 unsigned long 后也并非数字0了, 而是0的ascii码
  * 1. 栈空间的生长方向是高地址向低地址生长的
  */
@@ -251,7 +259,7 @@ void *MemcpyOptimised(void *dest, const void *src, size_t n)
 {
     assert(src != NULL);
 
-    int wordnum = n / 4; // 
+    int wordnum = n / 4;
     int slice = n % 4;
 
     // 转化为整型, 这样一次性就可以拷贝四个字节(32位机器)
@@ -286,7 +294,7 @@ void *MyMemmove(void *dst, const void *src, size_t n)
         {
             *(pdst--) = *(psrc--);
         }
-        
+
     }
     return pdst;
 }
@@ -326,6 +334,8 @@ int MyStrncmp(const char *str1, const char *str2, size_t n)
     // 用--n是因为str的下标是到n-1比较到str[5]而不是str[6]
     while ((*str1++ == *str2++) && *str1 && *str2 && --n)
         ;
+    // 由于循环退出时指针已指向str1和str2不相同的那个字符了, 所以要先--
+    // 相等则返回0, 如果 str1 > str2 则返回1, 否则返回 -1
     return *(--str1) == *(--str2) ? 0 : (*(--str1) > *(--str2) ? 1 : -1);
 }
 
@@ -418,9 +428,9 @@ char* MyStrstr2(char* str1, const char* str2)
 
     assert(str1 != NULL);
     assert(str2 != NULL);
-    
+
     if (*str2 == '\0') return str1;
-    
+
     while(cur)
     {
         s1 = cur;
@@ -477,13 +487,13 @@ char* MyStrtok(char* str, const char* delimeter)
     {
         strStatic  = str;
     }
-    
+
     if (*strStatic == '\0')
     {
         return NULL;
     }
     pRetStr = strStatic;
-    
+
     while(*strStatic != '\0')
     {
         for(pDelimeter = delimeter; *pDelimeter != '\0'; pDelimeter++)
@@ -500,7 +510,7 @@ char* MyStrtok(char* str, const char* delimeter)
             }
         }
         strStatic++;
-        
+
         if (bFind)
         {
             break;
@@ -517,7 +527,7 @@ char* MyStrtok(char* str, const char* delimeter)
 /*
  * @brief	: 去除string首尾空格
  * @param	: 原字符串
- * @return	: 去除空格后字符串 
+ * @return	: 去除空格后字符串
  */
 string& StringTrim( string &str)
 {
@@ -639,7 +649,7 @@ void cString()
     char str_ini1[] = "helloworld"; // 输出为helloworld
     char str_ini2[2] = {"a"}; // 输出为a
     // char str_ini3[2] = {"ab"}; // error, const char[3]类型不能用于初始化char[2]类型的实体, 因为字符串末尾会有一个'\0'结束符
-    // char str_ini4[2] = {"a", "b"}; // error, 初始值设定项太对, 因为是一维数组, 只能赋值一个字符串, 字符串末尾会默认加上'\0'结束符  
+    // char str_ini4[2] = {"a", "b"}; // error, 初始值设定项太对, 因为是一维数组, 只能赋值一个字符串, 字符串末尾会默认加上'\0'结束符
 
     // char str_ini5[2][3] = {{'a', 'b'}, {'e', 'd'}, {'e', 'f'}}; // error, 维度错误
     char str_ini6[2] = {'a', 'b'}; // 不能直接输出str_ini6, 因为字符串没有结尾, 这种方式赋值编译器不会加上'\0'
@@ -773,7 +783,8 @@ void cString()
 
     memcpy(&dst, src, len);
     cout << "memcpy:\n\tsrc: " << src << "\t dst: " << dst << endl;
-    MyMemcpy(&dst, src, len);
+    MyMemcpy1(&dst, src, len);
+    // MyMemcpy(&dst, src, len);
     cout << "MyMemcpy:\n\tsrc: " << src << "\t dst: " << dst << endl;
     MemcpyOptimised(&dst, src, len);
     cout << "MemcpyOptimised:\n\tsrc: " << src << "\t dst: " << dst << endl;
@@ -804,8 +815,8 @@ void cString()
     // char sprintf_str[10] = {0};
     // int sprintf_res  = sprintf(sprintf_str, "I'm %d years old!",10);
     // 返回实际写入的字符串长度，不会进行越界判断，会直接对之后的内存进行覆盖
-    // printf("sprintf_str:%s\t sprintf_res:%d\n", sprintf_str, sprintf_res); 
-    
+    // printf("sprintf_str:%s\t sprintf_res:%d\n", sprintf_str, sprintf_res);
+
     char snprintf_str[10] = {0};
     // int snprintf_res = snprintf(snprintf_str, sizeof(snprintf_str), "I'm %d years old!",10);
     // 相比snprintf多个第二个缓存的参数，返回欲写入的长度, 但是只拷贝了n-1个, 就在末尾自动加上'\0'
@@ -967,7 +978,7 @@ void cppString()
     {
         cout << "not found" << endl;
     }
-    /* 正确写法: 
+    /* 正确写法:
      * find 函数找不到指定值的时候，会返回string::npos,表示字符串的结束
      * npos也表示sizt_t的最大值
     if (str.find("xxx") == string::npos)

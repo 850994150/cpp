@@ -3,6 +3,7 @@
 #include <vector>
 #include <assert.h>
 #include <string.h>
+#include <string>
 #include <time.h>
 #include <stdarg.h>
 #include <iostream>   // std::cout
@@ -15,6 +16,84 @@ typedef void(pLineCallback)(string strContent);
 
 const int iCommitCnt = 100;
 #define MAX 40000
+
+typedef struct tagDBFHead
+{
+	char			Mark;
+	unsigned char	Year;
+	unsigned char	Month;
+	unsigned char	Day;
+    // 4 + 4 = 8
+	long			RecCount;
+    // 8
+	unsigned short	DataOffset;
+	unsigned short	RecSize;
+    // 4 + 4 = 8
+	char 			Reserved[20];
+    // 8 + 8 + 4 + 4 = 24
+} DBFHEAD, *LPDBFHEAD;
+// sizeof(DBFHEAD) = 40
+
+typedef struct stDBFHead
+{
+    char szMark[1];          // 版本信息
+    char szYear[1];
+    char szMonth[1];
+    char szDay[1];
+    char szRecCount[4];    // 4字节保存记录数
+    char szDataOffset[2];  // 2字节保存文件头字节数
+    char szRecSize[2];     // 2字节保存每行数据的长度
+    char Reserved[20];
+} stDbfHead;
+
+
+string WString2String(const std::wstring& ws)
+{
+	std::string strLocale = setlocale(LC_ALL, "");
+	const wchar_t* wchSrc = ws.c_str();
+	size_t nDestSize = wcstombs(NULL, wchSrc, 0) + 1;
+	char *chDest = new char[nDestSize];
+	memset(chDest, 0, nDestSize);
+	wcstombs(chDest, wchSrc, nDestSize);
+	std::string strResult = chDest;
+	delete[]chDest;
+	setlocale(LC_ALL, strLocale.c_str());
+	return strResult;
+}
+
+string GetMsgValue(string strOrig, string strKey, string strSplit)
+{
+	string strRetValue = "";
+	int iStrOrigLen;
+	int iStrKeyLen;
+	size_t uiPosKeyBegin;
+	size_t uiPosKeyEnd;
+	size_t uiPosStrSplit;
+
+	iStrOrigLen = strOrig.length();
+	iStrKeyLen = strKey.length();
+	uiPosKeyBegin = strOrig.find(strKey);
+
+	if (uiPosKeyBegin != string::npos)
+	{
+		// 从key的位置开始,第一次出现 str_split 的位置
+		uiPosStrSplit =  strOrig.substr(uiPosKeyBegin).find(strSplit);
+		if (uiPosStrSplit != string::npos)
+		{
+			uiPosKeyEnd = uiPosKeyBegin + uiPosStrSplit;
+		}
+		else
+		{
+			uiPosKeyEnd = iStrOrigLen;
+		}
+		int pos_begin = uiPosKeyBegin + iStrKeyLen + 1; // +1 跳过'='字符
+		int value_len = uiPosKeyEnd - pos_begin;
+		strRetValue = strOrig.substr(pos_begin, value_len);
+		return strRetValue;
+	}
+	return strRetValue;
+}
+
 
 void SwapNeighbourCharacters(string str_swap)
 {
@@ -292,7 +371,7 @@ int main(int argc, char const *argv[])
         b = t;
         c--;
     }
-    printf("%d,%d,%d\n", a, b, c); 
+    printf("%d,%d,%d\n", a, b, c);
     int n[3][3], i, j;
     for (i = 0; i < 3; i++)
         for (j = 0; j < 3; j++)
@@ -312,7 +391,55 @@ int main(int argc, char const *argv[])
     {
         cout << "diff" << endl;
     }
-    
+    stDbfHead dbfHead;
+    memset(&dbfHead, 0x00, sizeof(stDbfHead));
+    cout << sizeof(dbfHead) << endl;
+    dbfHead.szMark[0] = 0x03;
+    string msg ="NAME:YEAR,TYPE:C,LEN:20";
+    cout << GetMsgValue(msg, "NAME", ",")<<endl;
+
+    time_t now;
+    time(&now);
+	tm* tp = localtime(&now);
+
+    short offset = 161;
+    memcpy(&dbfHead.szDataOffset, &offset, 2);
+
+    memmove(&dbfHead.szYear, &tp->tm_year, sizeof(dbfHead.szYear));
+    memmove(&dbfHead.szMonth, &tp->tm_mon, sizeof(dbfHead.szMonth));
+    memmove(&dbfHead.szDay, &tp->tm_mday, sizeof(dbfHead.szDay));
+
+
+    // 存在char数组里的数怎么进行加减读取
+    uint8_t uinta = 0x03;
+    cout << uinta << uinta++ << endl;
+
+    uint8_t iLen;
+    char aaa[1];
+    string x="LEN:20000";
+    string strTmp = GetMsgValue(x, "LEN", ",");
+    int iTmp = atoi(GetMsgValue(x, "LEN", ",").c_str());
+    memcpy(aaa, &iTmp, sizeof(aaa)); // 从string到char[]
+    // memcpy(aaa, strTmp.c_str(), sizeof(aaa));
+    memcpy(&iLen, aaa, 1); // 从char[]到int
+    printf("%d\n", iLen);
+
+    union DataUnion
+    {
+        char buf[4];
+        uint32_t number;
+    };
+
+    auto iiTmp = atoi(strTmp.c_str());
+    char aa[4];
+    memcpy(aa, &iiTmp, sizeof(iiTmp));
+    printf("iiTmp = %d\n", iiTmp);
+    printf("iTmp=%d, %x\t%x\t%x\t%x\n",iiTmp, aa[0],aa[1],aa[2],aa[3]);
+
+    wstring cc = L"wstring中文";
+    string strcc = WString2String(cc);
+    wcout << cc <<endl;
+    cout << strcc<<endl;
     return 0;
 }
 

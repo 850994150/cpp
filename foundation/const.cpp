@@ -4,13 +4,15 @@
 * Last modified: 2018-02-01 10:14:16
 * Filename     : define.cpp
 * Description  : const
-*              1. 修饰函数名前后
-               2. 修饰函数参数
-               3. 修饰函数返回值
-               4. 修饰指针变量
-               5. 修饰类对象
-               6. static、const修饰成员变量的差异
-               7. 作用域为类的常量
+* const
+    1. 修饰函数名前后
+    2. 修饰函数参数
+    3. 修饰函数返回值
+    4. 修饰指针变量
+    5. 修饰类对象
+    6. static、const修饰成员变量的差异
+    7. 作用域为类的常量
+* static
 **********************************************************/
 
 #include <stdio.h>
@@ -50,7 +52,7 @@ class CConstTest
     ~CConstTest();
 
     int &get();
-    // const修饰返回值: const int &get() { return i; }
+    // const int &get() { return i; } //const修饰返回值
 
     int get_const() const; // const 修饰函数; 只有类成员函数才能这样用
                            // 修饰后，该函数不能对类的成员变量进行任何修改, 但可以访问, 而且只能调用const成员函数
@@ -86,7 +88,7 @@ int CConstTest::get_const() const
 
 /*
 StringCopy函数体如果尝试改动strSource则会爆出错误
-值传递是通过产生临时变量用于复制该参数的,所以无需保护 
+值传递是通过产生临时变量用于复制该参数的,所以无需保护
 */
 void CConstTest::StringCopy(char *strDestination, const char *strSource)
 {
@@ -110,7 +112,7 @@ int main(int argc, char const *argv[])
     printf("const int*p; *p = %d\n", *p);
 
     int *const p2 = &iTest2; // 声明的时候就赋初值
-    iTest2 = 100;           
+    iTest2 = 100;
     // p = &iTets1;         // 报错， p是常量,p的值(地址）是不可改动的
     printf("int *const p2; *p2 = %d\n", *p2);
 

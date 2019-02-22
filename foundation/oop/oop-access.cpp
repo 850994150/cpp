@@ -12,7 +12,6 @@
 #include <string>
 using namespace std;
 
-
 class PIG
 {
 public:
@@ -42,13 +41,19 @@ private:
 };
 
 // 静态成员函数不属于某个对象，而是属于整个类，因此没有this指针
+// 既然不属于某个对象, 那么为什么要放在类里面呢? 和全局变量有什么区别
 // 静态成员函数中，不能直接调用非静态成员变量, 因为非静态成员变量只有在对象创建时才分配内存, 而静态成员函数不需要类的实例就可以调用，即通过 class name::调用
 // 但可以通过形参传递进来的对象来调用非静态成员变量
 void PIG::f1(PIG m)
 {
-     cout<<"A="<<m.A<<endl; 
-     // cout<<"A="<<A<<endl; // err 静态成员函数只能访问静态的成员变量
-     cout<<"B="<<B<<endl; // 非静态成员函数也可以范文静态成员变量
+    cout << "A=" << m.A << endl;
+    // cout << "A=" << A << endl; // err 静态成员函数只能访问静态的成员变量
+    cout << "B=" << B << endl; // 非静态成员函数也可以访问静态成员变量
+    // 静态成员函数访问静态成员
+    cout << "C=" << C << endl;
+    cout << "m.C=" << m.C  << endl;
+    // cout << "C=" << this.C << endl;
+    cout << "PIG::C=" << PIG::C << endl;
 }
 
 
