@@ -113,7 +113,7 @@ void func_mutex(void)
 void ThreadMutex()
 {
 	thread threads[2];
-	
+
 	for(size_t i = 0; i < 2; ++i)
 	{
 		threads[i] = thread(func_mutex);
@@ -210,7 +210,8 @@ void ThreadLock()
 	CThread clThread;
 
 	// 如果生产者产生得很慢, (比如消费者线程先执行)消费者的循环次数就会增加, 而且都在做无用功;
-	// condition_variable可解决(配合unique_lock)
+	// condition_variable 可解决(配合unique_lock)
+
 	// notify_once()唤醒处于wait中的其中一个条件变量（可能当时有很多条件变量都处于wait状态）
 	thread myOutThread = thread(&CThread::outMsgRecvQueue, &clThread); // 消费
 	thread myInThread = thread(&CThread::inMsgRecQueue, &clThread); // 生产
@@ -253,10 +254,9 @@ void ThreadCreate()
 	// 如果在类成员函数创建线程, 线程函数也是类成员, 则第二参数为this
 	// Q: 为什么使用类成员函数作为线程函数入口就要传入一个对象?
 	// A: 可以不传入对象, 把入口函数定义为静态成员函数就可以, 但是这样的话这个函数里面就不可以调用该类的其他非静态成员了
-	//    之所以要传入对象, 和“A类中如何调用B类的成员函数"的问题是一样的; https://bbs.csdn.net/topics/390859834 
+	//    之所以要传入对象, 和“A类中如何调用B类的成员函数"的问题是一样的; https://bbs.csdn.net/topics/390859834
 	// 至于为什么不能是非静态成员函数呢, 因为非静态成员函数都会在参数列表中加上一个this指针为为参数, 这样的话你写的线程
 	// 函数就不符合调用规定了.
-
 
 	ClassFuncThread.join();
 
@@ -284,7 +284,7 @@ void ThreadManager(void)
 
 void setValue(std::future<int> &fut, int value)
 {
-	std::promise<int> prom;				  // 用来包装数据, 将数据与 future对象 关联 
+	std::promise<int> prom;				  // 用来包装数据, 将数据与 future对象 关联
 	fut = prom.get_future();
 	int values = value +10;
 	std::this_thread::sleep_for(chrono::seconds(5)); // 休眠线程, 观察future阻塞现象, 必须放在关联之后，否则会报异常
@@ -295,7 +295,7 @@ void printValue(std::future<int> &fut)
 {
 	// future有三种操作: get：等待结果并返回; wait:等待异步操作完成; 没有返回值, wait_for超时等待返回future_status状态
 	int x = fut.get(); // 等待异步操作并获取返回的值. 线程会阻塞在这里,直至promise执行set_value
-	// 移动语义, 此处get后fut结果已经转移到x了,其他地方再get的话会报错(可改用shared_future)
+	// 移动语义, 此处get后fut结果已经转移到x了,其他地方再get的话会报错(用shared_future则不会)
 	std::cout << "value: " << x << '\n';
 }
 
@@ -341,7 +341,7 @@ std::string fetchDataFromDB(int count, std::string recvData)
 		std::this_thread::sleep_for(std::chrono::seconds(1)); // 处理时间为5s
 		cout << "handling data from db..." << i << endl;
 	}
-	
+
 	return "DB_" + recvData;
 }
 
@@ -353,7 +353,7 @@ std::string fetchDataFromFile(int count, std::string recvData)
 		std::this_thread::sleep_for(std::chrono::seconds(1)); // 处理时间为10s
 		cout << "handling data from file..." << i << endl;
 	}
-	
+
 	return "File_" + recvData;
 }
 
@@ -386,11 +386,12 @@ void ThreadAsync()
 	cout << "处理结束" << endl;
 }
 
+// atomic
 // 能确保加减、读写是原子性的, 但对于需要复杂判断的就不方便使用了
 void ThreadAutomic()
 {
 	thread threads[2];
-	
+
 	for(size_t i = 0; i < 2; ++i)
 	{
 		threads[i] = thread(func_mutex);

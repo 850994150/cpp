@@ -34,9 +34,11 @@ class CConstTest
     static int iStatic;
         // 在类实现文件中定义并初始化, 初始化时不需要static关键字, 不能在构造函数初始化列表中初始化, 因为它不属于某个对象
     const int iConst;
-        // 只能在构造函数初始化列表初始化
+        // 只能在构造函数初始化列表初始化, 因为const不能被改变, 所以只能在初始化时给初值
     static const int iStaticConst;
         // 与 const static 一样, 给静态成员变量赋值时，不需要加static， 但要加const
+        // 和 static 不一样的是, 这变量可以在类内初始化
+        // 不可以同时用const和static修饰成员函数。调用const成员函数时其实是有一个隐藏的const this*指针的, 但是static又不含this指针, 所以矛盾
 
     // 作用域为类的常量: static const 或 enum常量
     static const int iNumTurns = 5;

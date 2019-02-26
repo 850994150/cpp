@@ -440,6 +440,7 @@ int main(int argc, char const *argv[])
     string strcc = WString2String(cc);
     wcout << cc <<endl;
     cout << strcc<<endl;
+
     return 0;
 }
 

@@ -39,13 +39,13 @@
      * 声明一个数组TYPE array[n], **数组名** 有两重含义，
      * 代表整个数组,类型是TYPE[n]或者代表一个指针,类型是TYPE*
      * 它与数组第0号单元占据的内存区是不同的，该指针是不能修改的,*str++是错的 *(str+1)是对的
-     * 如果先访问第n个元素可使用: *(str+n) 
+     * 如果先访问第n个元素可使用: *(str+n)
      * char str[3]={'a','b','c'}; '*str'是一个指向数组第0号单元的指针
      * 对空指针应用delete是安全的
      * 用指针创建动态数组（可在运行时选择数组长度）.
      * psome = psome + 1; //指针和数组名之间的区别，不能更改数组名的值; 但指针是变量，可以修改它的值
      * c++把数组名解释为第一个元素的地址,str[1]实际上是*(str+1),str[2]实际上是*(str+2),先算出了元素地址再去取存在那里的值
-     * 【字符指针变量指向的字符常量中的内容是不能修改】 
+     * 【字符指针变量指向的字符常量中的内容是不能修改】
         * 原因是 p指向的字符串的第一个字符地址, 指针存在栈上 而字符串的内容"abcedfg"存放在常量区, 常量区是不允许修改的
         * char *p = "abcdef";
         * p[3]='z';         // 错误 指针变量指向的值存放在常量区, 不允许修改
@@ -154,7 +154,7 @@ int main()
     char* tmpptr = "abcedfg";
     // tmpptr[4] = 'z';  // error  指针ptr存放在栈区, 指针指向的值"abcdefg"存放在常量区, 不允许修改常量区的值
                          // 如果是这样: char tmptr[] = "abcedfg" 则该操作是正确的, 因为此时“abcedfg”是存放在栈区
-    tmpptr = "hijklmn";  // success 修改指针的值, 存放常量"hijklmn"的地址 
+    tmpptr = "hijklmn";  // success 修改指针的值, 存放常量"hijklmn"的地址
     cout << tmpptr << endl;
     // string str = "abcdef";
     // char *p_str = (char * )str.c_str();
@@ -183,7 +183,7 @@ int main()
     // char test[3] = {'a', 'b', 'c'};
     string test = "abcdef";
     char* pTest = (char*)test.c_str();
-    cout << *pTest << endl; 
+    cout << *pTest << endl;
     cout << *(pTest+1) << endl; // 访问pTest + sizeof(char)地址的值
     cout << *pTest + 1 << endl; // 实际为ascii码+1
 
@@ -234,9 +234,9 @@ int main()
     // con_a = 101; //err
     cout << con_a + 1 << endl <<  con_b + 1 << endl;
 
-    const int *p_con_a = 0; //指针指向的值*p_con_a的值不能被改变，指针初始化赋为0不会报错。 
+    const int *p_con_a = 0; //指针指向的值*p_con_a的值不能被改变，指针初始化赋为0不会报错。
     const int * const p_con = 0; //指针指向的值和指针本身保存的值都不能改变
-    p_con_a = &con_b; 
+    p_con_a = &con_b;
     int c = 100;
     p_con_a = &c;
     // *p_con_a = 10; // err

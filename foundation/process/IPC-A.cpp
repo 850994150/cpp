@@ -8,10 +8,12 @@
  *                管道(FIFO)、信号、共享内存、消息队列、信号量、套接字
  * IPC好像都是通过一个ID来让进程间通讯
  * 无名管道
+    * 其实就是依靠fork函数, 利用fork来和父进程公用一个管道
     * int pipe(int filedis[2])
     * 参数 filedis 返回两个文件描述符：filedes[0] 为读而打开, filedes[1] 为写而打开.
     * filedes[1] 的输出是 filedes[0] 的输入
  * 有名管道
+    * 可以认为是通过文件来进行进程间通信, 写入读出的对象都是一个文件
     * 管道都有同步和阻塞的问题, 读写有等待的情况; 而且当读写的数据大于最大长度时会阻塞等待
  * 消息队列
     *
@@ -20,7 +22,7 @@
         int msgctl(int magid,int cmd,struct msgid_ds *buf);
         int msgsnd(int msgid,void *msg_ptr,size_t msg_sz,int msgflag);
         int msgrcv(int msgid,void *msg_ptr,size_t msg_sz,long int msg_type,int msgflag);
-    * 和有名管道一样, 发送的数据都有一个最大长度限制 
+    * 和有名管道一样, 发送的数据都有一个最大长度限制
     * 生命周期随内核，消息队列会一直存在，需要我们显式的调用接口或使用命令删除
     * 消息队列可以双向通信
     * 克服了管道只能承载无格式字节流的缺点
@@ -33,7 +35,7 @@
         int shmdt(const void *shm_addr);
     * 因为系统内核没有对访问共享内存进行同步，您必须提供自己的同步措施, 比如用信号量进行同步
  * 信号量 Pv：
-    * 
+    *
         #include<sys/sem.h>
         int semget(key_t key,int num_sems,int sem_flgs);
         int semctl(int sem_id,int sem_num,int command...);
@@ -112,7 +114,6 @@ void NoneNamedPipe()
  */
 int NamedPipeWrite()
 {
-    // window的文件系统不支持管道文件
     if (mkfifo(PIPENAME, 0666) < 0) // 创建管道
     {
         perror("mkfifo");
@@ -127,7 +128,7 @@ int NamedPipeWrite()
         return -1;
     }
 
-    unlink(PIPENAME);
+    unlink(PIPENAME); // 删除管道
 
     int i = 0;
     for (i = 0; i < 10; i++)
@@ -456,7 +457,7 @@ int IpcArgIncMmap()
         x = (int *)ptr;
 
         for (int i = 0; i < 10; i++)
-        { 
+        {
             g_lock.lock();
             // pthread_mutex_lock(&mutex);
             (*x)++;
@@ -480,7 +481,7 @@ int IpcArgIncMmap()
         x = (int *)ptr;
 
         for (int i = 0; i < 10; i++)
-        { 
+        {
             g_lock.unlock();
             // pthread_mutex_lock(&mutex);
             (*x)++;
@@ -496,7 +497,7 @@ int IpcArgIncMmap()
         perror("fork failed!\n");
         exit(1);
     }
-    
+
     shm_unlink(addnum);       //删除共享名称
     munmap(ptr, sizeof(int)); //删除共享内存
     return (0);
@@ -505,12 +506,12 @@ int IpcArgIncMmap()
 int main(int argc, char const *argv[])
 {
     // NoneNamedPipe();
-    // NamedPipeWrite();
-    // MsgQueueWrite();
+    // NamedPipeWrite(); // window的文件系统不支持管道文件
+    MsgQueueWrite();
     // SharedMemoryWrite();
     // SharedMemoryWithSema();
     // IpcMmmp();
-    IpcArgIncMmap(); // FIXME 多次运行有可能出现只有父进程运行 和 父进程+1后为1, 子进程+1后也为1的情况
+    // IpcArgIncMmap(); // FIXME 多次运行有可能出现只有父进程运行 和 父进程+1后为1, 子进程+1后也为1的情况
     return 0;
 }
 

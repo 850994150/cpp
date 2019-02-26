@@ -43,9 +43,10 @@ gif图:
 using namespace std;
 const int  n = 10;
 void create(int a[])
-{ srand((unsigned)time(NULL));
-    for(int i =0;i<10;i++)
-        a[i] = rand()%100+1;
+{
+    srand((unsigned)time(NULL));
+    for (int i = 0; i < 10; i++)
+        a[i] = rand() % 100 + 1;
 }
 
 void print(int s[])
@@ -91,12 +92,12 @@ void bubbleSort(int s[],int len)
 
 //交换排序 --- 快排 O(nlogn)(平均情况)
 /*
- *找一个数key，作为参照, 从序列两端开始扫，
- *找出右边第一个比key小的数a，
- *左边第一个比key大的数b，交换a b
- *j往←，i往→，当i=j时，交换a[i]和key
- *交换之后，肯定是key_left < key < key_right
- *然后就像二分法那样递归地对左右两边同样的操作
+ * 找一个数key，作为参照, 从序列两端开始扫，
+ * 找出右边第一个比key小的数a，
+ * 左边第一个比key大的数b，交换a b
+ * j往←，i往→，当i=j时，交换a[i]和key
+ * 交换之后，肯定是key_left < key < key_right
+ * 然后就像二分法那样递归地对左右两边同样的操作
  */
 void quickSort(int *a,int left,int right)
 {

@@ -174,7 +174,8 @@ void sizeofStruct()
 // 对于union来说大小为成员定义里面最大的那个
 void sizeofUnion()
 {
-    union uu {
+    union uu
+    {
         char ul[5];
         int u2[2];
     } ua;
@@ -194,7 +195,7 @@ sizeof(test6): 64
 void sizeofCharArray()
 {
     string s = "hello world";
-    char *s1 = "hello world";
+    char *s1 = (char*)"hello world";
     char s2[] = "hello world";
     char s3[100];
     char *s4 = (char *)malloc(100);
@@ -219,7 +220,7 @@ void sizeofCharArray()
 */
 
 /*
- * 类所占内存大小由非静态成员变量决定的, 静态成员是存储在全局变量区, 和类不在一个地方, 与成员函数无关 (虚函数另说)
+ * 类所占内存大小由非静态成员变量决定的, 静态成员是存储在全局变量区, 和类不在一个地方, **与成员函数无关** (虚函数另说)
 */
 // 空的类内存中要存在一个字节进行区分
 class emptyClass1
@@ -281,10 +282,10 @@ public:
 
 /*
 Q1: 继承的时候先分配父类的内存，那么父类里是先分配虚指针空间还是还是int呢？
-A1: 实践证明, 是先分配了子类的空间, 然后再分配父类的空间
+A1: XXX 实践证明, 是先分配了子类的空间, 然后再分配父类的空间
 
 Q2: 子类继承父类, 父类末尾本应该填充的内存可以继续使用吗
-A2: 不可以
+A2: ** 不可以 **
 
 子类的内存大小等于父类的内存大小加上子类独有成员变量的内存大小
 
@@ -358,12 +359,14 @@ sizeof subclassThird: 32
 
 void strlenTest()
 {
-    char* a = "hello";
+    char* a = (char*)"hello";
     char b[11] = "HelloWorld";
     char c[11] = "hello";
     char d[] = "HelloWorld";
     char *e = new char[11];
     char f[11];
+    char g[] = {'A','B','C','D','E','F'};
+    // char g[] = {'A','B','C','D','E','F', '\0'};
 
     cout << "sizeof(char*a = \"hello\") = " << sizeof(a) << endl;
     cout << "strlen(char*a = \"hello\") = " << strlen(a) << endl;
@@ -371,7 +374,7 @@ void strlenTest()
     cout << "sizeof(charb[11] = \"HelloWorld\") = " << sizeof(b) << endl;
     cout << "strlen(charb[11] = \"HelloWorld\") = " << strlen(b) << endl;
 
-    cout << "sizeof(c[11] = \"hello\") = " << sizeof(c) << endl;
+    cout << "sizeof(c[11] = \"hello\") = " << sizeof(c) << endl; // ***
     cout << "strlen(c[11] = \"hello\") = " << strlen(c) << endl;
 
     cout << "sizeof(d[]=\"HelloWorld\") = " << sizeof(d) << endl;
@@ -382,6 +385,9 @@ void strlenTest()
 
     cout << "sizeof(f[11]) = " << sizeof(f) << endl;
     cout << "strlen(f[11]) = " << strlen(f) << endl;
+
+    cout << "sizeof(g[]) = " << sizeof(g) << endl;
+    cout << "strlen(g[]) = " << strlen(g) << endl;  // 字符数组，以单个元素的形式赋值,没有\0, strlen会一直往后直到找到一个\0为止, 大小不确定
 
 }
 /*

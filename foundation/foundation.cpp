@@ -46,7 +46,7 @@ int main(int argc, char const *argv[])
 {
     // operator_test();
     int a = 10, b = 20, c = 50;
-    printf("%d,%d", a,b,c);
+    printf("%d,%d\n", a,b,c);
     return 0;
 
 }

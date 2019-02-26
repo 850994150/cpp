@@ -22,7 +22,7 @@ char *get_str()
 {
     string ttmp = "asdfghjkl";
     // str分配在栈区，程序运行完就被释放了
-    char *str = (char*)ttmp.c_str(); 
+    char *str = (char*)ttmp.c_str();
     return str;
 }
 
@@ -62,12 +62,12 @@ char * get_str2()
 
 int main(int argc, const char *argv[])
 {
-    /* 栈区 */ 
+    /* 栈区 */
     cout<< "--------------栈区---------------"<<endl;
 
     // get_str()运行完毕，str空间自动回收，str的空间内容未知，可能还保留着原来的内容，有可能是乱码
     char buf[128] = {0};
-    strcpy(buf, get_str()); 
+    strcpy(buf, get_str());
     printf("buf = %s\n", buf); // 乱码，不确定
 
     char* p = NULL;
@@ -75,7 +75,7 @@ int main(int argc, const char *argv[])
     printf("p = %s\n", p); // 乱码，不确定
 
 
-    /* 堆区 */ 
+    /* 堆区 */
     cout<< "--------------堆区---------------"<<endl;
 
     char * q = NULL;
@@ -89,11 +89,12 @@ int main(int argc, const char *argv[])
         printf("q = %s\n", q);
         free(q);
         q = NULL;
+
         // 错误 https://zhidao.baidu.com/question/339553907.html
         // 释放空间，只是做个标志，表示p所在的空间可以被其他进程使用了
         // 没释放之前，使用权是当前进程的；而且还需把指针p赋为NULL
         // https://zhidao.baidu.com/question/577455633.html
-        // 下面这个写法是错的：
+        // 下面这个写法是错的：野指针
         // if(p!=NULL)
         // {
         //    free(p);

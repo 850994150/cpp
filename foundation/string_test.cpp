@@ -164,6 +164,7 @@ int MyVsnprintf(char *dest, int size, char *formate, ...)
 
 void MyStrcpy(char* dest, const char* src)
 {
+    assert((dst != NULL) && (src != NULL));
     while ((*dest++ = *src++) != '\0') ;
 }
 
