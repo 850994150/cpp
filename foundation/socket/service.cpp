@@ -19,21 +19,17 @@ void thread_task()
 
 int main()
 {
-    //printf("%d\n",AF_INET);
-    //printf("%d\n",SOCK_STREAM);
-    int ss = socket(AF_INET, SOCK_STREAM, 0);
-    //printf("%d\n",ss);
+    int ss = socket(AF_INET, SOCK_STREAM, 0); // 1. 创建套接字
     struct sockaddr_in server_sockaddr;
     server_sockaddr.sin_family = AF_INET;
     server_sockaddr.sin_port = htons(PORT);
-    //printf("%d\n",INADDR_ANY);
     server_sockaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    if (bind(ss, (struct sockaddr *)&server_sockaddr, sizeof(server_sockaddr)) == -1)
+    if (bind(ss, (struct sockaddr *)&server_sockaddr, sizeof(server_sockaddr)) == -1) // 2. 绑定地址和端口
     {
         perror("bind");
         exit(1);
     }
-    if (listen(ss, QUEUE) == -1)
+    if (listen(ss, QUEUE) == -1) // 3. 设置套接字为监听模式, 准备接收客户端请求
     {
         perror("listen");
         exit(1);
@@ -41,8 +37,7 @@ int main()
 
     struct sockaddr_in client_addr;
     socklen_t length = sizeof(client_addr);
-    ///成功返回非负描述字，出错返回-1
-    conn = accept(ss, (struct sockaddr *)&client_addr, &length);
+    conn = accept(ss, (struct sockaddr *)&client_addr, &length); // 4. 客户请求到来时接收, 返回一个该条链接的套接字
     if (conn < 0)
     {
         perror("connect");
@@ -64,14 +59,14 @@ int main()
         // }
 
         memset(buffer, 0, sizeof(buffer));
-        int len = recv(conn, buffer, sizeof(buffer), 0);
+        int len = recv(conn, buffer, sizeof(buffer), 0); // 5.1 用accept返回的套接字进行通信
         if (strcmp(buffer, "exit\n") == 0)
             break;
         printf("%s", buffer);
         //必须要有返回数据， 这样才算一个完整的请求
-        send(conn, buffer, len, 0);
+        send(conn, buffer, len, 0);     // 5.1 用accept返回的套接字进行通信
     }
-    close(conn);
+    close(conn); // 6. 关闭套接字
     close(ss);
     return 0;
 }

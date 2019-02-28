@@ -164,7 +164,7 @@ int MyVsnprintf(char *dest, int size, char *formate, ...)
 
 void MyStrcpy(char* dest, const char* src)
 {
-    assert((dst != NULL) && (src != NULL));
+    assert((dest != NULL) && (src != NULL));
     while ((*dest++ = *src++) != '\0') ;
 }
 
@@ -996,6 +996,32 @@ void cppString()
     cout << val << endl;
 }
 
+typedef struct FlexiableStruct
+{
+    int a;
+    char array[0]; //或char array[]; // 定义0长数组, 只是把一个符号放在结构体内, 不占用内存
+}stFlexiable, *pstFlexiable;
+
+void FlexiableArray()
+{
+    char szStr[] = "hellohuangjinjie";
+    printf("sizeof struct: %Zu\n", sizeof(stFlexiable));
+
+    pstFlexiable p_stFlexiable;
+    p_stFlexiable = (pstFlexiable)malloc(sizeof(stFlexiable) + strlen(szStr) + 1);
+
+    // 动态申请的内存只是申请给数组拓展所用，结构体的大小在创建时已经确定了
+    // array明确来说不算是结构体成员，只是挂羊头卖狗肉而已
+    printf("sizeof struct after malloc: %Zu\n", sizeof(stFlexiable));
+
+    strcpy(p_stFlexiable->array, szStr);
+    p_stFlexiable->a = 10;
+
+    printf("struct.a:[%d]\nstruct.str:[%s]\n", p_stFlexiable->a, p_stFlexiable->array); // 为什么用cout不行?
+
+}
+
+
 int main( )
 {
     char str_email[] = "fasdf2@aa.com";
@@ -1012,6 +1038,12 @@ int main( )
     printf("-------------------------- ================ ---------------------------\n\n");
 
     cppString();
+
+
+    printf("\n\n-------------------------- ================ ---------------------------\n");
+    printf("-------------------------- 柔性数组 ---------------------------\n");
+    printf("-------------------------- ================ ---------------------------\n\n");
+    FlexiableArray();
 
     // debugLog(__FILE__, __LINE__, "TEST");
 
