@@ -17,7 +17,7 @@ void thread_task()
 {
 }
 
-int main()
+int service_accpet()
 {
     int ss = socket(AF_INET, SOCK_STREAM, 0); // 1. 创建套接字
     struct sockaddr_in server_sockaddr;
@@ -37,7 +37,7 @@ int main()
 
     struct sockaddr_in client_addr;
     socklen_t length = sizeof(client_addr);
-    conn = accept(ss, (struct sockaddr *)&client_addr, &length); // 4. 客户请求到来时接收, 返回一个该条链接的套接字
+    conn = accept(ss, (struct sockaddr *)&client_addr, &length); // 4. 客户请求到来时接收, 返回一个该连接的套接字
     if (conn < 0)
     {
         perror("connect");
@@ -69,4 +69,9 @@ int main()
     close(conn); // 6. 关闭套接字
     close(ss);
     return 0;
+}
+
+int main(int argc, char*argv[])
+{
+    service_accept();
 }

@@ -17,83 +17,88 @@ typedef void(pLineCallback)(string strContent);
 const int iCommitCnt = 100;
 #define MAX 40000
 
+typedef char DataType;
+typedef struct stBiTree
+{
+    DataType data;
+    struct stBiTree *lchild, *rchild; // 未定义就先使用
+} stTreeNode, *p_TreeNode;
+
 typedef struct tagDBFHead
 {
-	char			Mark;
-	unsigned char	Year;
-	unsigned char	Month;
-	unsigned char	Day;
+    char Mark;
+    unsigned char Year;
+    unsigned char Month;
+    unsigned char Day;
     // 4 + 4 = 8
-	long			RecCount;
+    long RecCount;
     // 8
-	unsigned short	DataOffset;
-	unsigned short	RecSize;
+    unsigned short DataOffset;
+    unsigned short RecSize;
     // 4 + 4 = 8
-	char 			Reserved[20];
+    char Reserved[20];
     // 8 + 8 + 4 + 4 = 24
 } DBFHEAD, *LPDBFHEAD;
 // sizeof(DBFHEAD) = 40
 
 typedef struct stDBFHead
 {
-    char szMark[1];          // 版本信息
+    char szMark[1]; // 版本信息
     char szYear[1];
     char szMonth[1];
     char szDay[1];
-    char szRecCount[4];    // 4字节保存记录数
-    char szDataOffset[2];  // 2字节保存文件头字节数
-    char szRecSize[2];     // 2字节保存每行数据的长度
+    char szRecCount[4];   // 4字节保存记录数
+    char szDataOffset[2]; // 2字节保存文件头字节数
+    char szRecSize[2];    // 2字节保存每行数据的长度
     char Reserved[20];
 } stDbfHead;
 
-
-string WString2String(const std::wstring& ws)
+string WString2String(const std::wstring &ws)
 {
-	std::string strLocale = setlocale(LC_ALL, "");
-	const wchar_t* wchSrc = ws.c_str();
-	size_t nDestSize = wcstombs(NULL, wchSrc, 0) + 1;
-	char *chDest = new char[nDestSize];
-	memset(chDest, 0, nDestSize);
-	wcstombs(chDest, wchSrc, nDestSize);
-	std::string strResult = chDest;
-	delete[]chDest;
-	setlocale(LC_ALL, strLocale.c_str());
-	return strResult;
+    std::string strLocale = setlocale(LC_ALL, "");
+    const wchar_t *wchSrc = ws.c_str();
+    size_t nDestSize = wcstombs(NULL, wchSrc, 0) + 1;
+    char *chDest = new char[nDestSize];
+    memset(chDest, 0, nDestSize);
+    wcstombs(chDest, wchSrc, nDestSize);
+    std::string strResult = chDest;
+    delete[] chDest;
+    setlocale(LC_ALL, strLocale.c_str());
+    return strResult;
 }
 
 string GetMsgValue(string strOrig, string strKey, string strSplit)
 {
-	string strRetValue = "";
-	int iStrOrigLen;
-	int iStrKeyLen;
-	size_t uiPosKeyBegin;
-	size_t uiPosKeyEnd;
-	size_t uiPosStrSplit;
+    string strRetValue = "";
+    int iStrOrigLen;
+    int iStrKeyLen;
+    size_t uiPosKeyBegin;
+    size_t uiPosKeyEnd;
+    size_t uiPosStrSplit;
 
-	iStrOrigLen = strOrig.length();
-	iStrKeyLen = strKey.length();
-	uiPosKeyBegin = strOrig.find(strKey);
+    iStrOrigLen = strOrig.length();
+    iStrKeyLen = strKey.length();
+    uiPosKeyBegin = strOrig.find(strKey);
 
-	if (uiPosKeyBegin != string::npos)
-	{
-		// 从key的位置开始,第一次出现 str_split 的位置
-		uiPosStrSplit =  strOrig.substr(uiPosKeyBegin).find(strSplit);
-		if (uiPosStrSplit != string::npos)
-		{
-			uiPosKeyEnd = uiPosKeyBegin + uiPosStrSplit;
-		}
-		else
-		{
-			uiPosKeyEnd = iStrOrigLen;
-		}
-		int pos_begin = uiPosKeyBegin + iStrKeyLen + 1; // +1 跳过'='字符
-		int value_len = uiPosKeyEnd - pos_begin;
-		strRetValue = strOrig.substr(pos_begin, value_len);
-		return strRetValue;
-	}
-	return strRetValue;
+    if (uiPosKeyBegin != string::npos)
+    {
+        // 从key的位置开始,第一次出现 str_split 的位置
+        uiPosStrSplit = strOrig.substr(uiPosKeyBegin).find(strSplit);
+        if (uiPosStrSplit != string::npos)
+        {
+            uiPosKeyEnd = uiPosKeyBegin + uiPosStrSplit;
+        }
+        else
+        {
+            uiPosKeyEnd = iStrOrigLen;
+        }
+        int pos_begin = uiPosKeyBegin + iStrKeyLen + 1; // +1 跳过'='字符
+        int value_len = uiPosKeyEnd - pos_begin;
+        strRetValue = strOrig.substr(pos_begin, value_len);
+        return strRetValue;
+    }
+    return strRetValue;
 }
-
 
 void SwapNeighbourCharacters(string str_swap)
 {
@@ -352,12 +357,12 @@ int test_bkdr()
 
 auto testsum(int a, int b) -> decltype(a)
 {
-    int sum ;
+    int sum;
     sum = a + b;
     return sum;
 }
 
-int main(int argc, char const *argv[])
+int test2(int argc, char const *argv[])
 {
     // test_bkdr();
     int ii = 010;
@@ -395,12 +400,12 @@ int main(int argc, char const *argv[])
     memset(&dbfHead, 0x00, sizeof(stDbfHead));
     cout << sizeof(dbfHead) << endl;
     dbfHead.szMark[0] = 0x03;
-    string msg ="NAME:YEAR,TYPE:C,LEN:20";
-    cout << GetMsgValue(msg, "NAME", ",")<<endl;
+    string msg = "NAME:YEAR,TYPE:C,LEN:20";
+    cout << GetMsgValue(msg, "NAME", ",") << endl;
 
     time_t now;
     time(&now);
-	tm* tp = localtime(&now);
+    tm *tp = localtime(&now);
 
     short offset = 161;
     memcpy(&dbfHead.szDataOffset, &offset, 2);
@@ -409,14 +414,13 @@ int main(int argc, char const *argv[])
     memmove(&dbfHead.szMonth, &tp->tm_mon, sizeof(dbfHead.szMonth));
     memmove(&dbfHead.szDay, &tp->tm_mday, sizeof(dbfHead.szDay));
 
-
     // 存在char数组里的数怎么进行加减读取
     uint8_t uinta = 0x03;
     cout << uinta << uinta++ << endl;
 
     uint8_t iLen;
     char aaa[1];
-    string x="LEN:20000";
+    string x = "LEN:20000";
     string strTmp = GetMsgValue(x, "LEN", ",");
     int iTmp = atoi(GetMsgValue(x, "LEN", ",").c_str());
     memcpy(aaa, &iTmp, sizeof(aaa)); // 从string到char[]
@@ -424,8 +428,7 @@ int main(int argc, char const *argv[])
     memcpy(&iLen, aaa, 1); // 从char[]到int
     printf("%d\n", iLen);
 
-    union DataUnion
-    {
+    union DataUnion {
         char buf[4];
         uint32_t number;
     };
@@ -434,13 +437,89 @@ int main(int argc, char const *argv[])
     char aa[4];
     memcpy(aa, &iiTmp, sizeof(iiTmp));
     printf("iiTmp = %d\n", iiTmp);
-    printf("iTmp=%d, %x\t%x\t%x\t%x\n",iiTmp, aa[0],aa[1],aa[2],aa[3]);
+    printf("iTmp=%d, %x\t%x\t%x\t%x\n", iiTmp, aa[0], aa[1], aa[2], aa[3]);
 
     wstring cc = L"wstring中文";
     string strcc = WString2String(cc);
-    wcout << cc <<endl;
-    cout << strcc<<endl;
+    wcout << cc << endl;
+    cout << strcc << endl;
 
     return 0;
 }
 
+void createTree(p_TreeNode &T)
+{
+    DataType data;
+    cin >> data;
+    if (data == '#')
+    {
+        T = NULL;
+    }
+    else
+    {
+        T = (p_TreeNode)malloc(sizeof(p_TreeNode));
+        T->data = data;
+        createTree(T->lchild);
+        createTree(T->rchild);
+    }
+}
+
+void PreVisit(p_TreeNode T)
+{
+    if (T != NULL)
+    {
+        if (T->data != '#')
+        {
+            printf("%c ", T->data);
+        }
+        PreVisit(T->lchild);
+        PreVisit(T->rchild);
+    }
+}
+
+void DestroyBinTree(p_TreeNode T)
+{
+    if (T == NULL)
+        return;
+    DestroyBinTree(T->lchild);
+    DestroyBinTree(T->rchild);
+    T->lchild = NULL;
+    T->rchild = NULL;
+    free(T);
+}
+
+int main(int argc, char *argv[])
+{
+    printf("         A         \n");
+    printf("        / \\       \n");
+    printf("       B   #       \n");
+    printf("     /   \\        \n");
+    printf("   C       D       \n");
+    printf("  / \\    /   \\   \n");
+    printf(" #   #  E     F    \n");
+    printf("       / \\   / \\ \n");
+    printf("      #   G #   #  \n");
+    printf("         / \\      \n");
+    printf("        #   #	   \n");
+
+    printf("         e          \n");
+    printf("       /   \\       \n");
+    printf("     b       f      \n");
+    printf("   /   \\    / \\   \n");
+    printf("  a     d  #   g    \n");
+    printf(" / \\   / \\    / \\\n");
+    printf("#   # c   #  #   #  \n");
+    printf("     / \\           \n");
+    printf("    #   #			\n");
+
+    /*
+    p_TreeNode p_Tree;
+    createTree(p_Tree);
+    PreVisit(p_Tree);
+    DestroyBinTree(p_Tree);
+    */
+    int a = 10;
+    float b = static_cast<float> (a);
+    int i;
+    cout << b << endl;
+}
