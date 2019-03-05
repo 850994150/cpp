@@ -94,11 +94,11 @@
 
     * strtok (token: 标记) / strtok_r / strsep (seperate: 分离)
         * char* strtok(char* str, const char* delimiters);
-            * 维护一个静态变量(【线程不安全】的原因)来保存第一次传入的str; 后续如果发现传入str是NULL, 就知道要继续处理上次的字符串;
+            * 维护一个静态变量(【线程不安全】的原因)来保存第一次传入的str; 后续如果发现传入str是NULL, 就继续处理上次的字符串(保存到静态变量中了);
             * 如果传入的str不为NULL，则知道要处理一个新的字符串, 所以静态变量始终保存着未处理完的字符串的剩下部分
             * 第一次调用入参str, 一次性把【str中包含的delimiters所有字符都替换成'\0'】(多个分割符算一个\0), 往后调用则将该参数设置为NULL, strtok会把NULL 换成\0
             * 因为第一次分割后str被破坏了, 变成了分割后的第一个字符串, 剩余的字符串保存到了static变量中(所以多线程不安全)
-            * 每次调用成功返回指向被分割出的片段的指针
+            * 每次调用成功【返回指向被分割出的片段的指针】
             * https://blog.csdn.net/hustfoxy/article/details/23473805
 
         * char *strtok_r(char *str, const char *delim, char **saveptr);
@@ -411,7 +411,7 @@ char *MyStrstr(char *str1, const char *str2)
             ;
         if (*cur == '\0')
         {
-            return str1 - strlen(str2); // 指针由于while循环比较已经往右移了, 现在往左退回第一个字符
+            return str1 - strlen(str2); // 指针由于while循环比较, str2指针已经往右移了, 现在往左退回第一个字符
         }
         if (*str1 == '\0')
         {
@@ -473,8 +473,6 @@ int MyStrlen(const char*src)
     while ((*src++ != '\0') && ++iLen) ;
     return iLen;
 }
-
-
 
 
 char* MyStrtok(char* str, const char* delimeter)

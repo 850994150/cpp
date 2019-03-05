@@ -92,8 +92,11 @@ void World::Hi_()
 int main()
 {
     World w;
+    World *p_w = new World;
     w.Hi_();
     cout << "Func_main end!" << endl;
+    delete p_w;
+    p_w = NULL;
     return 0;
 }
 
