@@ -61,7 +61,7 @@
 
 ## 说一说 extern
 
-1. extern int g_Int;
+1. `extern int g_Int;`
    它的作用就是声明函数或全局变量的作用范围的关键字, 其声明的函数和变量可以在本模块或其他模块中使用,不能重复初始化
 2. 声明函数的时候使用`extern "C" {void fun(int a,int b);}` 可以让编译器按照C语言的方式生成函数的符号
 
@@ -111,13 +111,18 @@
 
 ## new和malloc的区别
 
-1. [性质] new是操作符，操作符可以进行重载，malloc是库函数
-2. [使用] new使用的时候会自动计算大小，malloc则要指定大小
+1. [性质]
+   new是操作符，操作符可以进行重载，malloc是库函数
+2. [使用]
+   new使用的时候会自动计算大小，malloc则要指定大小
    new/delete在对象(如类对象)创建的同时会自动执行构造函数做初始化，在对象在消亡时会自动执行析构函数
    而malloc只管分配内存，并不能对所得的内存进行初始化，所以得到的一片新内存中，其值将是随机的；
-3. [成功] new成功后返回对象类型的指针，malloc返回void* 指针，需要自己做类型转换
-4. [失败] new抛出异常，malloc返回会NULL，所以用new之后在判断是否为NULL没什么意义
-5. [扩容] new不支持扩容, malloc在使用过程中发现内存不够可以使用realloc来进行扩容
+3. [成功]
+   new成功后返回对象类型的指针，malloc返回void* 指针，需要自己做类型转换
+4. [失败]
+   new抛出异常，malloc返回会NULL，所以用new之后在判断是否为NULL没什么意义
+5. [扩容]
+   new不支持扩容, malloc在使用过程中发现内存不够可以使用realloc来进行扩容
 6. 既然有了malloc为什么还要new呢？
 
 ## strcpy
@@ -454,14 +459,24 @@ pstFlexiable p_stFlexiable = (pstFlexiable)malloc(sizeof(stFlexiable) + strlen(s
    int semop(int sem_id,struct sembuf *sem_ops,size_t num_sem_ops); // 解锁或锁定共享资源
    ```
 
-6. ![基于套接字通信](http://images.cnblogs.com/cnblogs_com/skynet/201012/201012122157467258.png)
+6. 基于套接字通信
+   ![](http://images.cnblogs.com/cnblogs_com/skynet/201012/201012122157467258.png)
    所有的方法都是基于套接字通信的, 所以都有个套接字的入参
    1. 服务器
       1. 创建socket套接字
+         int fd = socket(AF_INET, SOCK_STREAM, 0);
+         AF_INET 表示使用TCP/IP协议族; SOCK_STREAM 表示使用TCP协议, SOCK_DGRAM 表示使用UDP协议;
       2. bind绑定地址和端口
       3. 设置套接字为listen状态,等待客户端链接
       4. accept接收到客户端连接进来, 创建新套接字与该客户端进行通信
       5. 进行读recv写send通信
+         ```
+         int write(int fd,     void *buf, size_t nbytes);
+         int send (int sockfd, void *buf, int len,      int flags)
+         在功能上，read/write是recv/send的子集。read/wirte是更通用的文件描述符操作，而recv/send在socket领域则更“专业”一些
+         有多一个参数用来进行socket控制
+         如: 为接收和发送进行一些选项设置;从多个客户端中接收报文等
+         ```
       6. 关闭套接字
    2. 客户端
       1. 创建socket套接字
@@ -516,21 +531,58 @@ pstFlexiable p_stFlexiable = (pstFlexiable)malloc(sizeof(stFlexiable) + strlen(s
 
 # 计算机网络和网络安全
 
-## 七层模型
+## 分层模型
 
-> [应用层 -> 表示层 -> 会话层] -> 运输层 -> 网络层 -> 数据链路层 -> 物理层
+0. 各层的作用
+```
+应用层: 用户与网络间的接口 http
+运输层: 进程到进程间的接口    tcp/udp
+网络层: 主机到主机间的接口    ip
+数据链路层: 相邻结点间的接口  mac、以太网
+物理层: 物理介质间的接口
+```
+1. OSI
+应用层 -> 表示层 -> 会话层 -> 运输层 -> 网络层 -> 数据链路层 -> 物理层
+
+2. TCP/IP
+应用层 -> 运输层 -> 网际层 -> 网络接口层
 
 ## ARP
 
 0. ARP是地址转换协议（Address Resolution Protocol）的英文缩写，它是一个链路层协议，工作在 OSI 模型的第二层
 1：首先，每个主机都会在自己的ARP缓冲区中建立一个ARP列表，以表示IP地址和MAC地址之间的对应关系。
-2：当源主机要发送数据时，首先检查ARP列表中是否有对应IP地址的目的主机的MAC地址，如果有，则直接发送数据;
-   如果没有，就向本网段(**局域网**)的所有主机发送ARP数据包，包括的内容有：源主机IP地址，源主机MAC地址，目的主机的IP地址。
+2：当源主机要发送数据时，首先[检查ARP缓冲列表]中是否有对应IP地址的目的主机的MAC地址，如果有，则直接发送数据;
+   如果没有，就向本网段(**局域网**)的所有主机[发送ARP数据包]，包括的内容有：源主机IP地址，源主机MAC地址，目的主机的IP地址。
 3：当本网络的所有主机收到该ARP数据包时，首先检查数据包中的目的IP地址是否是自己的IP地址，如果不是，则忽略该数据包;
-   如果是，则首先从数据包中取出源主机的IP和MAC地址写入到ARP列表中;
-   如果已经存在，则覆盖，然后将自己的MAC地址写入ARP响应包中，告诉源主机自己是它想要找的MAC地址。
-4：源主机收到ARP响应包后。将目的主机的IP和MAC地址写入ARP列表，并利用此信息发送数据;
+   如果是，则[更新自身Arp缓存]首先从数据包中取出源主机的IP和MAC地址写入到ARP列表中;
+   如果已经存在，则覆盖，然后将自己的[MAC地址写入ARP响应包]中，告诉源主机自己是它想要找的MAC地址。
+4：源主机收到ARP响应包后, [更新自身arp缓冲]将目的主机的IP和MAC地址写入ARP列表，并利用此信息发送数据;
    如果源主机一直没有收到ARP响应数据包，表示ARP查询失败。
+
+```
+A表示 IP地址, 电话号码表示Mac地址
+1. 在公园里, A 想打电话给 B, 翻看通讯录[检查arp缓存]没发现B的号码; (如果有就直接打电话过去了)
+2. 于是A在公园大喊一声[arp请求(广播)]:我是A,我号码是123, B你的电话号码是什么
+3. 公园里其他人看到问的是B, 就没管它;
+   B看到有人问自己号码, 于是就把对方存到通讯录[更新arp缓存], 然后打电话告诉对方:我就是B[arp响应(单播)]
+4. A看到接到电话说他就是B, 于是就记录到自己通讯录中, 下次想找B直接从通讯录打电话过去
+```
+
+## Arp欺骗
+
+> 接着上面的例子
+
+1. 有两个问题: A不管谁打电话来说他是B, 他都认为是真的 B 打过来的
+   B也不管谁说A的号码是什么, 他都认为这就是真的 A 的号码
+3. 假设有一个不规矩的C,电话号码是234
+   A在公园喊：我是A, 我号码是123,  B你的电话是多少?
+   [单向欺骗] 这时候C就打电话给A, 说我就是B, 然后A就把234保存为B的号码, 这样以后A要联系B都会去通讯录找
+   所以C就完全知道A想告诉B的内容了
+   [双向欺骗] C再可以假冒A, A虽然在公园喊谁是B的时候, C也在喊:我是A, 我的号码是234, B你的电话是多少?
+   这时候B会把234当作A的电话号码记到通讯录,.
+   之后, A要跟B交流会打234这个号码, C看到A发给B的内容后, 转手发给B, B看到是234发过来的, 就认为是A的内容, 然后继续通信下去...
+
+
 
 ## TCP/UDP的区别
 
@@ -547,7 +599,10 @@ pstFlexiable p_stFlexiable = (pstFlexiable)malloc(sizeof(stFlexiable) + strlen(s
 
 1. 连接性：
 　 TCP是面向连接(Connection oriented)的协议，UDP是无连接(Connection less)协议；
-　 TCP用三次握手建立连接：1) Client向server发送SYN；2) Server接收到SYN，回复Client一个SYN-ACK；3) Client接收到SYN_ACK;
+　 TCP用三次握手建立连接
+   1) Client向server发送SYN;
+   2) Server接收到SYN，回复Client一个SYN-ACK;
+   3) Client接收到SYN_ACK;
    回复Server一个ACK。到此，连接建成。UDP发送数据前不需要建立连接。
 2. 可靠性：
    TCP可靠，UDP不可靠；TCP丢包会自动重传，UDP不会。
@@ -568,6 +623,8 @@ pstFlexiable p_stFlexiable = (pstFlexiable)malloc(sizeof(stFlexiable) + strlen(s
 
 ## 三次握手
 
+![图](http://images.cnblogs.com/cnblogs_com/skynet/201012/201012122157467258.png)
+
 1. 第一次握手：建立连接时,客户端发送syn包(syn=j)到服务器,并进入SYN_SEND状态,等待服务器确认;
    SYN：同步序列编号(Synchronize Sequence Numbers)
 2. 第二次握手：服务器收到syn包,必须确认客户的SYN（ack=j+1）,同时自己也发送一个SYN包（syn=k);
@@ -582,9 +639,15 @@ pstFlexiable p_stFlexiable = (pstFlexiable)malloc(sizeof(stFlexiable) + strlen(s
 
 ## 只有两次握手行不行?
 
-1. 试想一下, Client第一次发送SYN1请求连接, 但是在网络某节点滞留了, 然后Client超时重传SYN2, 然后这一次一切正常, Client跟Service就愉快地进行数据传输了;
-   等到连接释放了以后, 那个迷失了的连接SYN1请求突然到了Service那, 如果是两次握手的话, Service发送确认ACK2, 它们就算是建立起了连接了;
-   事实上Client并不会理会这个ACK2确认, 因为我压根没有要传数据啊. 但是Service却傻傻地以为有数据要来, 苦苦等待. 结果就是造成资源的浪费.
+1. 试想一下, C第一次发送SYN1请求连接, 但是在网络某节点滞留了, 然后C超时重传SYN2, 然后这一次一切正常, C跟S可以正常进行数据传输;
+   等到连接释放了以后, 那个SYN1请求突然到了Service那, 如果是两次握手的话, Service发送确认ACK2, 它们就算是建立起了连接了;
+   事实上C并不会理会这个ACK2确认, 因为我压根没有要传数据啊. 但是S却傻傻地以为有数据要来, 苦苦等待. 结果就是造成资源的浪费.
+
+## 四次挥手
+
+
+
+
 
 ## 长连接、短链接
 
@@ -605,30 +668,32 @@ pstFlexiable p_stFlexiable = (pstFlexiable)malloc(sizeof(stFlexiable) + strlen(s
 
 ## 浏览器输入地址后发生了什么
 
-1. DNS服务把url转ip(数据链路层arp协议)
-2. 进行三次握手, 建立TCP/IP链接
-3. 浏览器发起HTTP的post请求
+> 1、客户端浏览器通过DNS解析到www.baidu.com的IP地址220.181.27.48，通过这个IP地址找到客户端到服务器的路径。客户端浏览器发起一个HTTP会话到220.161.27.48，然后通过TCP进行封装数据包，输入到网络层。
+> 2、在客户端的传输层，把HTTP会话请求分成报文段，添加源和目的端口，如服务器使用80端口监听客户端的请求，客户端由系统随机选择一个端口如5000，与服务器进行交换，服务器把相应的请求返回给客户端的5000端口。然后使用IP层的IP地址查找目的端。
+> 3、客户端的网络层不用关心应用层或者传输层的东西，主要做的是通过查找路由表确定如何到达服务器，期间可能经过多个路由器，这些都是由路由器来完成的工作，无非就是通过查找路由表决定通过那个路径到达服务器。
+> 4、客户端的链路层，包通过链路层发送到路由器，通过邻居协议查找给定IP地址的MAC地址，然后发送ARP请求查找目的地址，如果得到回应后就可以使用ARP的请求应答交换的IP数据包现在就可以传输了，然后发送IP数据包到达服务器的地址。
+
+1. [DNS]服务器(运行在应用层)把url转为ip地址
+2. 浏览器发起一个http会话到这个ip地址, 进行[三次握手], 建立TCP连接, 通过TCP封装后, 进入到网络层
+3. 浏览器发起HTTP的post请求, [传输数据]
 4. 请求由应用层不断包装进入到数据链路层, 然后经过路由转发(拆解到网络层), 最终经过防火墙\NAT到达目的主机
 5. 服务器处理该HTTP请求, 返回HTML文件
 6. 浏览器解析HTML文件, 展示
 
 ## 常用端口
-1. TCP协议:
+
 ```
 FTP      21
 TELNET   23
 SMTP     25
 POP3     110
 HTTP     80
-```
-2. UDP协议:
-```
 DNS      53
 ```
 
 
 
-## time_wait状态
+## Time_wait状态
 
 1. TIME_WAIT 状态，超时时间占用了 2MSL(Maximum segment lifetime) 有这个状态是两方面的原因
    1. 一个数据报在发送途中或者响应过程中有可能成为残余的数据报，因此必须等待足够长的时间避免新的连接会收到先前连接的残余数据报，而造成状态错误。
@@ -773,14 +838,6 @@ typedef struct TreeNode
    struct TreeNode *rchild;
 }TreeNode, *pTreeNode;
 ```
-
-
-
-
-
-
-
-
 
 # 其他
 

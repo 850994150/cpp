@@ -15,7 +15,8 @@
 int client_connect()
 {
     ///定义sockfd
-    int sock_cli = socket(AF_INET, SOCK_STREAM, 0); //1. 创建套接字
+    int sock_cli = socket(AF_INET, SOCK_STREAM, 0); //1. 创建流套接字
+    // AF_INET 表示使用TCP/IP协议族, SOCK_STREAM 表示使用TCP协议, SOCK_DGRAM 表示使用UDP协议
 
     ///定义sockaddr_in
     struct sockaddr_in servaddr;

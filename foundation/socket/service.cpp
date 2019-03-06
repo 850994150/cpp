@@ -58,7 +58,7 @@ int service_accpet()
         //     send(conn, buf, sizeof(buf), 0);
         // }
 
-        memset(buffer, 0, sizeof(buffer));
+        memset(bufeer, 0, sizeof(buffer));
         int len = recv(conn, buffer, sizeof(buffer), 0); // 5.1 用accept返回的套接字进行通信
         if (strcmp(buffer, "exit\n") == 0)
             break;
