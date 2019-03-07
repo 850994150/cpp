@@ -175,7 +175,7 @@ LinkList reverLinkList(LinkList llist)
     PNode pFirst;  // 反转前第一个结点
     PNode pInsert; // 待插入结点
     pFirst = llist->link;
-    while (pFirst->link != NULL) // 待插入结点
+    while (pFirst->link != NULL) // 待插入结点(例子中始终为1, 随着循环进行, 最后会把NULL赋值给1的link域)
     {
         pInsert = pFirst->link;
         pFirst->link = pInsert->link;
@@ -252,14 +252,14 @@ DataType Lastk(LinkList llist, int k)
     {
         p = p->link;
         i++;
-    } //p跑到第k个结点了
+    }
     if (p == NULL)
     {
         cout << "No Exit!\n";
     }
     while (p)
-    { //这里需要head先跑, 顺序不同结果也是不同的
-        head = head->link;
+    {
+        head = head->link; //这里需要head先跑, 顺序不同结果也是不同的
         p = p->link;
     }
     return head->info;
@@ -269,8 +269,9 @@ DataType Lastk(LinkList llist, int k)
 DataType LastKNode(LinkList llist, int k)
 {
     LinkList fast, low;
-    fast = llist->link;
-    low = llist->link;
+    fast = llist;
+    low = llist;
+
     while (k--)
     {
         fast = fast->link;
@@ -279,7 +280,7 @@ DataType LastKNode(LinkList llist, int k)
     {
         cout << "不存在" << endl;
     }
-    while (fast)
+    while (fast) // 因为最后一个结点也要算上, 所以如果是fast->link的话, 最后一个结点就没算上
     {
         fast = fast->link;
         low = low->link;
@@ -299,9 +300,18 @@ DataType LastKNode(LinkList llist, int k)
 DataType MiddleNode(LinkList llist)
 {
     LinkList fast, low;
-    fast = llist->link;
-    low = llist->link;
-    while (fast)
+    fast = llist;
+    low = llist;
+    //[h] 9 7 6 5 4 3 2 1 NULL .
+    //    i i i i   j   j
+    //[h] 8 6 5 4 3 2 1 NULL .
+    //    i i i i   j   j
+
+    // 如果是偶数个的话, fast最终落在n上，所以判断fast->link;
+    // 如果是奇数个的话, fast最终落在末结点的link上(为NULL)
+    // 为什么不合并起来只判断fast->link呢?
+    // 因为是奇数个时, fast=末尾结点的link域(null), 所以fast的link是不确定的
+    while (fast && fast->link)
     {
         fast = fast->link->link;
         low = low->link;
@@ -309,9 +319,42 @@ DataType MiddleNode(LinkList llist)
     return low->info;
 }
 
-void IsCircle(LinkList llist)
+// 获取单链表中间结点，若链表长度为n(n>0)
+// 若n为偶数, 则返回第n/2个结点
+// 若n为奇数, 则返回第n/2+1个结点
+DataType GetMiddleNode(LinkList pHead)
+{
+    if(pHead == NULL || pHead->link == NULL) // 链表为空或只有一个结点，返回头指针
+        return pHead->info;
+
+    LinkList pAhead = pHead;
+    LinkList pBehind = pHead;
+    while(pAhead->link!= NULL) // 前面指针每次走两步，直到指向最后一个结点，后面指针每次走一步
+    {
+        pAhead = pAhead->link;
+        pBehind = pBehind->link;
+        if(pAhead->link!= NULL)
+            pAhead = pAhead->link;
+    }
+    return pBehind->info; // 后面的指针所指结点即为中间结点
+}
+
+bool IsCircle(LinkList llist)
 {
     LinkList fast, low;
+    fast = llist;
+    low = llist;
+
+    while (fast && fast->link)
+    {
+        fast = fast->link->link;
+        low = low->link;
+        if (fast->info == low->info)
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 /*
@@ -407,6 +450,7 @@ int main()
     cout << LastKNode(llist, data) << "\n";
 
     cout << "中间结点是:" << MiddleNode(llist) << endl;
+    cout << "中间结点是:" << GetMiddleNode(llist) << endl;
 
     cout << "反转链表\n";
     LinkList tmp_link = reverLinkList(llist);

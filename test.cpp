@@ -488,6 +488,30 @@ void DestroyBinTree(p_TreeNode T)
     free(T);
 }
 
+int BinSearch(int array[], int target, int len)
+{
+    int low = 0;
+    size_t hight = len - 1; // XXX 这个len如果在函数内部计算的话, 效果是完全不一样的
+    while (low <= hight)
+    {
+        int mid = (low + hight) / 2;   //取中间值mid点位置
+        if (array[mid] == target)      //寻找到目标数
+        {
+            return mid;
+        }
+        if (array[mid] > target) //如果中间值大于目标数，则将highr点位置移动mid位置左边
+        {
+            hight = mid - 1;
+        }
+        if (array[mid] < target) //如果中间值小于目标数，则将low点位置移动mid位置右边
+        {
+            low = mid + 1;
+        }
+    }
+    return 0;
+}
+
+
 int main(int argc, char *argv[])
 {
     printf("         A         \n");
@@ -522,4 +546,12 @@ int main(int argc, char *argv[])
     float b = static_cast<float> (a);
     int i;
     cout << b << endl;
+    while (1 && NULL)
+    {
+        cout << "in" << endl;
+    }
+    cout << "out" << endl;
+    int arr[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    int len = sizeof(arr) / sizeof(arr[0]); // XXX 这个len如果在函数内部计算的话, 效果是完全不一样的
+    cout << BinSearch(arr, 4, len) << endl;
 }

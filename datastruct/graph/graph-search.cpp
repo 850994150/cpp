@@ -5,7 +5,7 @@
 #include <queue>
 using namespace std;
 int n;
-vector< list<int> > graph;
+vector<list<int>> graph;
 bool visited[100] = {0};
 void dfs(int v)
 {
@@ -13,9 +13,12 @@ void dfs(int v)
     visited[v] = true;
     printf("%5d", v);
     for (it = graph[v].begin(); it != graph[v].end(); ++it)
+    {
         if (!visited[*it])
             dfs(*it);
+    }
 }
+
 void bfs(int v)
 {
     list<int>::iterator it;
@@ -28,12 +31,19 @@ void bfs(int v)
         v = t.front();
         t.pop();
         for (it = graph[v].begin(); it != graph[v].end(); ++it)
+        {
             if (!visited[*it])
             {
                 printf("%5d", *it);
                 t.push(*it);
                 visited[*it] = true;
             }
+        }
     }
     cout << endl;
+}
+
+int main(int argc, char* argv[])
+{
+    return 0;
 }

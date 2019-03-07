@@ -393,8 +393,9 @@ bool isAVL(BiTree t, int &height) //判断二叉树是不是平衡二叉树
     }
 }
 
+//释放树空间
 void DestroyBinTree(BiTree t)
-{ //释放树空间
+{
     if (t == NULL)
         return;
     DestroyBinTree(t->lchild);
