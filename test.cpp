@@ -554,4 +554,12 @@ int main(int argc, char *argv[])
     int arr[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
     int len = sizeof(arr) / sizeof(arr[0]); // XXX 这个len如果在函数内部计算的话, 效果是完全不一样的
     cout << BinSearch(arr, 4, len) << endl;
+    char *p_print = "abcdef";
+    cout << "with cout :"<<p_print << endl;
+    printf("with %%s: %s\n", p_print);
+    cout << "without %%s:";
+    printf(p_print);
+    cout << endl;
+
+    return 0;
 }
