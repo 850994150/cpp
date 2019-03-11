@@ -10,6 +10,8 @@
 #include <functional> // std::ref
 #include <thread>     // std::thread
 #include <future>     // std::promise, std::future
+#include <map>
+#include <unordered_map>
 using namespace std;
 // typedef void (*pLineCallback)(int iCnt, const char *pcszContent);
 typedef void(pLineCallback)(string strContent);
@@ -52,6 +54,33 @@ typedef struct stDBFHead
     char szRecSize[2];    // 2字节保存每行数据的长度
     char Reserved[20];
 } stDbfHead;
+
+class Solution
+{
+  public:
+    vector<int> twoSum(vector<int> &nums, int target)
+    {
+        unordered_map<int, int> mapping;
+        vector<int> result;
+        for (int i = 0; i < nums.size(); i++)
+        {
+            mapping[nums[i]] = i;
+        }
+        for (int i = 0; i < nums.size(); i++)
+        {
+            const int gap = target - nums[i];
+            if (mapping.find(gap) != mapping.end() && mapping[gap] > i)
+            {
+                // result.push_back(i + 1);
+                // result.push_back(mapping[gap] + 1);
+                result.push_back(i);
+                result.push_back(mapping[gap]);
+                break;
+            }
+        }
+        return result;
+    }
+};
 
 string WString2String(const std::wstring &ws)
 {
@@ -546,6 +575,7 @@ int main(int argc, char *argv[])
     float b = static_cast<float> (a);
     int i;
     cout << b << endl;
+    // while (1 && NULL)
     while (1 && NULL)
     {
         cout << "in" << endl;
@@ -554,6 +584,9 @@ int main(int argc, char *argv[])
     int arr[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
     int len = sizeof(arr) / sizeof(arr[0]); // XXX 这个len如果在函数内部计算的话, 效果是完全不一样的
     cout << BinSearch(arr, 4, len) << endl;
+
+    // printf字符串指针, 可以不加格式化字符%s; 但是printf一个非字符串指针或常量时则不行
+    // 和printf("hello world"); 一样, "hello world" 入参的是该字符串的地址, 直接传char* 也一样
     char *p_print = "abcdef";
     cout << "with cout :"<<p_print << endl;
     printf("with %%s: %s\n", p_print);
@@ -561,5 +594,12 @@ int main(int argc, char *argv[])
     printf(p_print);
     cout << endl;
 
+    Solution clSolution;
+    vector<int> nums = {2, 7, 11, 15};
+    vector<int> results = clSolution.twoSum(nums, 13);
+    for(auto x: results)
+    {
+        cout << x << endl;
+    }
     return 0;
 }

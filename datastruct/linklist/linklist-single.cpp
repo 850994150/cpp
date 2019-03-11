@@ -3,9 +3,15 @@
 * EMail        : hellohuangjinjie@gmail.com
 * Last modified: 2016-04-14 12:02:04
 * Filename     : linklist-single.cpp
-* Description  : 带头结点的单链表
+* Description  : 带头结点的单链表操作
     * 由于我使用0表示输入结束，所以尽量不要插入0
-    * 带头结点？不带头结点？
+    * 单链表: 结点只有一个指针域
+    * 头指针
+        * 链表中第一个结点的存储位置叫做头指针
+    * 头结点
+        * 是为了操作的统一与方便而设立的，放在第一个元素结点之前，其数据域一般无意义
+        * 有了头结点后，对在第一个元素结点前插入结点和删除第一个结点，其操作与对其它结点的操作统一了。
+        LinkList llist; // 函数入参 llist 是入参头指针, 用 -> 访问符就可以访问头结点
 ***********************************************************/
 
 #include <iostream>
@@ -16,40 +22,81 @@
 using namespace std;
 typedef int DataType;
 struct Node;
-typedef struct Node *PNode;
+typedef struct Node* PNode;
 
 struct Node
 {
     DataType info;
     PNode link;
 };
-typedef struct Node *LinkList;
+typedef struct Node* LinkList;
 
-//创建空链表
+/*
+ * @function: 创建带头结点的空链表
+ * @brief	:
+ *            llist(头指针)
+ *              ↓
+ *             [ ] -> [1] -> [2] -> NULL
+ *                     ↑ llist = llist->link(头指针往后挪)
+ * @param	:
+ * @return	:
+ */
 LinkList createNullList_link()
 {
-    LinkList llist = (LinkList)malloc(sizeof(struct Node));
-    if (llist != NULL)
-        llist->link = NULL;
+    LinkList llist = NULL; // llist为链表头指针
+    PNode head = (PNode)malloc(sizeof(struct Node)); // 指向头结点的指针head
+    llist = head; // 头指针指向头结点
+    if (head != NULL)
+    {
+        head->link = NULL; // 初始化头结点, 指针用->来访问指向的结构体
+    }
     else
+    {
         printf("Out of space !\n");
-    return llist;
+        abort();
+    }
+    return llist; // 头结点的地址, 所以后面的函数入参 llist 都是入参头指针
 }
 
-//判断链表是否为空
+/*
+ * @brief	: 销毁链表空间
+ * @param	:
+ * @return	:
+ */
+void DestroyLinkList(LinkList llist)
+{
+    PNode head = llist;
+    while (head!= NULL)
+    {
+        llist = llist->link;
+        free(head);
+        head = llist;
+    }
+    llist = NULL;
+}
+
+/*
+ * @brief	: 判断是否为空链表
+ * @param	:
+ * @return	:
+ */
 int isNullList_link(LinkList llist)
 {
     return (llist->link == NULL);
 }
 
-//输出链表
+/*
+ * @brief	: 正序输出链表结点值
+ * @param	:
+ * @return	:
+ */
 void showLinkList(LinkList llist)
 {
-    PNode tmp = llist;
-    while ((tmp != NULL) & (tmp->link != NULL))
+    PNode head = llist;
+    while ((head != NULL) & (head ->link != NULL))
     {
-        tmp = tmp->link;
-        cout << tmp->info << " ";
+        head = head->link;
+        cout << head->info << " ";
     }
     cout << endl;
 }
@@ -70,8 +117,12 @@ PNode locate_x(LinkList llist, DataType x)
     return p;
 }
 
-//单链表的插入
-int insertPost_link(LinkList llist, PNode p, DataType x)
+/*
+ * @brief	: 带头结点单链表的插入(前插)
+ * @param	: 每次插入都是插入在head结点后面: h->1->null; h->2->1->null;
+ * @return	:
+ */
+int insertPost_link(PNode head, DataType x)
 {
     PNode q = (PNode)malloc(sizeof(struct Node));
     if (q == NULL)
@@ -82,71 +133,144 @@ int insertPost_link(LinkList llist, PNode p, DataType x)
     else
     {
         q->info = x;
-        q->link = p->link; //先右
-        p->link = q;       //后左
+        q->link = head->link; // 先右
+        head->link = q;       // 后左
         return 1;
     }
 }
 
-//在单链表中求p所指结点的前驱结点：
+/*
+ * @function: 单链表中求p所指结点的前驱结点：
+ * @brief	: 遍历结点, 判断link域是否指向结点p
+ * @param	:
+ * @return	:
+ */
 PNode locatePre_link(LinkList llist, PNode p)
 {
-    PNode p1;
+    PNode preNode;
     if (llist == NULL)
+    {
         return NULL;
-    p1 = llist;
-    while (p1 != NULL && p1->link != p) //p1->link指向的就是p
-        p1 = p1->link;
-    return p1;
+    }
+    preNode = llist;
+    while (preNode != NULL && preNode->link != p)
+    {
+        preNode= preNode->link;
+    }
+    return preNode;
 }
 
-//单链表的删除
+/*
+ * @function: 单链表的删除
+ * @brief	: 遍历找到前驱结点preNode
+ * @param	:
+ * @return	:
+ */
 int deleteValue(LinkList llist, DataType x)
 {
-    PNode p, q;
+    PNode preNode, xNode;
+    preNode = llist;
+    if (preNode == NULL)
+    {
+        return -1;
+    }
+    // 遍历链表, 寻找x所在的结点的前驱结点p
+    while (preNode->link != NULL && preNode->link->info != x)
+        preNode = preNode->link;
 
-    //p和llist都是头结点
-    p = llist;
-    if (p == NULL)
-        return 0;
-    //寻找x所在的结点
-    while (p->link != NULL && p->link->info != x)
-        p = p->link;
-
-    if (p->link == NULL)
+    if (preNode->link == NULL)
     {
         printf("Not exist!\n");
-        return 0;
+        return -1;
     }
     else
     {
-        q = p->link; //定q结点为x所在结点
-        p->link = q->link;
-        free(q);
-        return 1;
+        xNode = preNode->link; // x 所在结点
+        preNode->link = xNode->link;
+        free(xNode);
+        return 0;
     }
 }
 
-//删除下标为i的结点
+/*
+ * @function: 删除所有值为x的结点
+ * @brief	:
+ * @param	:
+ * @return	:
+ */
+void deleteAllValue(LinkList L, DataType x)
+{
+    if (L->link == NULL)
+    {
+        return;
+	}
+	PNode p, q;
+	p = L;
+    while (p->link != NULL)
+    {
+        if (p->link->info == x)
+        {
+            q = p->link;
+            p->link = q->link;
+            free(q);
+        }
+        else
+        {
+            p = p->link;
+		}
+    }
+}
+
+
+/*
+ * @function: 删除第i个结点(不是下标)
+ * @brief	:
+ * @param	:
+ * @return	:
+ */
+void deletebyIndex(LinkList llist, int index)
+{
+    PNode preNode;
+    preNode = llist;
+    // index += 1; // 下标和位置..
+    while (preNode->link !=NULL && --index)
+        preNode = preNode->link;
+
+    preNode->link = preNode->link->link;
+}
+
+/*
+ * @function: 删除下标为i的结点
+ * @brief	:
+ * @param	:
+ * @return	:
+ */
 void deletePosition(LinkList llist, int i)
 {
-    PNode p;
-    p = llist;
+    PNode preNode;
+    preNode = llist;
     for (int j = 0; j < i; j++)
     {
-        if (!p->link)
+        if (!preNode->link)
         {
             printf("Not exist\n");
             break;
         }
         else
-            p = p->link;
+        {
+            preNode = preNode->link;
+        }
     }
-    p->link = p->link->link;
+    preNode->link = preNode->link->link;
 }
 
 
-// 计算节点个数
+/*
+ * @function: 计算节点数
+ * @brief	:
+ * @param	:
+ * @return	:
+ */
 int ListNodeNum(LinkList llist)
 {
     int iNum = 0;
@@ -156,26 +280,25 @@ int ListNodeNum(LinkList llist)
     }
     while (llist->link != NULL)
     {
-        llist = llist->link; // llist一直是下一个结点
+        llist = llist->link; // llist(头指针)一直是下一个结点
         iNum++;
     }
     return iNum;
 }
 
-
-
 /*
- * 翻转链表
- * 思路: 将1～n结点一个个插入到head结点后
- *       指针修改顺序从后往前, 想修改待插入的
- * h -> 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> NULL
+ * @function: 带头结点的单链表翻转
+ * @brief	: 头结点h不用动将2～n结点一个个插入到head结点后
+              指针修改顺序从后往前, 想修改待插入的
+              h -> 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> null
+ * @param	:
+ * @return	:
  */
 LinkList reverLinkList(LinkList llist)
 {
-    PNode pFirst;  // 反转前第一个结点
-    PNode pInsert; // 待插入结点
-    pFirst = llist->link;
-    while (pFirst->link != NULL) // 待插入结点(例子中始终为1, 随着循环进行, 最后会把NULL赋值给1的link域)
+    PNode pFirst = llist->link; // 反转前第一个结点(头结点之后的第一个结点)
+    PNode pInsert;              // 待插入结点(例子中始终为1, 随着循环进行, 最后会把NULL赋值给1的link域)
+    while (pFirst->link != NULL)
     {
         pInsert = pFirst->link;
         pFirst->link = pInsert->link;
@@ -235,24 +358,34 @@ void sortLinkList(LinkList *plist)
     }
 }
 
+
 /*
- 输出链表中倒数第K个结点
-1. 先计算出总结点数n, 然后第n-k个就是倒数第k个结点了
-2. 双指针联动，快指针先走K个节点，然后快慢指针一起走，
-   快指针跑到尾节点时另一个指针恰好是倒数第K个结点
-   其实快指针走了k, 慢指针才开始走,而且快指针走到结尾就停止,
-   所以慢指针走了n-k个结点, 刚好是倒数第k个
+ * @function: 输出倒数第k个结点
+ * @brief	:
+            1. 先计算出总结点数n, 然后第n-k个就是倒数第k个结点了
+            2. 双指针联动，快指针先走K个节点，然后快慢指针一起走，
+               快指针跑到尾节点时另一个指针恰好是倒数第K个结点
+               其实快指针走了k, 慢指针才开始走,而且快指针走到结尾就停止,
+               所以慢指针走了n-k个结点, 刚好是倒数第k个
+ * @param	:
+ * @return	:
  */
 DataType Lastk(LinkList llist, int k)
 {
     int i = 1;
-    PNode head = llist;   //头结点
-    PNode p = head->link; //链表第一个结点
+    PNode head = llist;   // 头结点
+    PNode p = head->link;
+    while (p && --k) // 这里p为第一个结点, 所以找第k个结点循环k-1次
+        p = p->link;
+    /* // ok
     while (p && i < k)
     {
         p = p->link;
         i++;
     }
+    */
+    // 循环退出, p指向第k个结点
+    cout << "第k个结点为:" << p->info << endl;
     if (p == NULL)
     {
         cout << "No Exit!\n";
@@ -265,14 +398,19 @@ DataType Lastk(LinkList llist, int k)
     return head->info;
 }
 
-// 这种明显更直观
+/*
+ * @function: 输出倒数第k个结点
+ * @brief	:
+ * @param	:
+ * @return	:
+ */
 DataType LastKNode(LinkList llist, int k)
 {
     LinkList fast, low;
     fast = llist;
     low = llist;
 
-    while (k--)
+    while (k--) // 本来第k个结点, 需要找下标为k-1的结点, 但这里从头结点开始, 所以循环k次
     {
         fast = fast->link;
     }
@@ -290,27 +428,21 @@ DataType LastKNode(LinkList llist, int k)
 
 
 /*
- 查找中间结点
- 设置快慢指针, 都是从头开始走, 快指针走两步, 慢指针走一步
- 当快指针走到结尾时, 慢指针刚好指在中间结点
- 原理：
-    快指针是慢指针的两倍
- 这种方法求得的中间结点下标为: n/2 向上取整
-*/
+ * @function: 查找中间结点
+ * @brief	:
+            设置快慢指针, 都是从头开始走, 快指针走两步, 慢指针走一步
+            当快指针走到结尾时, 慢指针刚好指在中间结点
+            原理：
+                快指针是慢指针的两倍
+ * @param	:
+ * @return	: 返回第n/2个结点(向上取整) 如6个结点则返回第3个,7个结点则返回第4个
+ */
 DataType MiddleNode(LinkList llist)
 {
     LinkList fast, low;
     fast = llist;
     low = llist;
-    //[h] 9 7 6 5 4 3 2 1 NULL .
-    //    i i i i   j   j
-    //[h] 8 6 5 4 3 2 1 NULL .
-    //    i i i i   j   j
 
-    // 如果是偶数个的话, fast最终落在n上，所以判断fast->link;
-    // 如果是奇数个的话, fast最终落在末结点的link上(为NULL)
-    // 为什么不合并起来只判断fast->link呢?
-    // 因为是奇数个时, fast=末尾结点的link域(null), 所以fast的link是不确定的
     while (fast && fast->link)
     {
         fast = fast->link->link;
@@ -339,6 +471,13 @@ DataType GetMiddleNode(LinkList pHead)
     return pBehind->info; // 后面的指针所指结点即为中间结点
 }
 
+/*
+ * @function: 判断链表是否有环
+ * @brief	: 快慢指针, 快指针一次走两步, 慢指针一次走一步,
+              如果有环, 肯定会相遇
+ * @param	:
+ * @return	:
+ */
 bool IsCircle(LinkList llist)
 {
     LinkList fast, low;
@@ -358,14 +497,21 @@ bool IsCircle(LinkList llist)
 }
 
 /*
- * 两个有序链表的合并
+ * @function: 有序链表合并
+ * @brief	:
+ * @param	:
+ * @return	:
  */
 LinkList sortedMerge(LinkList llist1, LinkList llist2)
 {
     if (llist1 == NULL)
+    {
         return llist2;
+    }
     else if (llist2 == NULL)
+    {
         return llist1;
+    }
     PNode pMergedHead = NULL;
     if (llist1->info < llist2->info)
     {
@@ -380,42 +526,38 @@ LinkList sortedMerge(LinkList llist1, LinkList llist2)
     return pMergedHead;
 }
 
-DataType HeadorNoHead(LinkList llist)
-{
-    // PNode head = llist; 头结点, head->link 为第一个结点
-    // return head->info;
-
-    PNode p = llist->link; //头结点的指针指向了第一个结点
-    return p->info;
-}
-
 int main()
 {
     LinkList llist = createNullList_link();
     PNode head = llist;
     PNode tmp;
     DataType data;
-    cout << "输入结点,0表示输入完毕:\n";
+
+    cout << "输入结点, 0表示输入完毕:\n";
     cin >> data;
     while (data)
     {
-        insertPost_link(llist, head, data);
+        insertPost_link(head, data);
         cin >> data;
     }
-
     cout << "结点个数为: " << ListNodeNum(llist) << endl;
-
     cout << "由于是前插，所以实际顺序与输入顺序相反\n";
     showLinkList(llist);
 
     if (!isNullList_link(llist))
-        cout << "栈非空\n";
+    {
+        cout << "链表非空\n";
+    }
+    else
+    {
+        cout << "空链表" << endl;
+        return 0;
+    }
 
     cout << endl;
 
     DataType key;
     cout << "输入data, 找到data:\n";
-    // FIXME
     cin >> key;
     tmp = locate_x(llist, key);
     cout << tmp->info << endl;
@@ -424,7 +566,7 @@ int main()
     DataType input1, input2;
     cin >> input1 >> input2;
     tmp = locate_x(llist, input1);
-    insertPost_link(llist, tmp, input2);
+    insertPost_link(tmp, input2);
     showLinkList(llist);
 
     cout << "查找前驱结点,cin current data\n";
@@ -441,7 +583,17 @@ int main()
 
     cout << "按位置删除,cin i\n";
     cin >> data;
+    deletebyIndex(llist, data);
+    showLinkList(llist);
+
+    cout << "按下标删除,cin i\n";
+    cin >> data;
     deletePosition(llist, data);
+    showLinkList(llist);
+
+    cout << "删除所有值为x的结点\n";
+    cin >> data;
+    deleteAllValue(llist, data);
     showLinkList(llist);
 
     cout << "输入k,输出倒数第k个结点\n";
@@ -456,10 +608,6 @@ int main()
     LinkList tmp_link = reverLinkList(llist);
     showLinkList(tmp_link);
 
-    /* // cout<<"reverse\n";
-    // reverse(llist);
-    // showLinkList(llist); */
-
     cout << "表排序\n";
     sortLinkList(&llist);
     showLinkList(llist);
@@ -472,11 +620,15 @@ int main()
     cin >> data2;
     while (data2)
     {
-        insertPost_link(llist, head2, data2);
+        insertPost_link(head2, data2);
         cin >> data2;
     }
     sortLinkList(&llist2);
     showLinkList(sortedMerge(llist, llist2));
+
+    cout << "销毁链表空间" << endl;
+    DestroyLinkList(llist);
+    DestroyLinkList(llist2);
 
     return 0;
 }
