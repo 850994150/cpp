@@ -165,7 +165,7 @@ int MyVsnprintf(char *dest, int size, char *formate, ...)
 void MyStrcpy(char* dest, const char* src)
 {
     assert((dest != NULL) && (src != NULL));
-    while ((*dest++ = *src++) != '\0') ;
+    while ((*dest++ = *src++) != '\0') ; // 先赋值, 再自增, 然后用dest作为while条件
 }
 
 void MyStrncpy(char *dest, const char *src, int len)
@@ -322,7 +322,7 @@ int MyStrcmp(const char* str1, const char* str2)
     {
         printf("%c\t%c\n", *str1, *str2);
     }
-    // 循环结束后, *str1,*str2指向不同的那个字符的位置
+    // 循环结束后, *str1,*str2指向不同的那个字符的下一个字符的位置
     // 所以比较  前  的时候要先回退一位(--str1), 用str--结果是错的
     int result = *(--str1) == *(--str2) ? 0 : (*(--str1) > *(--str2) ? 1 : -1);
 }
@@ -391,57 +391,87 @@ char* MyStrrchr(const char*src, char ch)
     return ret;
 }
 
-char *MyStrstr(char *str1, const char *str2)
+char* MyStrstr(char* str1, const char* str2)
 {
     assert(str1 != NULL);
     assert(str2 != NULL);
 
     if (*str2 == '\0')
-    {
         return str1;
-    }
-    if (str1 == NULL)
+
+    while(str1)
     {
-        return NULL;
-    }
-    while (*str1)
-    {
-        const char *cur = str2; // 因为要整串比较, 所以始终要从第一个字符开始
-        while (*str1++ == *cur++)
+        const char *cur = str2; // 每次不相等都从第一个字符重新开始
+        while ((*str1++ == *cur++) && *str1 && *cur)
             ;
-        if (*cur == '\0')
-        {
-            return str1 - strlen(str2); // 指针由于while循环比较, str2指针已经往右移了, 现在往左退回第一个字符
-        }
-        if (*str1 == '\0')
-        {
-            return NULL;
-        }
+        // 循环退出, 指针指向不相等的字符的下一个字符
+        if (*(--cur) == *(--str1))
+            return str1 - strlen(str2) + 1;
         str1++;
+
+        if (*str1 == '\0')
+            return NULL;
+
     }
+    return NULL;
 }
 
 char* MyStrstr2(char* str1, const char* str2)
 {
-    const char* s1 = str1;
-    const char* s2 = str2;
-    char * cur = str1;
-
     assert(str1 != NULL);
     assert(str2 != NULL);
 
-    if (*str2 == '\0') return str1;
+    if (*str2 == '\0')
+        return str1;
 
-    while(cur)
+    while(str1)
     {
-        s1 = cur;
-        s2 = str2;
-        while(*s1 == *s2){s1++; s2++; };
-        if (*s2 == '\0') return cur;
-        if (*s1 == '\0') return NULL;
-        cur++;
+        const char *cur = str2; // 每次不相等都从第一个字符重新开始
+        while (*str1 == *cur)
+        {
+            str1++;
+            cur++;
+        };
+        if (*cur == '\0')
+            return str1 - strlen(str2); // str1指向了第一个不相等的字符上, 回退到str2开头, 返回str2在str1第一个字符位置
+        if (*str1 == '\0')
+            return NULL;
+        str1++;
     }
     return NULL;
+}
+
+/*
+ * @function: 计算str1中有多少个str2
+ * @brief	: 做法和strstr的实现一样, 只不过return的时候改为计数了
+ * @param	:
+ * @return	:
+ */
+int MyStrstrCnt(char* str1, const char* str2)
+{
+    int cnt = 0;
+    assert(str1 != NULL);
+    assert(str2 != NULL);
+
+    if (*str2 == '\0')
+        return 0;
+
+    while(str1)
+    {
+        const char *cur = str2;
+        // while ((*str1++ == *cur++) && *str1 && *cur) ;
+        while (*str1 == *cur)
+        {
+            str1++;
+            cur++;
+        };
+        if (*cur == '\0')
+            cnt++;
+        if (*str1 == '\0')
+            break;
+        str1++;
+    }
+    return cnt;
 }
 
 char* MyStrspn()
@@ -689,10 +719,13 @@ void cString()
     char *strrchr_rest = MyStrrchr(strchr_ch, ch);
     printf("MyStrrchr: %s\n", strrchr_rest);
 
-    char *strstr_res = strstr(strchr_ch, "fz");     // strstr 返回str2中str1第一次出现的位置，返回指针，否则返回 NULL; strrstr返回最后一次出现
+    char *strstr_res = strstr(strchr_ch, "as");     // strstr 返回str2中str1第一次出现的位置，返回指针，否则返回 NULL; strrstr返回最后一次出现
     printf("strstr: %s\n", strstr_res);
-    char *strstr_rest = MyStrstr(strchr_ch, "fz");
+
+    printf("orig    : %s\n", strchr_ch);
+    char *strstr_rest = MyStrstr(strchr_ch, "zaz");
     printf("Mystrstr: %s\n", strstr_rest);
+    printf("MystrstrCnt: %d\n", MyStrstrCnt(strchr_ch, "as"));
 
     char strfry_str[] = "huangjinjie";
     printf("strfry: %s\n", strfry(strfry_str));
@@ -714,11 +747,11 @@ void cString()
     char strcasecmp1[] = "asdf=Aesd";
     char strcasecmp2[] = "asdf=ADsd";
     // if (strcmp(strcmp1, strcmp2) != 0)
-    // if (MyStrcmp(strcasecmp1, strcasecmp2) != 0)
+    if (MyStrcmp(strcmp1, strcmp2) != 0)
     // if (strncmp(strcmp1, strcmp2, 6) != 0)
     // if (MyStrncmp(strcmp1, strcmp2, 6) != 0)
     // if (strcasecmp(strcasecmp1, strcasecmp2) != 0)
-    if (MyStrcasecmp(strcasecmp1, strcasecmp2) != 0)
+    // if (MyStrcasecmp(strcasecmp1, strcasecmp2) != 0)
         printf("不相等");
     else
         printf("相等");

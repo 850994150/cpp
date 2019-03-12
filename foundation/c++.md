@@ -720,7 +720,9 @@ bool IsLittleEndian()
    unorder_map和map, 前者是通过哈希表来实现的, 后者则是通过红黑树(默认就是有序的)
 
 
-## 信号
+## Linux信号
+
+1. 查看linux中有哪些信号 `kill -l`
 
 
 # 计算机网络和网络安全

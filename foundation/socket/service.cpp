@@ -17,7 +17,7 @@ void thread_task()
 {
 }
 
-int service_accpet()
+int main(int argc, char *argv[])
 {
     int ss = socket(AF_INET, SOCK_STREAM, 0); // 1. 创建套接字
     struct sockaddr_in server_sockaddr;
@@ -69,9 +69,4 @@ int service_accpet()
     close(conn); // 6. 关闭套接字
     close(ss);
     return 0;
-}
-
-int main(int argc, char*argv[])
-{
-    service_accept();
 }

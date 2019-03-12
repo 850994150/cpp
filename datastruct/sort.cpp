@@ -41,11 +41,11 @@ gif图:
 #include <time.h>
 #include <malloc.h>
 using namespace std;
-const int n = 10;
+const int n = 20;
 void create(int a[])
 {
     srand((unsigned)time(NULL));
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < n; i++)
     {
         a[i] = rand() % 100 + 1;
     }
@@ -519,7 +519,7 @@ int main()
     cout << endl;
 
     cout << "quickSort" << endl;
-    quickSort(s, 0, n);
+    quickSort(s, 0, n - 1);
     print(s);
     cout << endl;
 

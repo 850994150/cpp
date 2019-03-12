@@ -308,7 +308,7 @@ LinkList reverLinkList(LinkList llist)
     return llist;
 }
 
-// 插入排序---- 表排序
+// 插入排序
 // 移动次数为0，比较次数为O(n*n)
 // 空间复杂度O(n),(每个节点都附加了link字段)
 /*
@@ -316,6 +316,12 @@ LinkList reverLinkList(LinkList llist)
  * 为什么不像之前那样,从后往前比呢? 因为单链表中, 像找前驱节点不容易啊
  * 为什么需要q, p 两个节点, 因为要把now节点插入,而插入的位置就在q,p中间,
  * q就指向now的父节点,p就是now的next节点,插入完后，q,p重新回到开头,下一个继续从头开始与now节点比较
+ */
+/*
+ * @function: 链表排序
+ * @brief	: 插入排序的优化, 插入排序要把元素一个个往后移动才能插入, 用链表来改善插入复杂度
+ * @param	:
+ * @return	:
  */
 void sortLinkList(LinkList *plist)
 {
@@ -356,6 +362,82 @@ void sortLinkList(LinkList *plist)
         now->link = p;
         now = pre->link; // now还是指向下个需要插入的节点
     }
+}
+
+/*
+ * @function: 链表排序
+ * @brief	: 就像链表逆转一样, 把后面的结点一个个插入到前面
+ * @param	:
+ * @return	:
+ */
+void LinkListInsertSort(LinkList llist)
+{
+    PNode head;
+    PNode insertNode;        // 待插入结点
+    PNode preInsertNode;     // 待插入结点的前驱结点
+    PNode prePosition;       // 插入位置的前一个结点
+    PNode afterPosition;     // 插入位置的后一个结点(第一个比插入结点大或相等的结点)
+    head = llist;
+
+    if (head->link == NULL || head->link->link == NULL)
+        return;
+    preInsertNode = head->link;
+    insertNode = preInsertNode->link;
+    while (insertNode != NULL)
+    {
+        prePosition = head;
+        afterPosition = head->link; // 首个结点
+
+        while (afterPosition != insertNode && afterPosition->info <= insertNode->info)
+        {
+            prePosition = afterPosition;
+            afterPosition = afterPosition->link; // 遍历链表, 找到合适的位置
+        }
+        // printf("待插入前驱:%d\t待插入%d\n前位置%d\t后位置%d\n\n", preInsertNode->info, insertNode->info, prePosition->info, afterPosition->info);
+
+        if (afterPosition == insertNode) // 待插入结点和有序序列中最大的结点相等时
+        {
+            preInsertNode = preInsertNode->link;
+            insertNode = preInsertNode->link;
+            continue;
+        }
+
+        preInsertNode->link = insertNode->link;
+        prePosition->link = insertNode;
+        insertNode->link = afterPosition;
+        insertNode = preInsertNode->link;
+    }
+}
+
+/*
+ * @function: 链表冒泡排序
+ * @brief	: 思想和普通冒泡排序一样, 普通是比较数组元素, 这里是比较结点值; 注意结点移动
+ * @param	:
+ * @return	:
+ */
+void LinkLisBubbleSort(LinkList llist)
+{
+    int len = ListNodeNum(llist);
+    if (len == 0)
+        return;
+    int i, j;
+    PNode p;
+    DataType tmp;
+
+    for (i = 0; i < len; i++)
+    {
+        p = llist->link; // 带头结点的链表, 从第一个结点开始
+        for (j = 0; j < len - i - 1; j++)
+        {
+            if (p->info > p->link->info)
+            {
+				tmp = p->info;
+                p->info = p->link->info;
+                p->link->info= tmp;
+			}
+            p = p->link; // 结点移动
+        }
+	}
 }
 
 
@@ -526,7 +608,19 @@ LinkList sortedMerge(LinkList llist1, LinkList llist2)
     return pMergedHead;
 }
 
-int main()
+void sort_test(LinkList llist)
+{
+    cout << "原始序列:" << endl;
+    showLinkList(llist);
+    cout << "插入排序:" << endl;
+    LinkListInsertSort(llist);
+    showLinkList(llist);
+    cout << "冒泡排序排序:" << endl;
+    LinkLisBubbleSort(llist);
+    showLinkList(llist);
+}
+
+int main(int argc, char *argv[])
 {
     LinkList llist = createNullList_link();
     PNode head = llist;
@@ -608,9 +702,8 @@ int main()
     LinkList tmp_link = reverLinkList(llist);
     showLinkList(tmp_link);
 
-    cout << "表排序\n";
-    sortLinkList(&llist);
-    showLinkList(llist);
+    cout << "链表排序\n";
+    sort_test(llist);
 
     //FIXME 为什么会多了个0
     cout << "两个有序链表合并\n输入链表2\n";
@@ -632,3 +725,4 @@ int main()
 
     return 0;
 }
+

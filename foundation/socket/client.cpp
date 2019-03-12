@@ -12,7 +12,7 @@
 #define MYPORT 7000
 #define BUFFER_SIZE 1024
 
-int client_connect()
+int main(int argc, char *argv[])
 {
     ///定义sockfd
     int sock_cli = socket(AF_INET, SOCK_STREAM, 0); //1. 创建流套接字
@@ -48,14 +48,4 @@ int client_connect()
 
     close(sock_cli); // 4. 关闭套接字
     return 0;
-}
-
-int client_select()
-{
-
-}
-
-int main(int argc, char*argv[])
-{
-    client_connect();
 }

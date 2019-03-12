@@ -18,9 +18,10 @@ using namespace std;
 
 typedef int Datatype;
 
-struct SeqList{
-    int MAXNUM;//max length in seqlist
-    int n;//real length in seqlist
+struct SeqList
+{
+    int MAXNUM; // 顺序表最大长度
+    int n;      // 顺序表实际长度
     Datatype *element;
 };
 
@@ -29,10 +30,10 @@ typedef struct SeqList *PSeqList;
 PSeqList createEmptySeq(int m)
 {
     PSeqList palist = (PSeqList)malloc(sizeof(struct SeqList));
-    if (palist!=NULL)
+    if (palist != NULL)
     {
-        palist->element = (Datatype*)malloc(sizeof(Datatype)*m);
-        if(palist->element)
+        palist->element = (Datatype *)malloc(sizeof(Datatype) * m);
+        if (palist->element)
         {
             palist->MAXNUM = m;
             palist->n = 0;
@@ -41,7 +42,7 @@ PSeqList createEmptySeq(int m)
         else
             free(palist);
     }
-    cout<<"out of space\n";
+    cout << "out of space\n";
     return NULL;
 }
 
@@ -53,64 +54,64 @@ int isNULLSeq(PSeqList palist)
 void showSeq(PSeqList palist)
 {
     int i;
-    for(i=0; i<palist->n; i++)
-        cout<<palist->element[i]<<" ";
-    cout<<endl;
+    for (i = 0; i < palist->n; i++)
+        cout << palist->element[i] << " ";
+    cout << endl;
 }
 
 int locate_Seq(PSeqList palist, Datatype key)
 {
     int i;
-    for(i=0; i<palist->n; i++)
-        if(palist->element[i] == key)
+    for (i = 0; i < palist->n; i++)
+        if (palist->element[i] == key)
             return i;
     return -1;
-
 }
 void insertItem(PSeqList palist, int p, Datatype x)
 {
-    palist->element[p]=x;
-    palist->n = palist->n+1;
+    palist->element[p] = x;
+    palist->n = palist->n + 1;
 }
 void insertPre_seq(PSeqList palist, int p, Datatype key)
 {
-    if(p<0 ||p>palist->n)
-        cout<<"No this place\n";
-    if(palist->n >= palist->MAXNUM)
-        cout<<"Over flow"<<endl;
+    if (p < 0 || p > palist->n)
+        cout << "No this place\n";
+    if (palist->n >= palist->MAXNUM)
+        cout << "Over flow" << endl;
 
     int i;
-    for(i=palist->n-1; i>=p; i--)
-        palist->element[i+1] = palist->element[i];
-    palist->element[p]=key;
-    palist->n = palist->n+1;
+    for (i = palist->n - 1; i >= p; i--)
+        palist->element[i + 1] = palist->element[i];
+    palist->element[p] = key;
+    palist->n = palist->n + 1;
 }
 
 int insertPost_seq(PSeqList palist, int p, Datatype key)
 {
-    if(p<0 ||p>palist->n)
-        cout<<"No this place\n";
-    if(palist->n >= palist->MAXNUM)
-        cout<<"Over flow"<<endl;
+    if (p < 0 || p > palist->n)
+        cout << "No this place\n";
+    if (palist->n >= palist->MAXNUM)
+        cout << "Over flow" << endl;
 
     int i;
-    for(i=palist->n-1; i>p; i--)
-        palist->element[i+1] = palist->element[i];
-    palist->element[i+1] = key;
-    palist->n=palist->n+1;
+    for (i = palist->n - 1; i > p; i--)
+        palist->element[i + 1] = palist->element[i];
+    palist->element[i + 1] = key;
+    palist->n = palist->n + 1;
     return 1;
 }
 
 int deleteP_seq(PSeqList palist, int p)
 {
     int q;
-    if(p<0 || p>palist->n-1){
-        cout<<"Not exist\n";
+    if (p < 0 || p > palist->n - 1)
+    {
+        cout << "Not exist\n";
         return 0;
     }
-    for(q=p; q<palist->n-1; q++)
-        palist->element[q]=palist->element[q+1];
-    palist->n = palist->n-1;
+    for (q = p; q < palist->n - 1; q++)
+        palist->element[q] = palist->element[q + 1];
+    palist->n = palist->n - 1;
     return 1;
 }
 
@@ -122,13 +123,13 @@ int deleteP_seq(PSeqList palist, int p)
  */
 int deleteV_seq(PSeqList palist, Datatype key)
 {
-    int count=0, i;
-    for(i=0; i<palist->n; i++)
+    int count = 0, i;
+    for (i = 0; i < palist->n; i++)
     {
-        if(palist->element[i] == key)
+        if (palist->element[i] == key)
             count++;
         else
-            palist->element[i-count] = palist->element[i];
+            palist->element[i - count] = palist->element[i];
     }
     palist->n = palist->n - count;
     return 1;
@@ -141,10 +142,11 @@ int deleteV_seq(PSeqList palist, Datatype key)
  */
 void deleteV_seq_pro(PSeqList palist, Datatype key)
 {
-    int i,k=0;
-    for(i=0; i<palist->n; i++)
+    int i, k = 0;
+    for (i = 0; i < palist->n; i++)
     {
-        if(palist->element[i]!= key){
+        if (palist->element[i] != key)
+        {
             palist->element[k] = palist->element[i];
             k++;
         }
@@ -156,11 +158,11 @@ void reverSeq(PSeqList palist)
 {
     int i;
     Datatype tmp;
-    for(i=0; i<palist->n/2; i++)
+    for (i = 0; i < palist->n / 2; i++)
     {
-        tmp = palist->element[palist->n-1];
-        palist->element[palist->n-1]=palist->element[i];
-        palist->element[i]=tmp;
+        tmp = palist->element[palist->n - 1];
+        palist->element[palist->n - 1] = palist->element[i];
+        palist->element[i] = tmp;
         // palist->n-1;
     }
 }
@@ -168,62 +170,60 @@ void reverSeq(PSeqList palist)
 int main()
 {
     int m;
-    cout<<"input MAXNUM:\n";
-    cin>>m;
+    cout << "input MAXNUM:\n";
+    cin >> m;
     PSeqList palist = createEmptySeq(m);
 
-    cout<<"input items:\n";
-    int count =0;
+    cout << "input items:\n";
+    int count = 0;
     Datatype data;
-    cin>>data;
-    while(data)
+    cin >> data;
+    while (data)
     {
-        insertItem(palist,count,data);
+        insertItem(palist, count, data);
         // insertPost_seq(palist,count, data);
         count++;
-        cin>>data;
+        cin >> data;
     }
 
-    cout<<"show seqlist:\n";
+    cout << "show seqlist:\n";
     showSeq(palist);
 
     int loc;
-    cout<<"to find index, input data:\n";
-    cin>>loc;
-    cout<<locate_Seq(palist, loc)<<endl;
+    cout << "to find index, input data:\n";
+    cin >> loc;
+    cout << locate_Seq(palist, loc) << endl;
 
     int pre;
     Datatype data_pre;
-    cout<<"input insert pre_locate & data:\n";
-    cin>>pre>>data_pre;
-    insertPre_seq(palist,pre,data_pre);
+    cout << "input insert pre_locate & data:\n";
+    cin >> pre >> data_pre;
+    insertPre_seq(palist, pre, data_pre);
     showSeq(palist);
 
     int pos;
     Datatype data_pos;
-    cout<<"input insert aft_locate & data:\n";
-    cin>>pos>>data_pos;
+    cout << "input insert aft_locate & data:\n";
+    cin >> pos >> data_pos;
     insertPost_seq(palist, pos, data_pos);
     showSeq(palist);
 
     int d_pos;
-    cout<<"input delete postion:\n";
-    cin>>d_pos;
+    cout << "input delete postion:\n";
+    cin >> d_pos;
     deleteP_seq(palist, d_pos);
     showSeq(palist);
 
     Datatype data_delete;
-    cout<<"input item you want to del:\n";
-    cin>>data_delete;
+    cout << "input item you want to del:\n";
+    cin >> data_delete;
     //这个也行 deleteV_seq(palist, data_delete);
     deleteV_seq_pro(palist, data_delete);
     showSeq(palist);
 
-    cout<<"Reverse list:\n";
+    cout << "Reverse list:\n";
     reverSeq(palist);
     showSeq(palist);
 
     return 0;
 }
-
-
