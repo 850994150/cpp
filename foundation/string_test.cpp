@@ -723,7 +723,7 @@ void cString()
     printf("strstr: %s\n", strstr_res);
 
     printf("orig    : %s\n", strchr_ch);
-    char *strstr_rest = MyStrstr(strchr_ch, "zaz");
+    char *strstr_rest = MyStrstr(strchr_ch, "df");
     printf("Mystrstr: %s\n", strstr_rest);
     printf("MystrstrCnt: %d\n", MyStrstrCnt(strchr_ch, "as"));
 
@@ -1059,6 +1059,9 @@ void FlexiableArray()
 根据读取的的8位字节判断是否=int的值, 如果相等，则证明int的值保存在低地址
 [低地址->] 00001111 00000000 00000000 00000000[高地址]
 [高地址->] 00000000 00000000 00000000 00001111[低地址]
+(高位) 0x12345678 (地位)
+[低地址]: 12 34 56 78 (大端)
+[低地址]: 78 56 34 12 (小端)
 */
 bool IsLittleEndian()
 {

@@ -240,8 +240,8 @@ int orphan()
 
 int main(int argc, char const *argv[])
 {
-    // zombie_wait();
-    zombie_wait_pid();
+    zombie_wait();
+    // zombie_wait_pid();
     // zombie_signal();
 
     // orphan();
