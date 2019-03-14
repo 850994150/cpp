@@ -12,11 +12,13 @@
 #include <future>     // std::promise, std::future
 #include <map>
 #include <unordered_map>
+#include <math.h>
 using namespace std;
 // typedef void (*pLineCallback)(int iCnt, const char *pcszContent);
 typedef void(pLineCallback)(string strContent);
 
 const int iCommitCnt = 100;
+const double eps = 1e-6;
 #define MAX 40000
 
 typedef char DataType;
@@ -352,7 +354,7 @@ unsigned int BKDRHash(char *str)
 
     return hash % 32767; //最好对一个大的素数取余
 }
-int test_bkdr()
+int test_hash()
 {
     int i = 0, n, t, j;
     char a[MAX][30];
@@ -391,9 +393,9 @@ auto testsum(int a, int b) -> decltype(a)
     return sum;
 }
 
-int test2(int argc, char const *argv[])
+int test20190210(int argc, char const *argv[])
 {
-    // test_bkdr();
+    // test_hash();
     int ii = 010;
     cout << ii + 1 << endl;
 
@@ -541,7 +543,7 @@ int BinSearch(int array[], int target, int len)
 }
 
 
-int main(int argc, char *argv[])
+int test190314()
 {
     printf("         A         \n");
     printf("        / \\       \n");
@@ -601,5 +603,25 @@ int main(int argc, char *argv[])
     {
         cout << x << endl;
     }
+    float fa = 99.9f;
+    double faa = 10.7;
+    float fb = 99.9f;
+    double fbb = 10.7;
+    printf("%f\n", fa); // 99.900002
+    // if (fabs(fa - fb) < eps)
+    if (fa == fb)
+    {
+        cout << fa << " 和 " << fb << " 相等" << endl;
+    }
+    else
+    {
+        cout << fa << " 和 " << fb << " 不等" << endl;
+    }
+    return 0;
+}
+
+int main(int argc, char *argv[])
+{
+    test20190124();
     return 0;
 }

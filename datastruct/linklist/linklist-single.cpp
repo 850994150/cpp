@@ -570,12 +570,83 @@ bool IsCircle(LinkList llist)
     {
         fast = fast->link->link;
         low = low->link;
-        if (fast->info == low->info)
+        if (fast == low)
         {
             return true;
         }
     }
     return false;
+}
+
+/*
+ * @function: 两个链表是否相交, 输出相交结点(结点相等包括data值和link域)
+ * @brief	: 如果两个链表相交, 那肯定有一个相交的结点(这个结点的值和link域都一样)
+ *            因为link域一样, 所以两个链表的相交结点后面的结点都是相同的(因为link保存的是地址是一样的)
+ *            * 所以, 判断是否相交可以直接看尾结点是否一样, 如果一样, 则相交
+ *            1->2->3->4->5->6->7->null(链表1)0->9->8->6->7->null(链表2), 相交如下图:
+ *            1->2->3->4->5
+ *                         ↘
+ *                           6->7->null
+ *                          ↗
+ *                  3->9->8
+ * @param	: 
+ * @return	: 
+ */
+bool IsY(LinkList llist1, LinkList llist2)
+{
+    PNode head1 = llist1;
+    PNode head2 = llist2;
+    while (head1->link != NULL)
+    {
+        head1 = head1->link;
+    }
+    while (head2->link != NULL)
+    {
+        head2 = head2->link;
+    }
+    // if (head1->info == head2->info)
+    if (head1 == head2)
+    {
+        return true;
+    }
+    return false;
+}
+
+/*
+ * @function: 获取第一个相交结点
+ * @brief	: 计算两个链表的长度差n, 长链表先走n, 然后长短链表同时往后走, 直到第一个相等的结点就是相交结点
+ * @param	: 
+ * @return	: 
+ */
+DataType GetYNode(LinkList llist1, LinkList llist2)
+{
+    if (!IsY(llist1, llist2))
+    {
+        return -1;
+    }
+    int len1 = ListNodeNum(llist1);
+    int len2 = ListNodeNum(llist2);
+    PNode head1 = llist1;
+    PNode head2 = llist2;
+    while (len1 > len2 && head1->link != NULL && --len1)
+    {
+        head1 = head1->link;
+    }
+    while (len2 > len1 && head2->link != NULL && --len2)
+    {
+        head2 = head2->link;
+    }
+    // 以上循环表示长链表先走n步(n为差值), 以下循环表示两链表一起走, 直到相等
+    while (head1->link != NULL && head2->link != NULL)
+    {
+        head1 = head1->link;
+        head2 = head2->link;
+        // if (head1->info == head2->info)
+        if (head1 == head2)
+        {
+            return head1->info;
+        }
+    }
 }
 
 /*
@@ -705,8 +776,8 @@ int main(int argc, char *argv[])
     cout << "链表排序\n";
     sort_test(llist);
 
+    cout << "创建链表2\n";
     //FIXME 为什么会多了个0
-    cout << "两个有序链表合并\n输入链表2\n";
     LinkList llist2 = createNullList_link();
     PNode head2 = llist2;
     DataType data2;
@@ -716,6 +787,14 @@ int main(int argc, char *argv[])
         insertPost_link(head2, data2);
         cin >> data2;
     }
+    showLinkList(llist2);
+
+    cout << "两个链表是否相交\n"; // 因为采用的是前插, 所以构造的时候注意点
+    cout << IsY(llist, llist2) << endl;
+    cout << "相交结点为\n";
+    cout << GetYNode(llist, llist2) << endl;
+
+    cout << "两个有序链表合并\n输入链表2\n";
     sortLinkList(&llist2);
     showLinkList(sortedMerge(llist, llist2));
 

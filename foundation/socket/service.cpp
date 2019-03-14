@@ -21,8 +21,8 @@ int main(int argc, char *argv[])
 {
     int ss = socket(AF_INET, SOCK_STREAM, 0); // 1. 创建套接字
     struct sockaddr_in server_sockaddr;
-    server_sockaddr.sin_family = AF_INET;
-    server_sockaddr.sin_port = htons(PORT);
+    server_sockaddr.sin_family = AF_INET; // IPV4协议族, IPV6:AF_INET6
+    server_sockaddr.sin_port = htons(PORT); // htons 转化为网络字节序(大端) h表示host,n表示network,s表示short,l表示long
     server_sockaddr.sin_addr.s_addr = htonl(INADDR_ANY);
     if (bind(ss, (struct sockaddr *)&server_sockaddr, sizeof(server_sockaddr)) == -1) // 2. 绑定地址和端口
     {

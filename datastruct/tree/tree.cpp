@@ -434,36 +434,36 @@ void PreOrder2(BiTree T)
         }
     } //while
 }
-//中序遍历(非递归)
+
+/*
+ * @function: 二叉树的中序遍历（非递归）
+ * @brief	: 栈的特点: 先进后出, 所以入栈顺序是: 右中左, 出栈顺序就是中序遍历的顺序: 左中右
+ * @param	: 
+ * @return	: 
+ */
 void InOrder2(BiTree T)
 {
-    //思路：T是要遍历树的根指针，中序遍历要求在遍历完左子树后，访问根，再遍历右子树。先将T入栈，遍历左子树；
-    //遍历完左子树返回时，栈顶元素应为T，出栈，访问T->data，再中序遍历T的右子树。
 
     stack<BiTree> stack;
-    //p是遍历指针
     BiTree p = T;
-    //栈不空或者p不空时循环
+
     while (p || !stack.empty())
     {
         if (p != NULL)
         {
-            //存入栈中
             stack.push(p);
-            //遍历左子树
             p = p->lchild;
         }
         else
         {
-            //退栈，访问根节点
             p = stack.top();
             printf("%c ", p->data);
             stack.pop();
-            //访问右子树
             p = p->rchild;
         }
-    } //while
+    }
 }
+
 //后序遍历(非递归)
 typedef struct BiTNodePost
 {

@@ -636,9 +636,120 @@ void email_check(char str[])
     }
 }
 
+// ------------------------------------------------------------ 字符翻转 ------------------------------------------------------------ 
 
+/*
+ * @function: 交换相邻字符
+ * @brief	: HuangJinJie ---> uHnaJgniiJe
+ * @param	: 
+ * @return	: 
+ */
+void SwapNeighbourCharacters(string str_swap)
+{
+    int i = 0;
+    char tmp = {0};
+    char *pData = (char *)str_swap.c_str();
+    char *pCur = (char *)str_swap.c_str();
 
+    // 1.
+    while (*pCur != '\0' && i != str_swap.length() - 1)
+    {
+        tmp = *pCur;
+        *(pData + i) = *(pCur + 1);
+        *(pData + i + 1) = tmp;
+        pCur = pData + i + 2;
+        i += 2;
+    }
+    std::string strResult;
+    strResult = pData;
+    printf("%s\n", (char *)strResult.c_str());
 
+    int len = str_swap.length();
+    char chTmp[len];
+    str_swap.copy(chTmp, len, 0); // string装char数组
+
+    // 2.
+    for (size_t i = 0; i < len - 1; i = i + 2)
+    {
+        tmp = chTmp[i];
+        chTmp[i] = chTmp[i + 1];
+        chTmp[i + 1] = tmp;
+    }
+    chTmp[len] = '\0';
+    strResult = chTmp;
+
+    printf("%s\n", (char *)strResult.c_str());
+}
+
+/*
+ * @function: 反转字符串
+ * @brief	: hello --> olleh
+ *            直接从两头往中间走，同时交换两边的字符即可
+ * @param	:
+
+ * @return	: 
+ */
+string reverseString(string s)
+{
+    int left = 0, right = s.size() - 1;
+    while (left < right)
+    {
+        // swap(s[left++], s[right--]);
+        char t = s[left];
+        s[left++] = s[right];
+        s[right--] = t;
+    }
+    return s;
+}
+
+/*
+ * @function: 字符串翻转
+ * @brief	: 方法和上面的一样
+ *            huang jin jie --> eij nij gnauh
+ * @param	: left起始点指针, right终点指针(msg+strlen(msg))
+ * @return	: 
+ */
+void reverseChar(char *left, char *right)
+{
+    assert(left != NULL && right != NULL);
+    while (left < right)
+    {
+        // 异或的方法交换
+        *left ^= *right;
+        *right ^= *left;
+        *left ^= *right;
+
+        left++, right--;
+    }
+}
+
+/*
+ * @function: 翻转单词
+ * @brief	: 基于反转字符串, 先把整个字符串翻转, 然后再按照空格把一个个单词翻转(注意最后一个单词的后一位是\0)
+ *            huang jin jie --> eij nij gnauh --> jie jin huang
+ *            left始终记录翻转的起点, right始终记录翻转的终点(注意不算空格)
+ * @param	: 
+ * @return	: 
+ */
+void reverseWord(char *msg)
+{
+    int len = strlen(msg) - 1;
+    reverseChar(msg, msg + len);
+    int left = 0;
+    int right = 0;
+    char *cur = msg;
+    // while (*cur != '\0')
+    while (right <= strlen(msg))
+    {
+        if (*cur == ' ' || *cur == '\0')
+        {
+            reverseChar(msg + left, msg + right - 1); // -1 空格
+            left = right + 1;
+        }
+        right++;
+        cur++;
+    }
+}
 
 // 打印信息
 void debugLog(const char * FileName, int Line, const char * msg, ...)
@@ -1074,15 +1185,16 @@ bool IsLittleEndian()
     u.a = k;
     if ((int)u.b == k)
     {
-        printf("小端\n");
         return true;
     }
     else
     {
-        printf("大端\n");
         return false;
     }
 }
+
+
+
 
 int main( )
 {
@@ -1103,20 +1215,41 @@ int main( )
 
 
     printf("\n\n-------------------------- ================ ---------------------------\n");
-    printf("-------------------------- 柔性数组 ---------------------------\n");
+    printf("-------------------------- 其他 ---------------------------\n");
     printf("-------------------------- ================ ---------------------------\n\n");
+    printf("柔性数组: n");
     FlexiableArray();
 
-
-
+    printf("大小端判断:\n");
+    if (IsLittleEndian())
+    {
+        printf("小端\n");
+    }
+    else
+    {
+        printf("大端\n");
+    }
     printf("\n\n-------------------------- ================ ---------------------------\n");
-    printf("-------------------------- 机器大小端判断---------------------------\n");
+    printf("-------------------------- 字符翻转  ---------------------------\n");
     printf("-------------------------- ================ ---------------------------\n\n");
-    IsLittleEndian();
 
-
+    printf("交换字符:\n");
+    SwapNeighbourCharacters("HuangJinJie");
 
     // debugLog(__FILE__, __LINE__, "TEST");
+    printf("反转字符串:\n");
+    string res = reverseString("HuangJinJie");
+    printf("%s\n", res.c_str());
+
+    printf("翻转字符串\n");
+    char rever[] = "huang jin jie";
+    reverseChar(rever, rever+ strlen(rever) - 1);
+    printf("%s\n", rever);
+
+    printf("翻转单词\n");
+    char word[] = "huang jin jie";
+    reverseWord(word);
+    printf("%s\n", word);
 
     return 0;
 }

@@ -407,6 +407,32 @@ strlen(f[11]) = 1
 */
 
 
+struct s
+{
+    int a;
+    int b;
+    bool operator == (const s &rhs);
+};
+
+bool s::operator == (const s &rhs)
+{
+    return ((a == rhs.a) && (b == rhs.b));
+}
+
+void compareStruct(s s1, s s2)
+{
+
+    // struct s s1, s2;
+    s1.a = 1;
+    s1.b = 2;
+    s2.a = 1;
+    s2.b = 2;
+    if (s1 == s2)
+        cout << "两个结构体相等" << endl;
+    else
+        cout << "两个结构体不相等" << endl;
+}
+
 int main(int argc, char const *argv[])
 {
     int a = 10;
@@ -448,6 +474,8 @@ int main(int argc, char const *argv[])
     cout << "\n===---=== sizeof & strlen ===---===" << endl;
     strlenTest();
 
-
+    cout << "\n===---=== 结构体比较 ===---===" << endl;
+    struct s s1, s2;
+    compareStruct(s1, s2);
     return 0;
 }
