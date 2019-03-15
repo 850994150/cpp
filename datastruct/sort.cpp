@@ -590,5 +590,8 @@ int main()
     print(s);
     cout << endl;
 
+    cout << "二分搜索:\n";
+    cout << "数字 " << s[7] << " 的下标是 " << BinSearch(s, s[7], n) << endl;
+
     return 0;
 }

@@ -706,7 +706,7 @@ string reverseString(string s)
  * @function: 字符串翻转
  * @brief	: 方法和上面的一样
  *            huang jin jie --> eij nij gnauh
- * @param	: left起始点指针, right终点指针(msg+strlen(msg))
+ * @param	: left起始点指针, right终点指针(msg + strlen(msg) -1)
  * @return	: 
  */
 void reverseChar(char *left, char *right)
@@ -714,11 +714,9 @@ void reverseChar(char *left, char *right)
     assert(left != NULL && right != NULL);
     while (left < right)
     {
-        // 异或的方法交换
-        *left ^= *right;
-        *right ^= *left;
-        *left ^= *right;
-
+        *left ^= *right; // a = a + b; a = 1 + 2;
+        *right ^= *left; // b = a - b; b = 3 - 2;
+        *left ^= *right; // a = a - b; a = 3 - 1;
         left++, right--;
     }
 }
@@ -750,6 +748,83 @@ void reverseWord(char *msg)
         cur++;
     }
 }
+
+/*
+ * @function: 左旋字符串
+ * @brief	: 拿出首个字符h, 从前往后依次与后面的每个字符交换, 即可完成一次左旋
+ *            huangjinjie --> uangjinjieh
+ * @param	: 左旋，k为指定的左旋字符的个数
+ * @return	: 
+ */
+void LRevolve_Words(char *Pword, int  k, int len)
+{
+	int i = len;                                         
+	char temp;
+    char *curr = Pword + 1;
+    while (k--)
+	{
+		for ( i = 0; i < len - 1 ; i++)
+        {
+            // 首字符依次与后面的字符依次交换
+            temp = *(Pword + i);
+			*(Pword + i) = *(Pword + i + 1);
+			*(Pword + i + 1) = temp;
+		}
+	}
+}
+
+/*
+ * @function: 左旋字符串
+ * @brief	: 先反转前cnt个字符, 然后再反转后len - cnt个字符, 最后再反转整个字符串
+ *            huangjinjie --> auhngjinjie --> auheijnijgn --> ngjinjiehua
+ * @param	: 
+ * @return	: 
+ */
+void LReverStr(char* str, int cnt, int len)
+{
+    reverseChar(str, str + cnt - 1);
+    reverseChar(str + cnt, str + len - 1);
+    reverseChar(str, str + len - 1);
+}
+
+/*
+ * @function: 右旋字符串
+ * @brief	: 和左旋思路相反, 用最后的字符从后往前依次交换
+ * @param	: 
+ * @return	: 
+ */
+void RRevolve_Words(char *Pword, int  k, int len)
+{
+	int i = len;
+	char temp;
+	while (k--)
+	{
+		for ( i = len ; i > 1 ; i--) // 从后往前
+		{
+			temp = *(Pword + i - 1);
+			*(Pword + i - 1) = *(Pword +  i - 2);
+			*(Pword + i - 2) = temp;
+		}
+	}
+}
+
+
+/*
+ * @function: 右旋字符串
+ * @brief	: 先翻转后cnt个字符, 再翻转前len - cnt个字符, 最后整个字符串翻转
+ *            huangjinjie --> huangjineij --> nijgnauheij --> jiehuangjin
+ * @param	: 
+ * @return	: 
+ */
+
+void RReverStr(char* str, int cnt, int len)
+{
+    // str + len - cnt  为倒数第k个字符
+    reverseChar(str + len - cnt, str + len - 1);
+    reverseChar(str, str + len - cnt - 1);
+    reverseChar(str, str + len - 1);
+}
+
 
 // 打印信息
 void debugLog(const char * FileName, int Line, const char * msg, ...)
@@ -1250,6 +1325,18 @@ int main( )
     char word[] = "huang jin jie";
     reverseWord(word);
     printf("%s\n", word);
+
+    printf("左旋3个字符\n");
+    char lrwords[] = "huangjinjie";
+    // LRevolve_Words(lrwords, 3, strlen(lrwords));
+    LReverStr(lrwords, 3, strlen(lrwords));
+    printf("%s\n", lrwords);
+
+    printf("右旋3个字符\n");
+    char rrwords[] = "huangjinjie";
+    // RRevolve_Words(rrwords, 3, strlen(rrwords));
+    RReverStr(rrwords, 3, strlen(lrwords));
+    printf("%s\n", rrwords);
 
     return 0;
 }
