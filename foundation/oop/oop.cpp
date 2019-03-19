@@ -81,13 +81,33 @@ inline void World::set_ot_()
     cout << "inline function" << endl;
 }
 
-
 void World::Hi_()
 {
     m_imiss = 2.1; //可以直接访问私有变量
-    cout << m_imiss << '\n' << "Hello World in class World" << endl;
+    cout << m_imiss << '\n'
+         << "Hello World in class World" << endl;
 }
 
+class D
+{
+  public:
+    D(double d) : d_(d) {}
+
+    /* “(int)D”类型转换 */
+    operator int() const
+    {
+        std::cout << "(int)d called!" << std::endl;
+        return static_cast<int>(d_);
+    }
+
+  private:
+    double d_;
+};
+
+int add(int a, int b)
+{
+    return a + b;
+}
 
 int main()
 {
@@ -97,6 +117,10 @@ int main()
     cout << "Func_main end!" << endl;
     delete p_w;
     p_w = NULL;
+
+    D d1 = 1.1;
+    D d2 = 2.2;
+    std::cout << add(d1, d2) << std::endl;
+
     return 0;
 }
-

@@ -17,7 +17,7 @@ void thread_task()
 {
 }
 
-int main(int argc, char *argv[])
+int one_client()
 {
     int ss = socket(AF_INET, SOCK_STREAM, 0); // 1. 创建套接字
     struct sockaddr_in server_sockaddr;
@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
         //     send(conn, buf, sizeof(buf), 0);
         // }
 
-        memset(bufeer, 0, sizeof(buffer));
+        memset(buffer, 0, sizeof(buffer));
         int len = recv(conn, buffer, sizeof(buffer), 0); // 5.1 用accept返回的套接字进行通信
         if (strcmp(buffer, "exit\n") == 0)
             break;
@@ -68,5 +68,21 @@ int main(int argc, char *argv[])
     }
     close(conn); // 6. 关闭套接字
     close(ss);
+    return 0;
+}
+
+void multi_client_select()
+{
+
+}
+
+void multi_client_epoll()
+{
+
+}
+
+int main(int argc, char *argv[])
+{
+    one_client();
     return 0;
 }

@@ -641,6 +641,39 @@ void Floor()
      }
 }
 
+
+// 计算x二进制中1的数目
+void count1num(int x)
+{
+    int countx = 0;
+    while(x)
+    {
+        countx ++;
+        x = x&(x-1);
+    }
+    cout << countx << endl;
+}
+
+void operator_test()
+{
+    /*
+    【除号】的正负取舍和一般的算数一样，符号相同为正，相异为负
+    【求余符号】的正负取舍和被除数符号相同
+    -3/16=0     16/-3=-5     -3%16=-3      16%-3=1
+    */
+    int a = 5;
+    int b = -5;
+    printf(("%d,%d\n"), a % (-4), b % (-4));
+
+    // 逗号表达式作为一个整体，它的值为最后一个表达式的值
+    int c = (1, 2, 3, 4, 5);
+    cout << c << endl;
+
+    count1num(9999);
+
+}
+
+
 // 动态规划: 一步两步上台阶
 int step(int s)
 {
@@ -660,5 +693,7 @@ int main(int argc, char *argv[])
 
     int steps = 6;
     cout << step(steps) << endl;
+
+    operator_test();
     return 0;
 }

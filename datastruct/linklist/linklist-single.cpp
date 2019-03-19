@@ -140,6 +140,16 @@ int insertPost_link(PNode head, DataType x)
 }
 
 /*
+ * @function: 不带头结点的前插法 TODO
+ * @brief	: 
+ * @param	: 
+ * @return	: 
+ */
+void insertPost_linkNoHead(PNode head, DataType x)
+{
+}
+
+/*
  * @function: 单链表中求p所指结点的前驱结点：
  * @brief	: 遍历结点, 判断link域是否指向结点p
  * @param	:

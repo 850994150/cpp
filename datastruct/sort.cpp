@@ -40,8 +40,16 @@ gif图:
 #include <stdlib.h>
 #include <time.h>
 #include <malloc.h>
+#include <stack>
 using namespace std;
 const int n = 20;
+#define swap(x, y)    \
+    {                 \
+        int temp = x; \
+        x = y;        \
+        y = temp;     \
+    }
+
 void create(int a[])
 {
     srand((unsigned)time(NULL));
@@ -57,7 +65,7 @@ void print(int s[])
         cout << s[i] << " ";
 }
 
-void swap(int a, int b)
+void swapp(int a, int b)
 {
     int temp;
     temp = a;
@@ -102,13 +110,16 @@ void bubbleSort(int s[], int len)
     }
 }
 
-//交换排序 --- 快排 O(nlogn)(平均情况)
 /*
- * 找一个数key，作为参照值, 从序列头尾两端开始扫描
- * 找出右边第一个比key小的数a，左边第一个比key大的数b，交换a b
- * j往←，i往→，当i=j时，交换a[i]和key
- * 交换之后，这样循环下来, 肯定是比key小的在左边了, 比key大的在右边了
- * 然后就像二分法那样递归地对左右两边同样的操作
+ * @function: 快速排序
+ * @brief	: 
+ *           找一个数key，作为参照值, 从序列头尾两端开始扫描
+ *           找出右边第一个比key小的数a，左边第一个比key大的数b，交换a b
+ *           j往←，i往→，当i=j时，交换a[i]和key
+ *           交换之后，这样循环下来, 肯定是比key小的在左边了, 比key大的在右边了
+ *           然后就像二分法那样递归地对左右两边同样的操作
+ * @param	: 
+ * @return	: 
  */
 void quickSort(int *a, int left, int right)
 {
@@ -141,6 +152,92 @@ void quickSort(int *a, int left, int right)
     a[i] = key;
     quickSort(a, left, i - 1);
     quickSort(a, i + 1, right);
+}
+
+int Partition(int a[], int low, int high)
+{
+    //假设每次都以第一个元素作为枢轴值，进行一趟划分：
+    int pivot = a[low];
+
+    while (low < high)
+    {
+        while (low < high && a[high] >= pivot)
+            --high;
+        a[low] = a[high]; //停下来做交换
+        while (low < high && a[low] <= pivot)
+            ++low;
+        a[high] = a[low]; //停下来做交换
+    }
+
+    a[low] = pivot; //pivot的最终落点
+    return low;
+}
+
+/*
+ * @function: 快排递归实现
+ * @brief	: 
+ * @param	: 
+ * @return	: 
+ */
+void quickSort2(int a[], int left, int right)
+{
+    if (left < right)
+    {
+        int boundary = Partition(a, left, right);
+        quickSort2(a, left, boundary);
+        quickSort2(a, boundary + 1, right);
+    }
+}
+
+/*
+ * @function: 快排非递归实现
+ * @brief	: 
+ * @param	: 
+ * @return	: 
+ */
+void quickSort3(int a[], int left, int right)
+{
+    //手动利用栈来存储每次分块快排的起始点
+    //栈非空时循环获取中轴入栈
+    stack<int> s;
+    if (left < right)
+    {
+        int boundary = Partition(a, left, right);
+
+        if (boundary - 1 > left) //确保左分区存在
+        {
+            //将左分区端点入栈
+            s.push(left);
+            s.push(boundary - 1);
+        }
+        if (boundary + 1 < right) //确保右分区存在
+        {
+            s.push(boundary + 1);
+            s.push(right);
+        }
+
+        while (!s.empty())
+        {
+            //得到某分区的左右边界
+            int r = s.top();
+            s.pop();
+            int l = s.top();
+            s.pop();
+
+            boundary = Partition(a, l, r);
+            if (boundary - 1 > l) //确保左分区存在
+            {
+                //将左分区端点入栈
+                s.push(l);
+                s.push(boundary - 1);
+            }
+            if (boundary + 1 < r) //确保右分区存在
+            {
+                s.push(boundary + 1);
+                s.push(r);
+            }
+        }
+    }
 }
 
 //选择排序 --- 直接选择排序 O(n) -> O(n^2)
@@ -217,37 +314,92 @@ void chooseSort3(int s[], int len)
  *
  */
 /*
- * @function: 堆排序
- * @brief	: 对于堆排序来说，我们先要做的是，把待排序的一堆无序的数，整理成一个大根堆，或者小根堆
- * @param	: 
+ * @function: 堆排序调整
+ * @brief	: 要知道节点关系：树下标从1开始, 则i结点的左儿子为 2*i , 右儿子为 2*i+1
+ * @param	: len 表示最大结点下标
+ * @param	: k   表示子树根结点下标
  * @return	: 
  */
-void sink(int *a, int m, int k)
+void sink(int *s, int len, int k)
 {
-    while (2 * k <= m)
+    while (2 * k <= len) // k的儿子结点下标不能超过总结点数
     {
         int j = 2 * k;
-        if (j < m && a[j] < a[j + 1])
+        if (j < len && s[j] < s[j + 1]) // 找树根下标为k的左右儿子中最大值
             j++;
-        if (a[k] > a[j])
+        if (s[k] > s[j]) // 根比左右子树都大, 无需交换
             break;
-        swap(a[j], a[k]);
-        k = j;
-    }
-}
-void heapSort(int *a, int len)
-{
-    for (int k = len / 2; k >= 1; k--)
-        sink(a, len, k);
-    for (; len > 1;)
-    {
-        swap(a[1], a[len]);
-        len--;
-        sink(a, len, 1);
+
+        swap(s[j], s[k]); // 由于下标是从1开始, 所以swap(s[0], s[5])会越界，现在换成宏定义的swap
+        k = j;            // 交换后导致子树结构乱了, 继续调整子树, 下表为j的左节点为2*j, 如果要调整右子树, j在上面已经++了
     }
 }
 
-// 插入排序 --- 直接插入排序
+/*
+ * @function: 堆排序
+ * @brief	: 这里构建的二叉树下标是从 1 开始的
+ *            下标为 i 或 i+1 的父节点都是 i/2
+ *            下标为 i 的子节点为 2*i、2*i + 1
+ * @param	: len 为节点数
+ * @return	: 
+ */
+void heapSort(int *s, int len)
+{
+    // step1: 构建堆
+    for (int k = len / 2; k >= 1; k--)  // 1. 从最后一个叶子结点的父节点开始
+    {
+        sink(s, len, k);
+    }
+
+    // step2: 调整交换
+    for (; len > 1;)
+    {
+        swap(s[1], s[len]); // 将堆顶元素与末尾交换，使最大元素沉到数组末尾（因为是小根堆，所以末元素肯定是最大的）
+        len--;              // 已交换元素不用再参与调整(此时s[len]元素已经就位了)
+        sink(s, len, 1);    // 重新调整剩下的元素，使其满足堆定义
+    }
+}
+
+// 下标从0开始进行堆排
+/*
+i结点的左右孩子分别为： 2i+1 2i+2
+
+i结点的父节点为：
+i/2：       i 为左孩子结点；
+i/2-1：     i 为右孩子结点；
+*/
+void sink2(int *s, int len, int k)
+{
+    while (2 * k + 1 <= len) // 结点k的子结点下标不超过总结点(和下标从1开始的逻辑就这里有差异)
+    {
+        int j = 2 * k + 1;
+        if (j < len && s[j] < s[j + 1])
+            j++;
+        if (s[k] > s[j])
+            break;
+
+        swap(s[j], s[k]); // 这里下标从0 ~ len-1，不会越界，可放心用swap函数
+
+        k = j;
+    }
+}
+void heapSort2(int *s, int len)
+{
+    len -= 1; // 下标从0开始
+    for (int k = len / 2 - 1; k >= 0; k--)
+    {
+        sink2(s, len, k);
+    }
+
+    // for (; len > 1;)
+    for (; len >= 0;)
+    {
+        swap(s[0], s[len]);
+        len--;
+        sink2(s, len, 0);
+    }
+}
+
 // [时间复杂度]:O(n) -> O(n^2) * [空间复杂度]:O(1)(借用了一个空间tmp)
 //
 /* 已排序的序列为A,刚开始只有一个元素,从s中取元素与已排序的a中的元素做比较,
@@ -348,8 +500,8 @@ int BinSearch(int array[], int target, int len)
     int hight = len - 1;
     while (low <= hight)
     {
-        int mid = (low + hight) / 2;   //取中间值mid点位置
-        if (array[mid] == target)      //寻找到目标数
+        int mid = (low + hight) / 2; //取中间值mid点位置
+        if (array[mid] == target)    //寻找到目标数
             return mid;
         if (array[mid] > target) //如果中间值大于目标数，则将highr点位置移动mid位置左边
             hight = mid - 1;
@@ -358,7 +510,6 @@ int BinSearch(int array[], int target, int len)
     }
     return 0;
 }
-
 
 //插入排序 --- 表排序
 //放在linklist-single.cpp里测试成功了
@@ -515,7 +666,19 @@ void pancakeSort(int *arr, int n)
     }
 }
 
-int main()
+int main(int argc, char *argv[])
+{
+	int s[] = {4, 6, 8, 5, 9};
+    // int s[] = {4, 6, 8, 5, 9, 16, 7, 3, 20, 17, 8};
+    int len = sizeof(s) / sizeof(s[0]);
+    heapSort2(s, len);
+    for (int i = 0; i < len; i++)
+        cout << s[i] << " ";
+    cout << endl;
+    return 0;
+}
+
+int test()
 {
     int *s = new int[n];
     create(s);
@@ -531,6 +694,16 @@ int main()
 
     cout << "quickSort" << endl;
     quickSort(s, 0, n - 1);
+    print(s);
+    cout << endl;
+
+    cout << "quickSort2" << endl;
+    quickSort2(s, 0, n - 1);
+    print(s);
+    cout << endl;
+
+    cout << "quickSort3" << endl;
+    quickSort3(s, 0, n - 1);
     print(s);
     cout << endl;
 

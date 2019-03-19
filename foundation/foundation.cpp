@@ -1,52 +1,45 @@
-/*
- **********************************************************
- * Author       : M_Kepler
- * EMail        : m_kepler@foxmail.com
- * Last modified: 2019-02-11 21:47:32
- * Filename     : foundation.cpp
- * Description  :
- ***********************************************************
- */
-
 #include <iostream>
+
 using namespace std;
 
-void func(int x)
+class Base
 {
-    int countx = 0;
-    while(x)
-    {
-        countx ++;
-        x = x&(x-1);
-    }
-    cout << countx << endl;
-}
+  public:
+    virtual void f() { cout << "base::f" << endl; }
+    virtual void g() { cout << "base::g" << endl; }
+    virtual void h() { cout << "base::h" << endl; }
+};
 
-void operator_test()
+class Derive : public Base
 {
-    /*
-    【除号】的正负取舍和一般的算数一样，符号相同为正，相异为负
-    【求余符号】的正负取舍和被除数符号相同
-    -3/16=0     16/-3=-5     -3%16=-3      16%-3=1
-    */
-    int a = 5;
-    int b = -5;
-    printf(("%d,%d\n"), a % (-4), b % (-4));
+  public:
+    void g() { cout << "derive::g" << endl; }
+};
 
-    // 逗号表达式作为一个整体，它的值为最后一个表达式的值
-    int c = (1, 2, 3, 4, 5);
-    cout << c << endl;
-
-    func(9999);
-
-}
-
-
-int main(int argc, char const *argv[])
+//可以稍后再看
+int main(int argc, char *argv[])
 {
-    // operator_test();
-    int a = 10, b = 20, c = 50;
-    printf("%d,%d\n", a,b,c);
-    return -1;
+    cout << "size of Base: " << sizeof(Base) << endl;
 
+    typedef void (*Func)(void);
+    Base b;
+    Base *d = new Derive();
+
+    long *pvptr = (long *)d;
+    long *vptr = (long *)*pvptr;
+    Func f = (Func)vptr[0];
+    Func g = (Func)vptr[1];
+    Func h = (Func)vptr[2];
+
+    f();
+    g();
+    h();
+
+
+    cout << "虚函数表地址：" << (int *)(&b) << endl;
+    cout << "虚函数表 — 第一个函数地址：" << (int *)*(int *)(&b) << endl;
+    Func fFun = NULL;
+    fFun();
+
+    return 0;
 }

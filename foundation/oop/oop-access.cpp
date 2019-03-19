@@ -14,30 +14,30 @@ using namespace std;
 
 class PIG
 {
-public:
-  PIG(int a)
-  {
-      A = a;
-      B += a;
-      m_strName = "hello pig";
-  }
-  static void f1(PIG m);
-  // 静态成员的内存分配在全局/静态存储区
-  // 程序运行结束的时候自动释放资源
-  friend void f2(int x, PIG &m); // 友元(普通函数放在了类里面)允许访问内部成员
-  void f3();
+  public:
+    PIG(int a)
+    {
+        A = a;
+        B += a;
+        m_strName = "hello pig";
+    }
+    static void f1(PIG m);
+    // 静态成员的内存分配在全局/静态存储区
+    // 程序运行结束的时候自动释放资源
+    friend void f2(int x, PIG &m); // 友元(普通函数放在了类里面)允许访问内部成员
+    void f3();
 
-  static double C;
+    static double C;
 
-  string m_strName;
+    string m_strName;
 
-protected:
-     int protect_var;
-     void f4(PIG p);
+  protected:
+    int protect_var;
+    void f4(PIG p);
 
-private:
-     int A;
-     static int B;
+  private:
+    int A;
+    static int B;
 };
 
 // 静态成员函数不属于某个对象，而是属于整个类，因此没有this指针
@@ -51,19 +51,18 @@ void PIG::f1(PIG m)
     cout << "B=" << B << endl; // 非静态成员函数也可以访问静态成员变量
     // 静态成员函数访问静态成员
     cout << "C=" << C << endl;
-    cout << "m.C=" << m.C  << endl;
+    cout << "m.C=" << m.C << endl;
     // cout << "C=" << this.C << endl;
     cout << "PIG::C=" << PIG::C << endl;
 }
 
-
 // 友元函数不是类的成员函数，不需要用::域引用
-void f2(int x, PIG & m)
+void f2(int x, PIG &m)
 {
     // m.A = x;
-    cout << "friend F2: " << m.A << endl << m.B << endl;
+    cout << "friend F2: " << m.A << endl
+         << m.B << endl;
 }
-
 
 void PIG::f3()
 {
@@ -79,6 +78,30 @@ void PIG::f4(PIG p)
 
 int PIG::B = 0; // 静态数据成员初始化的格式<数据类型><类名>::<静态数据成员名>=<值>
 double PIG::C = 0.11;
+
+
+
+// 继承方式
+
+class Base
+{
+  public:
+    int ipub;
+    Base(){};
+    virtual ~Base(){};
+
+  protected:
+    int int_pro;
+};
+
+class A : protected Base
+{
+  public:
+    A(){};
+    A(int da) { int_pro = da; }
+    void Print(A &obj) { obj.int_pro = 24; }
+    void PrintPro() { cout << "The proteted data is " << int_pro << endl; }
+};
 
 int main()
 {
@@ -97,6 +120,13 @@ int main()
     delete p; // 释放内存
     p = NULL;
 
+    A aObj;
+    A aObj2(5);
+    aObj2.PrintPro();
+    aObj.Print(aObj2);
+    aObj2.PrintPro();
+    // aObj.int_pro = 8;
+    // aObj.ipub = 8; // protected继承, 原本public的现在变成protecetd了
 
     return 0;
 }
