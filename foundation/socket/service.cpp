@@ -71,15 +71,25 @@ int one_client()
     return 0;
 }
 
+void multi_client()
+{
+
+}
+
 void multi_client_select()
+{
+
+}
+
+void multi_client_poll()
 {
 
 }
 
 void multi_client_epoll()
 {
-
 }
+
 
 int main(int argc, char *argv[])
 {

@@ -65,7 +65,7 @@ class CConstTest
 int CConstTest::iStatic = 0;
 const int CConstTest::iStaticConst = 30;
 
-CConstTest::CConstTest() : iConst(0)
+CConstTest::CConstTest() : iConst(0) // 初始化列表
 {
     i = 0;
 }

@@ -133,7 +133,7 @@ int main(int argc, char const *argv[])
 {
 	/* code */
 	// NamedPipeRead();
-	MsgQueueRead();
+	// MsgQueueRead();
 	// SharedMemory();
 	return 0;
 }

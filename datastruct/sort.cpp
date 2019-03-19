@@ -156,7 +156,7 @@ void quickSort(int *a, int left, int right)
 
 int Partition(int a[], int low, int high)
 {
-    //假设每次都以第一个元素作为枢轴值，进行一趟划分：
+    // 假设每次都以第一个元素作为参照值，进行一趟划分：
     int pivot = a[low];
 
     while (low < high)
@@ -191,7 +191,7 @@ void quickSort2(int a[], int left, int right)
 
 /*
  * @function: 快排非递归实现
- * @brief	: 
+ * @brief	: 任何递归解法都可以借助栈转换为非递归
  * @param	: 
  * @return	: 
  */

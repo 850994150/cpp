@@ -109,6 +109,23 @@ int add(int a, int b)
     return a + b;
 }
 
+struct Test1
+{
+  // Test1(){};
+  Test1(int a) : i(a) {}
+  int i;
+};
+
+struct Test2
+{
+    Test1 test1 ;
+    // Test2(Test1 &t1) : test1(t1)
+    Test2(Test1 &t1)
+    {
+        test1 = t1 ;
+    }
+};
+
 int main()
 {
     World w;

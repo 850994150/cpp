@@ -799,10 +799,16 @@ int main(int argc, char *argv[])
     }
     showLinkList(llist2);
 
-    cout << "两个链表是否相交\n"; // 因为采用的是前插, 所以构造的时候注意点
-    cout << IsY(llist, llist2) << endl;
-    cout << "相交结点为\n";
-    cout << GetYNode(llist, llist2) << endl;
+    if(IsY(llist, llist2))
+    {
+        cout << "两个链表是否相交\n"; // 因为采用的是前插, 所以构造的时候注意点
+        cout << "相交结点为\n";
+        cout << GetYNode(llist, llist2) << endl;
+    }
+    else
+    {
+        cout << "两个链表不相交\n";
+    }
 
     cout << "两个有序链表合并\n输入链表2\n";
     sortLinkList(&llist2);

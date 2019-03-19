@@ -13,7 +13,9 @@
 #include <map>
 #include <unordered_map>
 #include <math.h>
+#include <memory>
 using namespace std;
+
 // typedef void (*pLineCallback)(int iCnt, const char *pcszContent);
 typedef void(pLineCallback)(string strContent);
 
@@ -525,8 +527,8 @@ int BinSearch(int array[], int target, int len)
     size_t hight = len - 1; // XXX 这个len如果在函数内部计算的话, 效果是完全不一样的
     while (low <= hight)
     {
-        int mid = (low + hight) / 2;   //取中间值mid点位置
-        if (array[mid] == target)      //寻找到目标数
+        int mid = (low + hight) / 2; //取中间值mid点位置
+        if (array[mid] == target)    //寻找到目标数
         {
             return mid;
         }
@@ -541,7 +543,6 @@ int BinSearch(int array[], int target, int len)
     }
     return 0;
 }
-
 
 int test190314()
 {
@@ -574,7 +575,7 @@ int test190314()
     DestroyBinTree(p_Tree);
     */
     int a = 10;
-    float b = static_cast<float> (a);
+    float b = static_cast<float>(a);
     int i;
     cout << b << endl;
     // while (1 && NULL)
@@ -590,7 +591,7 @@ int test190314()
     // printf字符串指针, 可以不加格式化字符%s; 但是printf一个非字符串指针或常量时则不行
     // 和printf("hello world"); 一样, "hello world" 入参的是该字符串的地址, 直接传char* 也一样
     char *p_print = "abcdef";
-    cout << "with cout :"<<p_print << endl;
+    cout << "with cout :" << p_print << endl;
     printf("with %%s: %s\n", p_print);
     cout << "without %%s:";
     printf(p_print);
@@ -599,7 +600,7 @@ int test190314()
     Solution clSolution;
     vector<int> nums = {2, 7, 11, 15};
     vector<int> results = clSolution.twoSum(nums, 13);
-    for(auto x: results)
+    for (auto x : results)
     {
         cout << x << endl;
     }
@@ -620,7 +621,6 @@ int test190314()
     return 0;
 }
 
-
 #define FloorNum 12
 int F[FloorNum] = {0};
 
@@ -638,18 +638,17 @@ void Floor()
                 F[loop1] = temp;
             }
         }
-     }
+    }
 }
-
 
 // 计算x二进制中1的数目
 void count1num(int x)
 {
     int countx = 0;
-    while(x)
+    while (x)
     {
-        countx ++;
-        x = x&(x-1);
+        countx++;
+        x = x & (x - 1);
     }
     cout << countx << endl;
 }
@@ -670,21 +669,19 @@ void operator_test()
     cout << c << endl;
 
     count1num(9999);
-
 }
-
 
 // 动态规划: 一步两步上台阶
 int step(int s)
 {
-    if( s <= 0 )
+    if (s <= 0)
         return 0;
-    if( s <= 2 )
-        return s; // f(1) = 1, f(2) = 2
-    return step( s - 1 ) + step( s - 2 ); // 状态转移方程 f(s) = f(s-1) + f(s-2)
+    if (s <= 2)
+        return s;                     // f(1) = 1, f(2) = 2
+    return step(s - 1) + step(s - 2); // 状态转移方程 f(s) = f(s-1) + f(s-2)
 }
 
-int main(int argc, char *argv[])
+int step_test(int argc, char *argv[])
 {
     F[0] = 0;
     F[1] = 1;
@@ -695,5 +692,63 @@ int main(int argc, char *argv[])
     cout << step(steps) << endl;
 
     operator_test();
+    return 0;
+}
+
+void memory_pointer()
+{
+    // auto_ptr
+    /* shared_ptr */
+    int a = 10;
+    int *p = new int;
+    shared_ptr<int> test(p);
+
+    shared_ptr<int> ptra = make_shared<int>(a); // 智能指针
+
+    shared_ptr<int> ptra2(ptra); // copy
+
+    cout << ptra.use_count() << endl;
+
+    int b = 20;
+    int *pb = &a;
+    // std::shared_ptr<int> ptrb = pb;  //error
+    shared_ptr<int> ptrb = make_shared<int>(b);
+    ptra2 = ptrb;    // assign
+    pb = ptrb.get(); // 获取原始指针
+
+    cout << ptra.use_count() << endl;
+    cout << ptrb.use_count() << endl;
+
+    /* unique_ptr */
+    {
+        unique_ptr<int> uptr(new int(10)); // 绑定动态对象
+        // unique_ptr<int> uptr2 = uptr;    // 不能赋值
+        // unique_ptr<int> uptr2(uptr);     // 不能拷贝
+        unique_ptr<int> uptr2 = move(uptr); // 转换所有权
+        uptr2.release();                    //释放所有权
+    }
+    // 超过作用域，指针自动释放
+
+    /* weak_ptr */
+}
+
+class CTest
+{
+  public:
+    CTest(string name, int id);
+
+  private:
+    string _name;
+    int _id;
+};
+
+CTest::CTest(string name, int id) : _name(name), _id(id) // 初始化列表
+{
+}
+
+int main(int argc, char *argv[])
+{
+    memory_pointer();
+
     return 0;
 }

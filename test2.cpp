@@ -34,6 +34,7 @@ void print(int s[], int len)
 		printf("%d ", s[i]);
 	}
 }
+
 void bubbleSort(int s[], int len)
 {
 	for (int i = 0; i < len; ++i)
@@ -42,6 +43,7 @@ void bubbleSort(int s[], int len)
 		{
 			if (s[j + 1] < s[j])
 			{
+				// swap(s[j + 1], s[j]);
 				s[j + 1] = s[j + 1] + s[j];
 				s[j] = s[j + 1] - s[j];
 				s[j + 1] = s[j + 1] - s[j];
@@ -73,7 +75,7 @@ void quickSort(int s[], int left, int right)
 	s[left] = key;
 
 	quickSort(s, i, left - 1);
-	quickSort(s, left + 1, right);
+    quickSort(s, left + 1, right);
 }
 
 void chooseSort(int s[], int len)
@@ -164,41 +166,6 @@ void heapSort(int s[], int len)
 	}
 }
 
-
-
-void sink2(int *a, int n, int k)
-{
-    while (2 * k <= n)
-    {
-        int j = 2 * k;
-        if (j < n && a[j] < a[j + 1])
-            j++;
-        //if(a[j]<a[j+1]) j=j+1;
-        if (a[k] > a[j])
-            break;
-        swap(a[j], a[k]);
-        k = j;
-    }
-}
-void heapSort2(int *a, int n)
-{
-    for (int k = n / 2; k >= 1; k--)
-        sink2(a, n, k);
-    for (; n > 1;)
-    {
-        swap(a[1], a[n]);
-        n--;
-        sink2(a, n, 1);
-    }
-}
-void pt(int *a, int s, int n)
-{
-    for (int i = s; i < n; i++)
-        printf("%d ", a[i]);
-    printf("\n");
-}
-
-
 int main(int argc, char const *argv[])
 {
 	// int s[] = {9, 2, 4, 6, 8, 23, 3, 11};
@@ -210,7 +177,7 @@ int main(int argc, char const *argv[])
 	// bubbleSort(s, len);
 	// chooseSort(s, len);
 	// insertSort(s, len);
-	heapSort2(s, 5);
+	heapSort(s, 5);
 	print(s, 5);
 	return 0;
 }

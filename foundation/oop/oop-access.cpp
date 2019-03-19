@@ -87,7 +87,6 @@ class Base
 {
   public:
     int ipub;
-    Base(){};
     virtual ~Base(){};
 
   protected:
@@ -97,7 +96,7 @@ class Base
 class A : protected Base
 {
   public:
-    A(){};
+    A(){}; // 这个函数为什么不能省略呢? 因为下面使用A aobj来构造对象，自已又写了下面这个构造函数, 所以系统不再提供默认的构造函数(无参)
     A(int da) { int_pro = da; }
     void Print(A &obj) { obj.int_pro = 24; }
     void PrintPro() { cout << "The proteted data is " << int_pro << endl; }

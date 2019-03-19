@@ -162,17 +162,20 @@ void MsgQueueWrite()
     printf("key:%x\n", key);
 
     msgid = msgget(key, 0666 | IPC_CREAT); // 2. 建立消息队列
+    // IPC_CREAT 不存在则创建, 存在则返回已有id
+    // IPC_EXCL  存在则返回错误
     if (msgid == -1)
     {
         fprintf(stderr, "msgget failed with error: %d\n", errno);
-        exit(EXIT_FAILURE);
+        exit(EXIT_FAILURE); // exit(1);
+        // exit(EXIT_SUCCESS); // exit(0);
     }
 
     // 向消息队列中写消息，直到写入end
     while (running)
     {
         printf("Enter some text: ");
-        fgets(buffer, BUFSIZ, stdin);
+        fgets(buffer, BUFSIZ, stdin); // 从标准输入获取一行到buffer中
         data.msg_type = 1;
         strcpy(data.text, buffer);
         if (msgsnd(msgid, (void *)&data, MAX_TEXT, 0) == -1) // 3. 发送消息 0 阻塞 IPC_NOWAIT 非阻塞
@@ -507,7 +510,7 @@ int main(int argc, char const *argv[])
 {
     // NoneNamedPipe();
     // NamedPipeWrite(); // window的文件系统不支持管道文件
-    MsgQueueWrite();
+    // MsgQueueWrite();
     // SharedMemoryWrite();
     // SharedMemoryWithSema();
     // IpcMmmp();
@@ -519,6 +522,7 @@ int main(int argc, char const *argv[])
 // g++ a.cpp -lrt
 
 /*
+ · linux查看:  ipcs
  . 有名管道先运行 IPC-A.out 再另一终端运行 IPC-B.out
 
  Q1: 是先读还是先写呢? 如果读的进程还没等到写进程写入数据呢?
