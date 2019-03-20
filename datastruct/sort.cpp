@@ -147,7 +147,7 @@ void quickSort(int *a, int left, int right)
             a[j] = t;
         }
     }
-    // 交换key值和a[i]值
+    // i是比key大的值，交换key值和a[i]值
     a[left] = a[i];
     a[i] = key;
     quickSort(a, left, i - 1);

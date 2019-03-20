@@ -621,25 +621,6 @@ int test190314()
     return 0;
 }
 
-#define FloorNum 12
-int F[FloorNum] = {0};
-
-void Floor()
-{
-    int temp;
-    for (int loop1 = 2; loop1 < FloorNum; ++loop1)
-    {
-        F[loop1] = loop1;
-        for (int loop2 = 1; loop2 < FloorNum; ++loop2)
-        {
-            temp = (loop2 >= (1 + F[loop1 - loop2])) ? loop2 : (1 + F[loop1 - loop2]);
-            if (F[loop1] > temp)
-            {
-                F[loop1] = temp;
-            }
-        }
-    }
-}
 
 // 计算x二进制中1的数目
 void count1num(int x)
@@ -671,29 +652,6 @@ void operator_test()
     count1num(9999);
 }
 
-// 动态规划: 一步两步上台阶
-int step(int s)
-{
-    if (s <= 0)
-        return 0;
-    if (s <= 2)
-        return s;                     // f(1) = 1, f(2) = 2
-    return step(s - 1) + step(s - 2); // 状态转移方程 f(s) = f(s-1) + f(s-2)
-}
-
-int step_test(int argc, char *argv[])
-{
-    F[0] = 0;
-    F[1] = 1;
-    Floor();
-    cout << F[FloorNum - 1] << endl;
-
-    int steps = 6;
-    cout << step(steps) << endl;
-
-    operator_test();
-    return 0;
-}
 
 void memory_pointer()
 {
