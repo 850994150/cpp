@@ -20,11 +20,12 @@ bool test::operator==(const test &s)
 	return (a == s.a) && (b == s.b);
 }
 
-void swap2(int a, int b)
+void swap2(int &a, int &b)
 {
-	a = a + b;
-	b = a - b;
-	a = a - b;
+	int tmp;
+	tmp = a;
+	a = b;
+	b = tmp;
 }
 
 void print(int s[], int len)
@@ -135,17 +136,17 @@ void sink(int *s, int len, int i)
 {
 	while (2 * i <= len)
 	{
-		int j = 2 * i;
-		if (j < len && s[j] < s[j + 1]) // 找大儿子
+		int lchild = 2 * i;
+		if (lchild < len && s[lchild] < s[lchild +1])
 		{
-			j++;
+			lchild++;
 		}
-		if (s[i] > s[j]) // 比较大儿子和根
+		if (s[i] > s[lchild])
 		{
 			break;
 		}
-		swap(s[i], s[j]);
-		i = j;
+		swap(s[i], s[lchild]);
+		i = lchild;
 	}
 }
 
@@ -168,16 +169,20 @@ void heapSort(int s[], int len)
 
 int main(int argc, char const *argv[])
 {
-	// int s[] = {9, 2, 4, 6, 8, 23, 3, 11};
-	int s[] = {4, 6, 8, 5, 9};
-	// const int N = 10;
-	// int b[N + 1] = {-999, 2, 1, -1, 123, 0, 1, 21, 7, -10, 1};
-
-	// int len = sizeof(s) / sizeof(s[0]);
+	int s[] = {9, 2, 4, 6, 8, 23, 3, 11};
+	// int s[] = {4, 6, 8, 5, 9};
+	int len = sizeof(s) / sizeof(s[0]) - 1;
 	// bubbleSort(s, len);
 	// chooseSort(s, len);
 	// insertSort(s, len);
-	heapSort(s, 5);
-	print(s, 5);
+	heapSort(s, len);
+	for (int i = 1; i <= len; i++)
+		cout << s[i] << " ";
+    cout << endl;
 	return 0;
 }
+
+
+
+
+

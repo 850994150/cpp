@@ -43,7 +43,7 @@ gif图:
 #include <stack>
 using namespace std;
 const int n = 20;
-#define swap(x, y)    \
+#define swap_define(x, y)    \
     {                 \
         int temp = x; \
         x = y;        \
@@ -65,7 +65,7 @@ void print(int s[])
         cout << s[i] << " ";
 }
 
-void swapp(int a, int b)
+void swap(int &a, int &b)
 {
     int temp;
     temp = a;
@@ -73,7 +73,7 @@ void swapp(int a, int b)
     b = temp;
 }
 
-void swap2(int a, int b)
+void swap2(int &a, int &b)
 {
     a = a + b;
     b = a - b;
@@ -81,7 +81,7 @@ void swap2(int a, int b)
 }
 
 // 跟加减法一样...
-void swap3(int a, int b)
+void swap3(int &a, int &b)
 {
     a = a ^ b;
     b = a ^ b;
@@ -322,16 +322,18 @@ void chooseSort3(int s[], int len)
  */
 void sink(int *s, int len, int k)
 {
+    // 这里为什么判断的是左儿子?
+    // 如果判断右儿子，那么当k只有左儿子没有右儿子，2*k+1 超过len，而且左儿子比根大，则不会交换了
     while (2 * k <= len) // k的儿子结点下标不能超过总结点数
     {
-        int j = 2 * k;
-        if (j < len && s[j] < s[j + 1]) // 找树根下标为k的左右儿子中最大值
+        int j = 2 * k; // 左儿子
+        if (j < len && s[j] < s[j + 1]) // 找树根下标为k的大儿子
             j++;
-        if (s[k] > s[j]) // 根比左右子树都大, 无需交换
+        if (s[k] > s[j]) // 根比大儿子还大, 无需交换
             break;
 
-        swap(s[j], s[k]); // 由于下标是从1开始, 所以swap(s[0], s[5])会越界，现在换成宏定义的swap
-        k = j;            // 交换后导致子树结构乱了, 继续调整子树, 下表为j的左节点为2*j, 如果要调整右子树, j在上面已经++了
+        swap_define(s[j], s[k]);
+        k = j; // 调整子树，此时j已等于大儿子下标了（因为大儿子和根做交换，所以会导致大儿子的子树不满足堆结构）
     }
 }
 
@@ -350,11 +352,13 @@ void heapSort(int *s, int len)
     {
         sink(s, len, k);
     }
+    // 既然sink函数会调整子树，为什么不直接sink(s, len, 1)?
+    // 不可以这样，因为如果根都比左右儿子大的话，就不会做后面的调整了，所以需要从下往上调整
 
     // step2: 调整交换
     for (; len > 1;)
     {
-        swap(s[1], s[len]); // 将堆顶元素与末尾交换，使最大元素沉到数组末尾（因为是小根堆，所以末元素肯定是最大的）
+        swap_define(s[1], s[len]); // 将堆顶元素与末尾交换，使最大元素沉到数组末尾（因为是小根堆，所以末元素肯定是最大的）
         len--;              // 已交换元素不用再参与调整(此时s[len]元素已经就位了)
         sink(s, len, 1);    // 重新调整剩下的元素，使其满足堆定义
     }
@@ -370,29 +374,35 @@ i/2-1：     i 为右孩子结点；
 */
 void sink2(int *s, int len, int k)
 {
-    while (2 * k + 1 <= len) // 结点k的子结点下标不超过总结点(和下标从1开始的逻辑就这里有差异)
+    while (2 * k + 1 <= len) // 结点k的子结点下标不超过总结点,叶子节点不处理(和下标从1开始的逻辑就这里有差异)
     {
         int j = 2 * k + 1;
         if (j < len && s[j] < s[j + 1])
+        {
             j++;
+        }
         if (s[k] > s[j])
+        {
             break;
-
+        }
         swap(s[j], s[k]); // 这里下标从0 ~ len-1，不会越界，可放心用swap函数
-
         k = j;
     }
 }
 void heapSort2(int *s, int len)
 {
     len -= 1; // 下标从0开始
-    for (int k = len / 2 - 1; k >= 0; k--)
+    // 如果len为左结点, 则父节点为len/2，如果为右节点，则父节点为len/2 - 1
+    // 这里从len/2开始调整，因为即使len为右节点，len/2为父节点的下一个结点(肯定是最后一层的最左边的叶子结点,sink函数不处理叶子结点，所以可以以len/2开始)
+    // 所以为了保持和下标从1开始的代码一致，这里也可以写成len/2
+    //  for (int k = len / 2 - 1; k >= 0; k--)
+    for (int k = len / 2; k >= 0; k--) // 和下标从1 开始差异是k>=0
     {
         sink2(s, len, k);
     }
 
-    // for (; len > 1;)
-    for (; len >= 0;)
+    // 和下标从1开始差异是，这里是0
+    for (; len > 0;)
     {
         swap(s[0], s[len]);
         len--;
@@ -666,18 +676,39 @@ void pancakeSort(int *arr, int n)
     }
 }
 
-int main(int argc, char *argv[])
+int heapsort1Test()
 {
-	int s[] = {4, 6, 8, 5, 9};
-    // int s[] = {4, 6, 8, 5, 9, 16, 7, 3, 20, 17, 8};
-    int len = sizeof(s) / sizeof(s[0]);
-    heapSort2(s, len);
-    for (int i = 0; i < len; i++)
+	// int s[] = {14, 6, 8, 5, 9};
+    int s[] = {9999, 4, 6, 8, 5, 9, 16, 7, 3, 20, 17, 18};
+    // 下标从1开始，s[0]值无意义
+    int len = sizeof(s) / sizeof(s[0]) - 1; // 下标从1开始，数组下标范围:[1,len]
+    heapSort(s, len);
+
+    for (int i = 1; i <= len; i++)
         cout << s[i] << " ";
-    cout << endl;
     return 0;
 }
 
+int heapsort2Test()
+{
+	// int s[] = {14, 6, 8, 5, 9};
+    int s[] = {999, 4, 6, 8, 5, 9, 16, 7, 3, 20, 17, 18};
+    int len = sizeof(s) / sizeof(s[0]); // 下标从0开始，数组下标范围:[0, len)
+    heapSort2(s, len);
+
+    for (int i = 0; i < len; i++)
+        cout << s[i] << " ";
+    return 0;
+}
+
+int main(int argc, char *argv[])
+{
+    heapsort1Test();
+    cout << endl;
+    heapsort2Test();
+
+    return 0;
+}
 int test()
 {
     int *s = new int[n];
@@ -768,3 +799,4 @@ int test()
 
     return 0;
 }
+

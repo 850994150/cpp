@@ -78,7 +78,6 @@ int MsgQueueRead()
 			exit(EXIT_FAILURE);
 		}
 		printf("You wrote: %s\n", data.text);
-		// 遇到end结束
 		if (strncmp(data.text, "end", 3) == 0)
 			running = 0;
 	}
@@ -92,7 +91,7 @@ int MsgQueueRead()
 }
 
 // 共享内存
-int SharedMemory()
+int SharedMemoryRead()
 {
 	// 生成一个key
 	key_t key = ftok("./", 66);
@@ -132,8 +131,8 @@ int SharedMemory()
 int main(int argc, char const *argv[])
 {
 	/* code */
-	// NamedPipeRead();
+	NamedPipeRead();
 	// MsgQueueRead();
-	// SharedMemory();
+	// SharedMemoryRead();
 	return 0;
 }

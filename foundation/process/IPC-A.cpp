@@ -43,6 +43,7 @@
     * 解决进程间同步与互斥问题的一种进程间通讯机制
  * 套接字
  * RPC
+ * https://www.cnblogs.com/xcywt/category/778140.html
  ***********************************************************
  */
 
@@ -73,12 +74,18 @@
 using namespace std;
 
 #define MAX_TEXT 512
+// 0 是标准输入, 1 是标准输出
 #define INPUT 0
 #define OUTPUT 1
 #define PIPENAME "NamedPipe" // 有名管道名(路径)
 #define SHM_SIZE 1024        //共享内存的大小
 
-// 无名管道 (适合父子进程间通信)
+/*
+ * @function: 无名管道(适合父子进程间通信)
+ * @brief	: 半双工的通信模式，具有固定的读端和写端：传输方向同时只能是一个方向
+ * @param	: 
+ * @return	: 
+ */
 void NoneNamedPipe()
 {
     int file_descriptors[2];
@@ -96,7 +103,7 @@ void NoneNamedPipe()
     if (pid == 0)
     {
         printf("in the spawned (child) process...\n");
-        close(file_descriptors[INPUT]); // 子进程向父进程写数据, 关闭管道的读端
+        close(file_descriptors[INPUT]);                // 子进程向父进程写数据, 关闭管道的读端
         write(file_descriptors[OUTPUT], "test data", strlen("test data") + 1);
         exit(0);
     }
@@ -110,7 +117,10 @@ void NoneNamedPipe()
 }
 
 /*
- * @brief	: 有名管道(写)
+ * @function: 有名管道
+ * @brief	: 有名管道可以使互不相关的两个进程互相通信。有名管道可以通过路径名来指出，并且在文件系统中可见
+ * @param	: 
+ * @return	: 
  */
 int NamedPipeWrite()
 {
@@ -128,7 +138,6 @@ int NamedPipeWrite()
         return -1;
     }
 
-    unlink(PIPENAME); // 删除管道
 
     int i = 0;
     for (i = 0; i < 10; i++)
@@ -139,11 +148,19 @@ int NamedPipeWrite()
     }
     // 关闭管道
     close(fd);
+
+    unlink(PIPENAME); // 删除管道文件
+
     return 0;
 }
 
 /*
- * @brief	: 消息队列(写)
+ * @function: 消息队列
+ * @brief	: 消息队列就是一个消息的链表。可以把消息看作一个记录，具有特定的格式以及特定的优先级。
+ *　　         对消息队列有写权限的进程可以向消息队列中按照一定的规则添加新消息；
+ *　           对消息队列有读权限的进程则可以从消息队列中读走消息。
+ * @param	: 
+ * @return	: 
  */
 struct msg_st
 {
@@ -178,6 +195,7 @@ void MsgQueueWrite()
         fgets(buffer, BUFSIZ, stdin); // 从标准输入获取一行到buffer中
         data.msg_type = 1;
         strcpy(data.text, buffer);
+
         if (msgsnd(msgid, (void *)&data, MAX_TEXT, 0) == -1) // 3. 发送消息 0 阻塞 IPC_NOWAIT 非阻塞
         {
             fprintf(stderr, "msgsnd failed\n");
@@ -192,7 +210,7 @@ void MsgQueueWrite()
 }
 
 /*
- * @brief	: 共享内存（写）
+ * @brief	: 共享内存（写）要编程者自己实现对共享内存互斥访问
  */
 int SharedMemoryWrite()
 {
@@ -225,7 +243,6 @@ int SharedMemoryWrite()
         exit(3);
     }
     printf("解除映射成功，销毁共享内存\n");
-    getchar();
 
     if (-1 == shmctl(shmid, IPC_RMID, NULL)) // 5. 销毁共享内存
     {
@@ -241,23 +258,23 @@ int SharedMemoryWrite()
  */
 int SharedMemoryWithSema()
 {
-    int ret;                                              //临时变量
-    int pid;                                              //进程id
-    int sme_id;                                           //保存信号量描述符
-    int shm_id;                                           //保存共享内存描述符
-    key_t sme_key;                                        //保存信号量键值
-    key_t shm_key;                                        //保存共享内存键值
-    char *shmp;                                           //指向共享内存的首地址
-    struct shmid_ds dsbuf;                                //定义共享内存信息结构变量
-    struct sembuf lock = {0, -1, SEM_UNDO};               //信号量上锁操作的数组指针
-    struct sembuf unlock = {0, 1, SEM_UNDO | IPC_NOWAIT}; //信号量解锁操作的数组指针
-    shm_key = ftok("./", 2);                              //获取信号量键值
+    int ret;                                              // 临时变量
+    int pid;                                              // 进程id
+    int sme_id;                                           // 保存信号量描述符
+    int shm_id;                                           // 保存共享内存描述符
+    key_t sme_key;                                        // 保存信号量键值
+    key_t shm_key;                                        // 保存共享内存键值
+    char *shmp;                                           // 指向共享内存的首地址
+    struct shmid_ds dsbuf;                                // 定义共享内存信息结构变量
+    struct sembuf lock = {0, -1, SEM_UNDO};               // 信号量上锁操作的数组指针
+    struct sembuf unlock = {0, 1, SEM_UNDO | IPC_NOWAIT}; // 信号量解锁操作的数组指针
+    shm_key = ftok("./", 2);                              // 获取信号量键值
     if (shm_key < 0)
     {
         perror("ftok");
         exit(0);
     }
-    sme_id = semget(shm_key, 1, IPC_CREAT | 0666); //获取信号量ID
+    sme_id = semget(shm_key, 1, IPC_CREAT | 0666); // 获取信号量ID
     if (sme_id < 0)
     {
         perror("semget");
@@ -289,27 +306,28 @@ int SharedMemoryWithSema()
         perror("fork");
         exit(0);
     }
-    else if (pid == 0) //子进程
+    else if (pid == 0) // 子进程
     {
-        ret = semctl(sme_id, 0, SETVAL, 1); //初始化信号量，初值设为1
+        ret = semctl(sme_id, 0, SETVAL, 1); // 初始化信号量，初值设为1
         if (ret == -1)
         {
             perror("semctl");
             exit(0);
         }
-        ret = semop(sme_id, &lock, 1); //申请访问共享资源，锁定临界资源
+        ret = semop(sme_id, &lock, 1); // 申请访问共享资源，锁定临界资源
         if (ret == -1)
         {
             perror("semop lock");
             exit(0);
         }
-        sleep(4);                    //让子进程睡眠4秒
-        strcpy(shmp, "hello\n");     //往共享内存写入数据
-        if (shmdt((void *)shmp) < 0) //使共享内存脱离进程地址空间
+        cout << "子进程睡眠4秒" << endl;
+        sleep(4);                    // 让子进程睡眠4秒
+        strcpy(shmp, "hello\n");     // 往共享内存写入数据
+        if (shmdt((void *)shmp) < 0) // 使共享内存脱离进程地址空间, 解除共享内存映射
         {
             perror("shmdt");
         }
-        ret = semop(sme_id, &unlock, 1); //解锁临界资源
+        ret = semop(sme_id, &unlock, 1); // 解锁临界资源
         if (ret == -1)
         {
             perror("semop unlock");
@@ -330,8 +348,9 @@ int SharedMemoryWithSema()
             perror("shmctl");
             exit(0);
         }
-        else /* 共享内存的状态信息获取成功 */
+        else 
         {
+            cout << "parent: 共享内存的状态信息获取成功" << endl;
             printf("Shared Memory Information:\n");
             printf("\tCreator PID: %d\n", dsbuf.shm_cpid);       /* 输出创建共享内存进程的标识符 */
             printf("\tSize(bytes): %d\n", dsbuf.shm_segsz);      /* 输出共享内存的大小 */
@@ -510,9 +529,9 @@ int main(int argc, char const *argv[])
 {
     // NoneNamedPipe();
     // NamedPipeWrite(); // window的文件系统不支持管道文件
-    // MsgQueueWrite();
     // SharedMemoryWrite();
-    // SharedMemoryWithSema();
+    SharedMemoryWithSema();
+    // MsgQueueWrite();
     // IpcMmmp();
     // IpcArgIncMmap(); // FIXME 多次运行有可能出现只有父进程运行 和 父进程+1后为1, 子进程+1后也为1的情况
     return 0;
