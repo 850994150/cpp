@@ -477,7 +477,7 @@ DataType Lastk(LinkList llist, int k)
     }
     */
     // 循环退出, p指向第k个结点
-    cout << "第k个结点为:" << p->info << endl;
+    // cout << "顺数第k个结点为:" << p->info << endl;
     if (p == NULL)
     {
         cout << "No Exit!\n";
@@ -492,17 +492,17 @@ DataType Lastk(LinkList llist, int k)
 
 /*
  * @function: 输出倒数第k个结点
- * @brief	:
+ * @brief	: fast指针先走k个结点，然后low结点和他一起走，此时low初始应该是从第一个结点和他一起走的
  * @param	:
  * @return	:
  */
-DataType LastKNode(LinkList llist, int k)
+DataType LastKNode2(LinkList llist, int k)
 {
     LinkList fast, low;
     fast = llist;
-    low = llist;
+    low = llist->link; // 关注点
 
-    while (k--) // 本来第k个结点, 需要找下标为k-1的结点, 但这里从头结点开始, 所以循环k次
+    while (k--)
     {
         fast = fast->link;
     }
@@ -510,7 +510,7 @@ DataType LastKNode(LinkList llist, int k)
     {
         cout << "不存在" << endl;
     }
-    while (fast) // 因为最后一个结点也要算上, 所以如果是fast->link的话, 最后一个结点就没算上
+    while (fast->link != NULL)
     {
         fast = fast->link;
         low = low->link;
@@ -566,7 +566,7 @@ DataType GetMiddleNode(LinkList pHead)
 /*
  * @function: 判断链表是否有环
  * @brief	: 快慢指针, 快指针一次走两步, 慢指针一次走一步,
-              如果有环, 肯定会相遇
+              如果有环, 肯定会相遇，快指针只要比慢指针快就行了，不管快多少步
  * @param	:
  * @return	:
  */
@@ -586,6 +586,42 @@ bool IsCircle(LinkList llist)
         }
     }
     return false;
+}
+
+/*
+ * @function: 找出环入口
+ * @brief	: 假如有快慢指针判断一个链表有局部环，链表起点是A，环的入口是B，快慢指针在环中的相遇点是C。那么按照原来的运动方向，有AB=CB，这是可以证明的结论
+ *            做法就是先找到相遇点，然后把快指针重置会头结点，快慢指针继续同步走，如果再次相遇，则相遇点就是环的入口
+ * @param	: 
+ * @return	: 
+ */
+
+DataType GetCircleNode(LinkList llist)
+{
+    PNode fast = llist;
+    PNode slow = llist;
+    // while(fast && slow)
+    while(fast && fast->link)
+    {
+        fast = fast->link->link;
+        slow = slow->link;
+        if (fast == slow)
+        {
+            // cout << "相遇点: " << fast->info << endl;
+            fast = llist;
+            break;
+        }
+    }
+    while (fast->link != NULL)
+    {
+        fast = fast->link;
+        slow = slow->link;
+        if (fast == slow)
+        {
+            return fast->info;
+        }
+    }
+    return -1;
 }
 
 /*
@@ -701,6 +737,57 @@ void sort_test(LinkList llist)
     showLinkList(llist);
 }
 
+// 链表环测试
+/*
+// 测试用例:
+                -----------------
+               ↓                 ↓
+[]->[1]->[2]->[3]->[4]->[5]->[6]-   // 尾结点指向3，制造一个环
+
+输入为: 6 5 4 3 2 1 0
+*/
+int CircleTest( )
+{
+    LinkList llist = createNullList_link();
+    PNode head = llist;
+    PNode tmp;
+    DataType data;
+
+    cout << "【链表环测试】\n输入结点, 0表示输入完毕:\n";
+    cin >> data;
+    while (data)
+    {
+        insertPost_link(head, data);
+        cin >> data;
+    }
+    cout << "结点个数为: " << ListNodeNum(llist) << endl;
+    cout << "由于是前插，所以实际顺序与输入顺序相反\n";
+    showLinkList(llist);
+
+    PNode p = NULL;
+    while (head->link != NULL)
+    {
+        head = head->link;
+        if (head->info == 3)
+        {
+            p = head;
+        }
+    }
+    head->link = p; // 创造一个环, 链表尾结点的link域指向结点3
+
+    if (IsCircle(llist))
+    {
+        cout << "链表有环" << endl;
+        cout << "环入口结点为：" << GetCircleNode(llist) << endl;
+    }
+    else
+    {
+        cout << "链表无环" << endl;
+    }
+
+    return 0;
+}
+
 int main(int argc, char *argv[])
 {
     LinkList llist = createNullList_link();
@@ -774,7 +861,7 @@ int main(int argc, char *argv[])
     cout << "输入k,输出倒数第k个结点\n";
     cin >> data;
     cout << Lastk(llist, data) << "\n";
-    cout << LastKNode(llist, data) << "\n";
+    cout << LastKNode2(llist, data) << "\n";
 
     cout << "中间结点是:" << MiddleNode(llist) << endl;
     cout << "中间结点是:" << GetMiddleNode(llist) << endl;

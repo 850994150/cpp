@@ -140,18 +140,12 @@ void bracketsTest()
     string str2 = "{[]}";
     string str3 = "{[}]";
     cout << "括号是否匹配: " << isValidBrackets(str3) << endl;
-    QueueTest();
 
 }
 
 int main(int argc, char *argv[])
 {
     // QueueTest();
-    stack<int> test;
-    test.push(1);
-    test.push(2);
-    test.push(3);
-
-
+    bracketsTest();
     return 0;
 }

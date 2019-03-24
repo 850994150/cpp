@@ -334,6 +334,12 @@ DateType GetLastCommonParent(BiTree t, DateType node1, DateType node2)
     }
 }
 
+/*
+ * @function: 翻转二叉树
+ * @brief	: 
+ * @param	: 
+ * @return	: 
+ */
 void swap_biTree(BiTree t)
 {
     if (t == NULL || (t->lchild == NULL && t->rchild == NULL))
@@ -345,6 +351,16 @@ void swap_biTree(BiTree t)
         swap_biTree(t->lchild);
     if (t->rchild)
         swap_biTree(t->rchild);
+}
+
+/*
+ * @function: 翻转二叉树（非递归实现）
+ * @brief	: 
+ * @param	: 
+ * @return	: 
+ */
+void swap_biTree2(BiTree t)
+{
 }
 
 /*
@@ -405,10 +421,14 @@ void DestroyBinTree(BiTree t)
     free(t);
 }
 
-//先序遍历(非递归)
+/*
+ * @function: 先序遍历（非递归实现)
+ * @brief	: 访问T->data后，将T入栈，遍历左子树；遍历完左子树返回时，栈顶元素应为T，出栈，再先序遍历T的右子树。
+ * @param	: 
+ * @return	: 
+ */
 void PreOrder2(BiTree T)
 {
-    //思路：访问T->data后，将T入栈，遍历左子树；遍历完左子树返回时，栈顶元素应为T，出栈，再先序遍历T的右子树。
     stack<BiTree> stack;
     //p是遍历指针
     BiTree p = T;
@@ -432,7 +452,7 @@ void PreOrder2(BiTree T)
             //访问右子树
             p = p->rchild;
         }
-    } //while
+    }
 }
 
 /*
