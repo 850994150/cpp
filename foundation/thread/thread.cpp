@@ -23,7 +23,7 @@
 
 using namespace std;
 
-volatile int g_counter(0);
+volatile int g_counter(0);						// 表示g_counter是随时可变的，这里用这个没什么意义，每次需要用到volatile变量时, 编译器都需要去内存中取值
 std::atomic<int> g_atomic_counter(0); // atomic是一个类模板
 mutex g_lock;
 std::condition_variable iMsg;
@@ -105,7 +105,10 @@ void func_mutex(void)
 		*/
 
 		// 4. atomic 原子操作
-		g_atomic_counter++; // 类模板atomic声明的对象确保了该操作是原子性的, 不需要加锁
+		// 类模板atomic声明的对象确保了该操作是原子性的, 不需要加锁
+		/*
+		g_atomic_counter++;
+		*/
 	}
 }
 
@@ -407,11 +410,11 @@ void ThreadAutomic()
 int main(int argc, char const *argv[])
 {
 	// ThreadCreate();
-	// ThreadMutex();
+	ThreadMutex();
 	// ThreadAutomic();
 	// ThreadLock();
 	// ThreadFuture();
 	// ThreadSwap();
-	ThreadAsync();
+	// ThreadAsync();
 	return 0;
 }

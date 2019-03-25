@@ -199,6 +199,13 @@ void ReadFile(const std::string &strFile, int iCommitCnt, pLineCallback pf)
     }
 }
 
+void swap(int &a, int &b)
+{
+    int tmp = a;
+    a = b;
+    b = tmp;
+}
+
 void test()
 {
     vector<string> vecInt{"a", "b", "c", "d"};
@@ -690,6 +697,41 @@ void memory_pointer()
     /* weak_ptr */
 }
 
+
+
+// 下标从0开始
+// i的子节点为2i+1和2i+2
+// i的父节点为 i/2 i/2 -1
+
+void sink(int*s, int len, int k)
+{
+    while (2 * k + 1 <= len)
+    {
+        int j = 2 * k + 1;
+        if (j < len && s[j] < s[j + 1])
+            j++;
+        if (s[j] < s[k])
+            break;
+        swap(s[j], s[k]);
+        k =j;
+	}
+	
+}
+void heapSort(int *s, int len)
+{
+    len -= 1;
+    // 从最后一个叶子结点的父节点往前建堆
+    for (int i = len / 2; i >= 0; i--)
+        sink(s, len, i);
+	// 调整
+    for (; len > 0;)
+    {
+		swap(s[len], s[0]);
+		len--;
+        sink(s, len, 0);
+    }
+}
+
 class CTest
 {
   public:
@@ -706,7 +748,18 @@ CTest::CTest(string name, int id) : _name(name), _id(id) // 初始化列表
 
 int main(int argc, char *argv[])
 {
-    memory_pointer();
+    // memory_pointer();
+    int s[] = {8, 6, 3, 1, 5, 2, 4, 9};
+    int len = sizeof(s) / sizeof(s[0]);
+    cout << len << endl;
+    heapSort(s, len);
+    for (size_t i = 0; i < len; i++)
+    {
+        cout << s[i] << " ";
+    }
+    cout << endl;
+    long long test = 2019032500000079;
+    printf("%07d", test % 100000000);
 
     return 0;
 }

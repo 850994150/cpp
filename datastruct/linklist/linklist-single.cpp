@@ -18,7 +18,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <malloc.h>
-
+#include <time.h>
 using namespace std;
 typedef int DataType;
 struct Node;
@@ -33,19 +33,21 @@ typedef struct Node* LinkList;
 
 /*
  * @function: 创建带头结点的空链表
- * @brief	:
+ * @brief	: 先定义一个结点类型的指针变量 Node *llist; 申请节点空间, 返回指向该结点的指针 phead
+ *            把头指针指向该结点，即把phead赋值给llist，这样就创建了一个带头结点的链表了
+ *            如果创建一个不带头结点的链表，那直接 Node* llist; 就行
  *            llist(头指针)
  *              ↓
  *             [ ] -> [1] -> [2] -> NULL
  *                     ↑ llist = llist->link(头指针往后挪)
  * @param	:
- * @return	:
+ * @return	: 头结点
  */
 LinkList createNullList_link()
 {
-    LinkList llist = NULL; // llist为链表头指针
-    PNode head = (PNode)malloc(sizeof(struct Node)); // 指向头结点的指针head
-    llist = head; // 头指针指向头结点
+    LinkList llist = NULL;                           // 定义一个指针, llist为链表[头指针]
+    PNode head = (PNode)malloc(sizeof(struct Node)); // 申请一个指向头结点的指针 head
+    llist = head;                                    // 把head指针赋值给llist
     if (head != NULL)
     {
         head->link = NULL; // 初始化头结点, 指针用->来访问指向的结构体
@@ -93,7 +95,7 @@ int isNullList_link(LinkList llist)
 void showLinkList(LinkList llist)
 {
     PNode head = llist;
-    while ((head != NULL) & (head ->link != NULL))
+    while(head->link != NULL)
     {
         head = head->link;
         cout << head->info << " ";
@@ -119,34 +121,53 @@ PNode locate_x(LinkList llist, DataType x)
 
 /*
  * @brief	: 带头结点单链表的插入(前插)
- * @param	: 每次插入都是插入在head结点后面: h->1->null; h->2->1->null;
+ * @param	: 每次插入都是插入在head结点后面,实际上h结点一直在后退: h->1->null; h->2->1->null;
  * @return	:
  */
 int insertPost_link(PNode head, DataType x)
 {
-    PNode q = (PNode)malloc(sizeof(struct Node));
-    if (q == NULL)
+    PNode newNode = (PNode)malloc(sizeof(struct Node));
+    if (newNode == NULL)
     {
         printf("Out of space\n");
         return 0;
     }
     else
     {
-        q->info = x;
-        q->link = head->link; // 先右
-        head->link = q;       // 后左
+        newNode->info = x;
+        newNode->link = head->link; // 先右
+        head->link = newNode;       // 后左
         return 1;
     }
 }
 
+
 /*
- * @function: 不带头结点的前插法 TODO
- * @brief	: 
+ * @function: 带头结点的尾插法
+ * @brief	: 尾插和头插的区别就是，尾插每次都要遍历一下链表，找到最后一个结点，然后插入
  * @param	: 
  * @return	: 
  */
-void insertPost_linkNoHead(PNode head, DataType x)
+int insertAfter_link(PNode head, DataType x)
 {
+    PNode newNode = (PNode)malloc(sizeof(struct Node));
+    if (newNode == NULL)
+    {
+        printf("Out of space\n");
+        return 0;
+    }
+    else
+    {
+        while (head->link != NULL)
+        {
+            head = head->link;
+        }
+        // 找到最后结点才插入
+        newNode->info = x;
+        newNode->link = head->link; // 先右
+        head->link = newNode;       // 后左
+        return 1;
+    }
 }
 
 /*
@@ -589,13 +610,12 @@ bool IsCircle(LinkList llist)
 }
 
 /*
- * @function: 找出环入口
+ * @function: 找出链表环入口
  * @brief	: 假如有快慢指针判断一个链表有局部环，链表起点是A，环的入口是B，快慢指针在环中的相遇点是C。那么按照原来的运动方向，有AB=CB，这是可以证明的结论
  *            做法就是先找到相遇点，然后把快指针重置会头结点，快慢指针继续同步走，如果再次相遇，则相遇点就是环的入口
  * @param	: 
  * @return	: 
  */
-
 DataType GetCircleNode(LinkList llist)
 {
     PNode fast = llist;
@@ -746,7 +766,7 @@ void sort_test(LinkList llist)
 
 输入为: 6 5 4 3 2 1 0
 */
-int CircleTest( )
+int main( )
 {
     LinkList llist = createNullList_link();
     PNode head = llist;
@@ -757,7 +777,8 @@ int CircleTest( )
     cin >> data;
     while (data)
     {
-        insertPost_link(head, data);
+        // insertPost_link(head, data);
+        insertAfter_link(head, data);
         cin >> data;
     }
     cout << "结点个数为: " << ListNodeNum(llist) << endl;
@@ -788,7 +809,19 @@ int CircleTest( )
     return 0;
 }
 
-int main(int argc, char *argv[])
+/*
+ * @function: 操作不带头结点的链表 TODO
+ * @brief	: 二级指针
+ * @param	: 
+ * @return	: 
+ */
+int main2(int argc, char *argv[])
+{
+    
+    return 0;
+}
+
+int main3(int argc, char *argv[])
 {
     LinkList llist = createNullList_link();
     PNode head = llist;
