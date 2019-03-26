@@ -746,6 +746,59 @@ CTest::CTest(string name, int id) : _name(name), _id(id) // 初始化列表
 {
 }
 
+void mystrcpy(char* dst, const char*src)
+{
+    if (src == NULL)
+    {
+        return ;
+    }
+    while((*dst++ = *src++) != NULL)
+        ;
+}
+
+char *mystrncpy(char *dest, const char *str, int dest_len, int str_len)
+{
+    int n;
+    assert((dest != NULL) && (str != NULL));
+
+    char *cp=dest;
+    if (dest_len > str_len)
+        n = str_len;
+    if (dest_len <= str_len)
+        n = dest_len; // 只拷贝dest_len个字符
+
+    while ((*cp++ = *str++) != NULL && --n)
+        ;
+	return dest;
+}
+
+
+char* mystrchr(char* str, char ch)
+{
+    while ((*str++ != ch) != NULL)
+        ;
+    return --str;
+}
+
+char* mymemcpy(char* dst, char* src, int n)
+{
+    // 判断是否存在内存重叠
+    bool flag = dst > src && dst <= src + n;
+    if (flag)
+    {
+        // 倒序拷贝
+        char *dst_cp = dst + n - 1;
+        char *src_cp = src + n - 1;
+        while ((*dst_cp-- = *src_cp--) != NULL && --n)
+            ;
+    }
+    else
+    {
+        while ((*dst++ = *src++) && --n)
+            ;
+    }
+    return dst;
+}
 int main(int argc, char *argv[])
 {
     // memory_pointer();
@@ -759,7 +812,17 @@ int main(int argc, char *argv[])
     }
     cout << endl;
     long long test = 2019032500000079;
-    printf("%07d", test % 100000000);
+    printf("%07d\n", test % 100000000);
+
+    char* str = "12345677890";
+    char dst[4] = {0};
+    mystrncpy(dst, str, sizeof(dst), 6);
+    printf("%s\n", dst);
+
+
+    char dst_test[] = "asdfghjkl";
+    mymemcpy(dst_test, dst_test, 4);
+    cout << dst_test << endl;
 
     return 0;
 }

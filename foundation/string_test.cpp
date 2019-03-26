@@ -184,15 +184,41 @@ void MyStrncpy(char *dest, const char *src, int len)
     if(len)
     {
         while(--len)
-        *cp++='\0';
-	}
+            *cp++ = '\0';
+    }
     // len >= sizeof(dst) 会破坏dst后面的内存
+    /* error， strlen(dest)就有问题。。。如果要补\0需要在这个函数外补,或者实现把dest初始化为0
     if (offset >= strlen(dest))
     {
         *(cp + len - 1) = '\0';
     }
+    */
 
 }
+
+/*
+ * @function: strncpy的优化版
+ * @brief	: 判断dest和需要拷贝的长度n，如果dest大，则后面补\0，如果n大，则只拷贝dest_len个字符
+ * @param	: 
+ * @return	: 
+ */
+char *mystrncpy(char *dest, const char *str, int dest_len, int len)
+{
+    int n;
+    assert((dest != NULL) && (str != NULL));
+
+    char *cp=dest;
+    if (dest_len > len)
+        n = len;
+    if (dest_len <= len)
+        n = dest_len; // 只拷贝dest_len个字符
+
+    while ((*cp++ = *str++) != NULL && --n)
+        ;
+	return dest;
+}
+
+
 
 // 设置内存位置v开始的n个元素值为c
 void *MyMemset(void *v, int c, size_t n)
@@ -250,6 +276,29 @@ void *MyMemcpy(void *dest, const void *src, size_t n)
     }
     return dest;
 }
+
+char* mymemcpy(char* dst, char* src, int n)
+{
+    // 判断是否存在内存重叠
+    // src: [低地址] 1 2 3 4 5 6
+    // dst: [低地址]         1 2 3 4 5 6
+    bool flag = dst > src && dst <= src + n;
+    if (flag)
+    {
+        // 倒序拷贝
+        char *dst_cp = dst + n - 1;
+        char *src_cp = src + n - 1;
+        while ((*dst_cp-- = *src_cp--) != NULL && --n)
+            ;
+    }
+    else
+    {
+        while ((*dst++ = *src++) && --n)
+            ;
+    }
+    return dst;
+}
+
 
 /*
  * memcpy的效率优化(只优化, 没有加入内存重叠处理)
@@ -360,6 +409,13 @@ char* MyStrchr(const char* src, char ch)
     while ((*cp++ != ch) && *cp)
         ;
     return (char *)(--cp);
+}
+
+char* mystrchr(char* str, char ch)
+{
+    while ((*str++ != ch) != NULL)
+        ;
+    return --str; // 返回ch在str的地址, 所以要--
 }
 
 
@@ -975,7 +1031,7 @@ void cString()
     printf("----------------- ======================================================== -----------------\n\n");
 
     // const char* p_src = "asdfasdf\0 is a good boy";
-    const char* p_src = "asdfasdf is a good boy"; // 用strcpy不安全
+    const char* p_src = "huangjinjie is a good boy"; // 用strcpy不安全
     char dest[20], Mydest[20], vardst[22 + 1];
 
     strcpy(dest, p_src);
@@ -1001,8 +1057,8 @@ void cString()
 
     memcpy(&dst, src, len);
     cout << "memcpy:\n\tsrc: " << src << "\t dst: " << dst << endl;
-    MyMemcpy1(&dst, src, len);
-    // MyMemcpy(&dst, src, len);
+    // MyMemcpy1(&dst, src, len);
+    MyMemcpy(&dst, src, len);
     cout << "MyMemcpy:\n\tsrc: " << src << "\t dst: " << dst << endl;
     MemcpyOptimised(&dst, src, len);
     cout << "MemcpyOptimised:\n\tsrc: " << src << "\t dst: " << dst << endl;
