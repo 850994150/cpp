@@ -1,20 +1,26 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <stdio.h>
+#include <sys/select.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <unistd.h>
 #include <string.h>
-#include <stdlib.h>
 #include <fcntl.h>
 #include <sys/shm.h>
 #include <thread>
 #include <iostream>
 #include <signal.h>
+#include <sys/types.h> 
+#include <stdio.h> 
+#include <netinet/in.h> 
+#include <sys/time.h> 
+#include <sys/ioctl.h> 
+#include <unistd.h> 
+#include <stdlib.h>
 #include "../thread/ThreadPool.h"
 
 #define PORT 7000
-#define QUEUE 20
+#define QUEUE 20 // 最多监听队列数
 
 /*
  * @function: 父进程退出时通知子信号
@@ -29,12 +35,11 @@ void signalHandler(int sig)
     exit(0);
 }
 
-
 int one_client()
 {
     int ss = socket(AF_INET, SOCK_STREAM, 0); // 1. 创建套接字
 
-    struct sockaddr_in server_sockaddr;                  // socket结构体（16字节）
+    struct sockaddr_in server_sockaddr; // socket结构体（16字节）
     memset(&server_sockaddr, 0, sizeof(server_sockaddr));
     server_sockaddr.sin_family = AF_INET;                // IPV4协议族, IPV6:AF_INET6
     server_sockaddr.sin_addr.s_addr = htonl(INADDR_ANY); // IP
@@ -70,7 +75,7 @@ int one_client()
 
     if (conn < 0)
     {
-        perror("connect");
+        perror("accept");
         exit(1);
     }
 
@@ -82,7 +87,7 @@ int one_client()
 
         // recv 同步阻塞模式
         int len = recv(conn, buffer, sizeof(buffer), 0); // 5.1 从内核协议栈的缓冲区拷贝数据到用户空间
-        if (len >0)
+        if (len > 0)
         {
             if (strcmp(buffer, "exit\n") == 0)
                 break;
@@ -104,7 +109,6 @@ int one_client()
     close(ss);   // 7. 关闭监听
     return 0;
 }
-
 
 void do_service(int conn)
 {
@@ -163,7 +167,7 @@ int multi_client_process()
 
         if (clientfd < 0)
         {
-            perror("connect");
+            perror("accept");
             exit(1);
         }
 
@@ -191,7 +195,6 @@ int multi_client_process()
 
     return 0;
 }
-
 
 /*
  * @function: 多线程处理多个客户链接
@@ -234,7 +237,7 @@ int multi_client_thread()
 
         if (clientfd < 0)
         {
-            perror("connect");
+            perror("accept");
             exit(1);
         }
 
@@ -356,29 +359,96 @@ void multi_client_select()
         exit(1);
     }
 
+    fd_set readfds, testfds;
+    FD_ZERO(&readfds);
+    FD_SET(listenfd, &readfds); // 将服务器socket加入到集合中
+    int result;
     struct sockaddr_in client_addr;
-    socklen_t length = sizeof(client_addr);
-    int clientfd = accept(listenfd, (struct sockaddr *)&client_addr, &length);
 
+    while (true)
+    {
+        int nread;
+        char ch;
+        socklen_t client_len;
+        int client_sockfd;
+        testfds = readfds; // 将需要监视的描述符集copy到select查询队列中，select会对其修改，所以一定要分开使用变量
+        printf("service waiting...\n");
+
+        // 无限期阻塞，并测试文件描述符变动 ,直到有socket可读
+        result = select(FD_SETSIZE, &testfds, (fd_set *)0, (fd_set *)0, (struct timeval *)0); // FD_SETSIZE 系统默认的最大文件描述符
+        if (result < 1)
+        {
+            perror("select");
+            exit(1);
+        }
+
+        // 扫描所有的文件描述符
+        for (int fd = 0; fd < FD_SETSIZE; fd++)
+        {
+            // 判断文件描述符是否在 FD_SET 中
+            if (FD_ISSET(fd, &testfds))
+            {
+                // 判断是否为服务器套接字，是则表示为客户请求连接
+                if (fd == listenfd)
+                {
+                    client_len = sizeof(client_addr);
+                    client_sockfd = accept(listenfd, (struct sockaddr *)&client_addr, &client_len);
+                    FD_SET(client_sockfd, &readfds); // 将客户端socket加入到集合中
+                    printf("adding client on fd %d\n", client_sockfd);
+                }
+                // 客户端socket中有数据请求时
+                else
+                {
+                    ioctl(fd, FIONREAD, &nread); // 取得数据量交给nread
+
+                    // 客户数据请求完毕，关闭套接字，从集合中清除相应描述符
+                    if (nread == 0)
+                    {
+                        close(fd);
+                        FD_CLR(fd, &readfds); //去掉关闭的fd
+                        printf("removing client on fd %d\n", fd);
+                    }
+                    // 处理客户数据请求
+                    else
+                    {
+                        char buffer[1024];
+                        memset(buffer, 0, sizeof(buffer));
+                        int len = recv(client_sockfd, buffer, sizeof(buffer), 0);
+                        if (len == 0)
+                        {
+                            printf("client closed\n");
+                            exit(0);
+                        }
+                        printf("%s", buffer);
+                        send(client_sockfd, buffer, len, 0);
+                        /*
+                        read(fd, &ch, 1);
+                        sleep(5);
+                        printf("serving client on fd %d\n", fd);
+                        ch++;
+                        write(fd, &ch, 1);
+                        */
+                    }
+                }
+            }
+        }
+    }
 }
 
 void multi_client_poll()
 {
-
 }
 
 void multi_client_epoll()
 {
-
 }
-
 
 int main(int argc, char *argv[])
 {
     // one_client();
     // multi_client_process();
     // multi_client_thread();
-    peer2peer();
-    // multi_client_select();
+    // peer2peer();
+    multi_client_select();
     return 0;
 }

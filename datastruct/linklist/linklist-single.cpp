@@ -120,7 +120,7 @@ PNode locate_x(LinkList llist, DataType x)
 }
 
 /*
- * @brief	: 带头结点单链表的插入(前插)
+ * @brief	: 带头结点单链表头插法
  * @param	: 每次插入都是插入在head结点后面,实际上h结点一直在后退: h->1->null; h->2->1->null;
  * @return	:
  */
@@ -773,12 +773,17 @@ int main( )
     PNode tmp;
     DataType data;
 
-    cout << "【链表环测试】\n输入结点, 0表示输入完毕:\n";
+    cout << "【用例】输入 6 5 4 3 2 1 0, 构造环如下:" << endl;
+    printf("                -----------------  \n");
+    printf("               ↓                 ↓ \n");
+    printf("[]->[1]->[2]->[3]->[4]->[5]->[6]-  \n");
+
+    cout << "\n【链表环测试】\n输入结点, 0表示输入完毕:\n";
     cin >> data;
     while (data)
     {
-        // insertPost_link(head, data);
-        insertAfter_link(head, data);
+        insertPost_link(head, data);
+        // insertAfter_link(head, data);
         cin >> data;
     }
     cout << "结点个数为: " << ListNodeNum(llist) << endl;
