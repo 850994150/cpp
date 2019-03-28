@@ -327,14 +327,30 @@ int ListNodeNum(LinkList llist)
  */
 LinkList reverLinkList(LinkList llist)
 {
-    PNode pFirst = llist->link; // 反转前第一个结点(头结点之后的第一个结点)
-    PNode pInsert;              // 待插入结点(例子中始终为1, 随着循环进行, 最后会把NULL赋值给1的link域)
+    PNode pPreIns = llist->link; // 反转前第一个结点(头结点之后的第一个结点),始终是待插入节点的前驱节点
+    PNode pInsert;               // 待插入结点(例子中始终为1, 随着循环进行, 最后会把NULL赋值给1的link域)
+    while (pPreIns->link != NULL)
+    {
+        pInsert = pPreIns->link;
+        // 指针调整(从后往前)
+        pPreIns->link = pInsert->link;
+        pInsert->link = llist->link; // 这里不能用pPreIns，因为新节点需要插入到最前面
+        llist->link = pInsert;
+    }
+    return llist;
+}
+
+// []->1->2->3->4->5->6
+LinkList LinkListRever(LinkList llist)
+{
+    PNode head = llist;
+    PNode pFirst = llist->link;
     while (pFirst->link != NULL)
     {
-        pInsert = pFirst->link;
+        PNode pInsert = pFirst->link;
         pFirst->link = pInsert->link;
-        pInsert->link = llist->link;
-        llist->link = pInsert;
+        pInsert->link = head->link;
+        head->link = pInsert;
     }
     return llist;
 }
@@ -702,7 +718,8 @@ DataType GetYNode(LinkList llist1, LinkList llist2)
     {
         head2 = head2->link;
     }
-    // 以上循环表示长链表先走n步(n为差值), 以下循环表示两链表一起走, 直到相等
+    // 以上两个循环表示[长链表]先走n步(n为差值), 以下循环表示两链表一起走, 直到相等
+
     while (head1->link != NULL && head2->link != NULL)
     {
         head1 = head1->link;
@@ -766,7 +783,7 @@ void sort_test(LinkList llist)
 
 输入为: 6 5 4 3 2 1 0
 */
-int main( )
+int main2( )
 {
     LinkList llist = createNullList_link();
     PNode head = llist;
@@ -820,13 +837,8 @@ int main( )
  * @param	: 
  * @return	: 
  */
-int main2(int argc, char *argv[])
-{
-    
-    return 0;
-}
 
-int main3(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
     LinkList llist = createNullList_link();
     PNode head = llist;
@@ -905,7 +917,10 @@ int main3(int argc, char *argv[])
     cout << "中间结点是:" << GetMiddleNode(llist) << endl;
 
     cout << "反转链表\n";
+    cout << "翻转前:";
+    showLinkList(llist);
     LinkList tmp_link = reverLinkList(llist);
+    cout << "翻转后:";
     showLinkList(tmp_link);
 
     cout << "链表排序\n";

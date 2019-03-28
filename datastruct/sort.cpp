@@ -115,7 +115,7 @@ void bubbleSort(int s[], int len)
  * @brief	: 
  *           找一个数key，作为参照值, 从序列头尾两端开始扫描
  *           找出右边第一个比key小的数a，左边第一个比key大的数b，交换a b
- *           j往←，i往→，当i=j时，交换a[i]和key
+ *           j往←，i往→，当i>=j时，交换a[j]和key,以保证key都大于左边
  *           交换之后，这样循环下来, 肯定是比key小的在左边了, 比key大的在右边了
  *           然后就像二分法那样递归地对左右两边同样的操作
  * @param	: 
@@ -123,35 +123,43 @@ void bubbleSort(int s[], int len)
  */
 void quickSort(int *a, int left, int right)
 {
-    int i, j, t, key;
+    int i = left, j = right;
+    int key = a[left];
     if (left > right)
     {
         return;
     }
-    key = a[left];
-    i = left;
-    j = right;
-    while (i != j)
+
+    // while (i != j)
+    while (i < j) // 前面 left > right 已做处理了,这里条件可以直接是i<j
     {
         //顺序很重要,先让j往左走
-        //因为当i=j的时候是要交换s[j]和key的
+        //因为当i>=j的时候是要交换s[j]和key的
         //所以必须j的方向必须是寻找<key的方向
         while (a[j] >= key && i < j)
             j--;
         while (a[i] <= key && i < j)
             i++;
-        if (i < j)
+        if (i < j) // 如果i > j，即s[i]在s[j]右边，而s[j]<s[key]<s[i]，所以s[j]和s[i]是不需要交换的
         {
-            t = a[i];
-            a[i] = a[j];
-            a[j] = t;
+            swap(a[i], a[j]);
         }
-    }
-    // i是比key大的值，交换key值和a[i]值
-    a[left] = a[i];
-    a[i] = key;
-    quickSort(a, left, i - 1);
-    quickSort(a, i + 1, right);
+    } // 循环结束后，i >= j
+    // [6] 4 3 7 8 9
+    // s[i=3] = 7, s[j=2] = 3
+
+
+    /* i是比key大的值，交换key值和a[i]值
+     a[left] = a[i];
+     a[i] = key;
+     quickSort(a, left, i - 1);
+     quickSort(a, i + 1, right);
+    */
+    // 因为s[j]是小于s[key]的，所以交换二者值，则以s[key]分界，左边都比s[key]小，右边都比s[key]大
+    a[left] = a[j];
+    a[j] = key;
+    quickSort(a, left, j - 1);
+    quickSort(a, j + 1, right);
 }
 
 int Partition(int a[], int low, int high)
@@ -701,15 +709,20 @@ int heapsort2Test()
     return 0;
 }
 
+// int quickSortTest( )
 int main(int argc, char *argv[])
 {
-    heapsort1Test();
-    cout << endl;
-    heapsort2Test();
 
+    int s[] = {999, 4, 6, 8, 32, 5, 9, 16, 7, 3, 20, 17, 18,0,-1};
+    int len = sizeof(s) / sizeof(s[0]);
+    quickSort(s, 0, len - 1);
+
+    for (int i = 0; i < len; i++)
+        cout << s[i] << " ";
     return 0;
 }
-int test()
+
+int main2()
 {
     int *s = new int[n];
     create(s);
