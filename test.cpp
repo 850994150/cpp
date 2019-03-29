@@ -14,6 +14,10 @@
 #include <unordered_map>
 #include <math.h>
 #include <memory>
+#include<stdio.h>
+#include<stdlib.h>
+#include<unistd.h>
+#include<signal.h>
 using namespace std;
 
 // typedef void (*pLineCallback)(int iCnt, const char *pcszContent);
@@ -799,7 +803,23 @@ char* mymemcpy(char* dst, char* src, int n)
     }
     return dst;
 }
-int main(int argc, char *argv[])
+
+std::vector<char*> vecRes;
+void StringSplitC(const char* pszString, const char* pszFlag, std::vector<char*>& vecRes)
+{
+   const char* p = strtok((char*)pszString, pszFlag);
+   while (p != NULL)
+   {
+       if (strlen(p) > 0)
+       {
+           vecRes.push_back((char *)p);
+       }
+
+       p = strtok(NULL, pszFlag);
+   }
+}
+
+int test20190329()
 {
     // memory_pointer();
     int s[] = {8, 6, 3, 1, 5, 2, 4, 9};
@@ -824,5 +844,59 @@ int main(int argc, char *argv[])
     mymemcpy(dst_test, dst_test, 4);
     cout << dst_test << endl;
 
+
+    string strDst = "1,2,3,4,5";
+    StringSplitC(strDst.c_str(), ",", vecRes);
+    for(auto x: vecRes)
+    {
+        cout << x << " " << endl;
+    }
+
+    return 0;
+}
+
+ 
+int count=0;   //初始化
+int wrong=0;   //初始化
+ 
+void handler(int s)  //当闹钟信号发过来，执行这个函数，输出对错的个数
+{
+  printf("time out \n");
+  printf("right = %d,wrong = %d\n ",count,wrong);
+  exit(1);
+}
+ 
+int sigalrmTest()
+{
+    int i = 0;
+    signal(SIGALRM, handler); // 定义信号函数接收信号
+
+    alarm(30);               // 设置闹钟时间为30秒，30秒后执行handler函数
+    srand(getpid());         // 用子进程id作为随机种子数
+    for (i = 0; i < 10; i++) // 循环十次，输出随机数相加结果
+    {
+        int left = rand() % 10;
+        int right = rand() % 10;
+        printf("%d + %d = ", left, right);
+        int ret;
+
+        while (getchar() != '\n')
+            ; //清空输入缓冲区，防止异常输入使得程序崩溃
+        scanf("%d", &ret);
+        if (left + right == ret) //判断对错
+        {
+            count++;
+        }
+        else
+        {
+            wrong++;
+        }
+    }
+    printf("做完了\n");
+    printf("right =%d,wrong = %d \n", count, wrong);
+}
+int main(int argc, char *argv[])
+{
+    sigalrmTest();
     return 0;
 }

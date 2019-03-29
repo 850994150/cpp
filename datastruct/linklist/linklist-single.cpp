@@ -341,18 +341,26 @@ LinkList reverLinkList(LinkList llist)
 }
 
 // []->1->2->3->4->5->6
-LinkList LinkListRever(LinkList llist)
+// 递归方式
+// FIXME
+LinkList LinkKListRever(LinkList head)
 {
-    PNode head = llist;
-    PNode pFirst = llist->link;
-    while (pFirst->link != NULL)
+    PNode newhead;
+    // 如果链表为空或者链表中只有一个元素
+    if (head == NULL || head->link == NULL)
     {
-        PNode pInsert = pFirst->link;
-        pFirst->link = pInsert->link;
-        pInsert->link = head->link;
-        head->link = pInsert;
+        return head;
     }
-    return llist;
+    else
+    {
+        // 先反转后面的链表，走到链表的末端结点
+        newhead = LinkKListRever(head->link);
+
+        // 再将当前节点设置为后面节点的后续节点
+        head->link->link = head; // 把结点link域指向前驱结点
+        head->link = NULL;       // 前驱结点修改为NULL
+        return newhead;          // 新链表头始终指向原链表尾
+    }
 }
 
 // 插入排序
@@ -919,7 +927,8 @@ int main(int argc, char *argv[])
     cout << "反转链表\n";
     cout << "翻转前:";
     showLinkList(llist);
-    LinkList tmp_link = reverLinkList(llist);
+    // LinkList tmp_link = reverLinkList(llist);
+    LinkList tmp_link = LinkKListRever(llist);
     cout << "翻转后:";
     showLinkList(tmp_link);
 

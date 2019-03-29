@@ -770,9 +770,13 @@ void reverseChar(char *left, char *right)
     assert(left != NULL && right != NULL);
     while (left < right)
     {
-        *left ^= *right; // a = a + b; a = 1 + 2;
-        *right ^= *left; // b = a - b; b = 3 - 2;
-        *left ^= *right; // a = a - b; a = 3 - 1;
+        *left = *left + *right;
+        *right = *left - *right;
+        *left = *left - *right;
+
+        // *left ^= *right; // a = a + b; a = 1 + 2;
+        // *right ^= *left; // b = a - b; b = 3 - 2;
+        // *left ^= *right; // a = a - b; a = 3 - 1;
         left++, right--;
     }
 }
@@ -798,7 +802,7 @@ void reverseWord(char *msg)
         if (*cur == ' ' || *cur == '\0')
         {
             reverseChar(msg + left, msg + right - 1); // -1 空格
-            left = right + 1;
+            left = right + 1; // +1 指向空格后一个字符
         }
         right++;
         cur++;
@@ -1377,7 +1381,7 @@ int main( )
     reverseChar(rever, rever+ strlen(rever) - 1);
     printf("%s\n", rever);
 
-    printf("翻转单词\n");
+    printf("倒序单词\n");
     char word[] = "huang jin jie";
     reverseWord(word);
     printf("%s\n", word);
