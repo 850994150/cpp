@@ -66,6 +66,7 @@ void sizeofStruct()
     } DBFHEAD, *LPDBFHEAD;
     // 64位机器上 sizeof(DBFHEAD) = 40
 
+    // 位域
     typedef struct
     {
         char a : 3; // 表示变量只是用其中的低3位，其他高5位不管
@@ -344,6 +345,19 @@ base:
 ******** ******** ******** ********(iBase)  ######## ######## ######## ########
 ******** ******** ******** ********         ******** ******** ******** ******** (vptr)
 */
+class baseClass2
+{
+  public:
+    virtual void baseFunc();
+};
+
+class subClassFour : baseClass, baseClass2
+{
+private:
+public:
+    subClassFour() : baseClass() {}
+    ~subClassFour(){}
+};
 
 /*
 ===---=== sizeof class ===---===
@@ -469,6 +483,7 @@ int main(int argc, char const *argv[])
     cout << "sizeof subclassFirst: " << sizeof(subClassFirst) << endl;
     cout << "sizeof subclassSec: " << sizeof(subClassSec) << endl;
     cout << "sizeof subclassThird: " << sizeof(subClassThird) << endl;
+    cout << "sizeof subclassFour: " << sizeof(subClassFour) << endl;
 
 
     cout << "\n===---=== sizeof & strlen ===---===" << endl;

@@ -14,10 +14,10 @@
 #include <unordered_map>
 #include <math.h>
 #include <memory>
-#include<stdio.h>
-#include<stdlib.h>
-#include<unistd.h>
-#include<signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <signal.h>
 using namespace std;
 
 // typedef void (*pLineCallback)(int iCnt, const char *pcszContent);
@@ -632,7 +632,6 @@ int test190314()
     return 0;
 }
 
-
 // 计算x二进制中1的数目
 void count1num(int x)
 {
@@ -662,7 +661,6 @@ void operator_test()
 
     count1num(9999);
 }
-
 
 void memory_pointer()
 {
@@ -701,13 +699,11 @@ void memory_pointer()
     /* weak_ptr */
 }
 
-
-
 // 下标从0开始
 // i的子节点为2i+1和2i+2
 // i的父节点为 i/2 i/2 -1
 
-void sink(int*s, int len, int k)
+void sink(int *s, int len, int k)
 {
     while (2 * k + 1 <= len)
     {
@@ -717,9 +713,8 @@ void sink(int*s, int len, int k)
         if (s[j] < s[k])
             break;
         swap(s[j], s[k]);
-        k =j;
-	}
-	
+        k = j;
+    }
 }
 void heapSort(int *s, int len)
 {
@@ -727,11 +722,11 @@ void heapSort(int *s, int len)
     // 从最后一个叶子结点的父节点往前建堆
     for (int i = len / 2; i >= 0; i--)
         sink(s, len, i);
-	// 调整
+    // 调整
     for (; len > 0;)
     {
-		swap(s[len], s[0]);
-		len--;
+        swap(s[len], s[0]);
+        len--;
         sink(s, len, 0);
     }
 }
@@ -750,13 +745,13 @@ CTest::CTest(string name, int id) : _name(name), _id(id) // 初始化列表
 {
 }
 
-void mystrcpy(char* dst, const char*src)
+void mystrcpy(char *dst, const char *src)
 {
     if (src == NULL)
     {
-        return ;
+        return;
     }
-    while((*dst++ = *src++) != NULL)
+    while ((*dst++ = *src++) != NULL)
         ;
 }
 
@@ -765,7 +760,7 @@ char *mystrncpy(char *dest, const char *str, int dest_len, int str_len)
     int n;
     assert((dest != NULL) && (str != NULL));
 
-    char *cp=dest;
+    char *cp = dest;
     if (dest_len > str_len)
         n = str_len;
     if (dest_len <= str_len)
@@ -773,18 +768,17 @@ char *mystrncpy(char *dest, const char *str, int dest_len, int str_len)
 
     while ((*cp++ = *str++) != NULL && --n)
         ;
-	return dest;
+    return dest;
 }
 
-
-char* mystrchr(char* str, char ch)
+char *mystrchr(char *str, char ch)
 {
     while ((*str++ != ch) != NULL)
         ;
     return --str;
 }
 
-char* mymemcpy(char* dst, char* src, int n)
+char *mymemcpy(char *dst, char *src, int n)
 {
     // 判断是否存在内存重叠
     bool flag = dst > src && dst <= src + n;
@@ -804,19 +798,19 @@ char* mymemcpy(char* dst, char* src, int n)
     return dst;
 }
 
-std::vector<char*> vecRes;
-void StringSplitC(const char* pszString, const char* pszFlag, std::vector<char*>& vecRes)
+std::vector<char *> vecRes;
+void StringSplitC(const char *pszString, const char *pszFlag, std::vector<char *> &vecRes)
 {
-   const char* p = strtok((char*)pszString, pszFlag);
-   while (p != NULL)
-   {
-       if (strlen(p) > 0)
-       {
-           vecRes.push_back((char *)p);
-       }
+    const char *p = strtok((char *)pszString, pszFlag);
+    while (p != NULL)
+    {
+        if (strlen(p) > 0)
+        {
+            vecRes.push_back((char *)p);
+        }
 
-       p = strtok(NULL, pszFlag);
-   }
+        p = strtok(NULL, pszFlag);
+    }
 }
 
 int test20190329()
@@ -834,20 +828,18 @@ int test20190329()
     long long test = 2019032500000079;
     printf("%07d\n", test % 100000000);
 
-    char* str = "12345677890";
+    char *str = "12345677890";
     char dst[4] = {0};
     mystrncpy(dst, str, sizeof(dst), 6);
     printf("%s\n", dst);
-
 
     char dst_test[] = "asdfghjkl";
     mymemcpy(dst_test, dst_test, 4);
     cout << dst_test << endl;
 
-
     string strDst = "1,2,3,4,5";
     StringSplitC(strDst.c_str(), ",", vecRes);
-    for(auto x: vecRes)
+    for (auto x : vecRes)
     {
         cout << x << " " << endl;
     }
@@ -855,17 +847,16 @@ int test20190329()
     return 0;
 }
 
- 
-int count=0;   //初始化
-int wrong=0;   //初始化
- 
-void handler(int s)  //当闹钟信号发过来，执行这个函数，输出对错的个数
+int count = 0; //初始化
+int wrong = 0; //初始化
+
+void handler(int s) //当闹钟信号发过来，执行这个函数，输出对错的个数
 {
-  printf("time out \n");
-  printf("right = %d,wrong = %d\n ",count,wrong);
-  exit(1);
+    printf("time out \n");
+    printf("right = %d,wrong = %d\n ", count, wrong);
+    exit(1);
 }
- 
+
 int sigalrmTest()
 {
     int i = 0;
@@ -895,8 +886,49 @@ int sigalrmTest()
     printf("做完了\n");
     printf("right =%d,wrong = %d \n", count, wrong);
 }
-int main(int argc, char *argv[])
+
+
+typedef void (*pFun)(void);
+class Base1
 {
-    sigalrmTest();
-    return 0;
+  public:
+    virtual void e() { cout << "B1:: e()       " << endl; }
+    virtual void f() { cout << "B1:: f()       " << endl; }
+    virtual void g() { cout << "B1:: g()       " << endl; }
+};
+
+class Base2
+{
+  public:
+    virtual void h() { cout << "B2:: h()       " << endl; }
+    virtual void i() { cout << "B2:: i()       " << endl; }
+};
+
+class Base3
+{
+  public:
+    virtual void j() { cout << "B3:: j()       " << endl; }
+};
+
+class Derive : public Base1, Base2, Base3
+{
+  public:
+    Derive() { cout << "sizeof(Derive) is : " << sizeof(Derive) << endl; }
+    virtual void k() { cout << "D::k()" << endl; }
+};
+
+int main()
+{
+    /*
+    Base1 base1;
+    Base2 base2;
+    Base3 base3;
+    Derive derive;
+    for (int i = 0; i < 4; i++)
+    {
+        pFun fun = (pFun) * ((int *)*(int *)&derive + i);
+        fun();
+    }
+    */
+    return 2;
 }

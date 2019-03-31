@@ -1273,6 +1273,8 @@ void cppString()
     cout << val << endl;
 }
 
+// 柔性数组
+// 变长结构体
 typedef struct FlexiableStruct
 {
     int a;

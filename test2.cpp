@@ -167,7 +167,7 @@ void heapSort(int s[], int len)
 	}
 }
 
-int main(int argc, char const *argv[])
+int heapsortTest()
 {
 	int s[] = {9, 2, 4, 6, 8, 23, 3, 11};
 	// int s[] = {4, 6, 8, 5, 9};
@@ -179,6 +179,12 @@ int main(int argc, char const *argv[])
 	for (int i = 1; i <= len; i++)
 		cout << s[i] << " ";
     cout << endl;
+	return 0;
+}
+
+int main(int argc, char *argv[])
+{
+	cout << system("/home/m_kepler/debug/test.out") << endl;
 	return 0;
 }
 

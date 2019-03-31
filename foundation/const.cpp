@@ -127,7 +127,7 @@ int main(int argc, char const *argv[])
     cout << "after clConstTest.get() = 2: i = " << clConstTest.get() << endl;
 
     cout << "===---===---===---==="
-         << "const在类成员函数名后"
+         << "const在类成员函数名后" // 非const对象也可以调用const成员函数
          << "===---===---===---===" << endl;
 
     cout << "clConstTest.get_const()" << clConstTest.get_const() << endl;
