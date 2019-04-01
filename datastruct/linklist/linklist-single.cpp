@@ -59,6 +59,27 @@ LinkList createNullList_link()
     }
     return llist; // 头结点的地址, 所以后面的函数入参 llist 都是入参头指针
 }
+/*
+ * @brief	: 带头结点单链表头插法
+ * @param	: 每次插入都是插入在head结点后面,实际上h结点一直在后退: h->1->null; h->2->1->null;
+ * @return	:
+ */
+int insertPost_link(PNode head, DataType x)
+{
+    PNode newNode = (PNode)malloc(sizeof(struct Node));
+    if (newNode == NULL)
+    {
+        printf("Out of space\n");
+        return 0;
+    }
+    else
+    {
+        newNode->info = x;
+        newNode->link = head->link; // 先右
+        head->link = newNode;       // 后左
+        return 1;
+    }
+}
 
 /*
  * @brief	: 销毁链表空间
@@ -119,27 +140,6 @@ PNode locate_x(LinkList llist, DataType x)
     return p;
 }
 
-/*
- * @brief	: 带头结点单链表头插法
- * @param	: 每次插入都是插入在head结点后面,实际上h结点一直在后退: h->1->null; h->2->1->null;
- * @return	:
- */
-int insertPost_link(PNode head, DataType x)
-{
-    PNode newNode = (PNode)malloc(sizeof(struct Node));
-    if (newNode == NULL)
-    {
-        printf("Out of space\n");
-        return 0;
-    }
-    else
-    {
-        newNode->info = x;
-        newNode->link = head->link; // 先右
-        head->link = newNode;       // 后左
-        return 1;
-    }
-}
 
 
 /*
@@ -327,7 +327,7 @@ int ListNodeNum(LinkList llist)
  */
 LinkList reverLinkList(LinkList llist)
 {
-    PNode pPreIns = llist->link; // 反转前第一个结点(头结点之后的第一个结点),始终是待插入节点的前驱节点
+    PNode pPreIns = llist->link; // 反转前第一个结点(头结点之后的第一个结点), 始终是待插入节点的前驱节点
     PNode pInsert;               // 待插入结点(例子中始终为1, 随着循环进行, 最后会把NULL赋值给1的link域)
     while (pPreIns->link != NULL)
     {

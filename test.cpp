@@ -930,5 +930,13 @@ int main()
         fun();
     }
     */
+    int i = 10;
+    printf("%d%d", i);
+    cout << endl;
+    float a = 2.0;
+    double b = 3.0;
+    long int c = 1000000000; // long int 占4字节
+    long int d = 1280079890;
+    printf("%ld %ld %ld %ld", a, b, c, d);
     return 2;
 }
