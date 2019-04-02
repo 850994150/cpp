@@ -63,6 +63,31 @@ typedef struct stDBFHead
     char Reserved[20];
 } stDbfHead;
 
+
+void swap(int &a, int &b)
+{
+    int temp;
+    temp = a;
+    a = b;
+    b = temp;
+}
+
+// 这种写法有毒。。当a==b的时候，函数运行完a和b都变成0了
+void swap2(int &a, int &b)
+{
+    a = a + b;
+    b = a - b;
+    a = a - b;
+}
+
+// 跟加减法一样...
+void swap3(int &a, int &b)
+{
+    a = a ^ b;
+    b = a ^ b;
+    b = b ^ a;
+}
+
 class Solution
 {
   public:
@@ -201,13 +226,6 @@ void ReadFile(const std::string &strFile, int iCommitCnt, pLineCallback pf)
     {
         free(line);
     }
-}
-
-void swap(int &a, int &b)
-{
-    int tmp = a;
-    a = b;
-    b = tmp;
 }
 
 void test()
@@ -937,6 +955,11 @@ int main()
     double b = 3.0;
     long int c = 1000000000; // long int 占4字节
     long int d = 1280079890;
-    printf("%ld %ld %ld %ld", a, b, c, d);
+    printf("%ld %ld %ld %ld\n", a, b, c, d);
+
+    int test[2] = {8, 8};
+    swap2(test[0], test[1]);
+    cout << "after swap:" << swaptest[0] << " " << swaptest[1] << endl;
+
     return 2;
 }

@@ -73,6 +73,7 @@ void swap(int &a, int &b)
     b = temp;
 }
 
+// 这种写法有毒。。当a==b的时候，函数运行完a和b都变成0了
 void swap2(int &a, int &b)
 {
     a = a + b;
@@ -125,7 +126,7 @@ void quickSort(int *a, int left, int right)
 {
     int i = left, j = right;
     int key = a[left];
-    if (left > right)
+    if (left > right) // 递归退出条件
     {
         return;
     }
@@ -156,8 +157,10 @@ void quickSort(int *a, int left, int right)
      quickSort(a, i + 1, right);
     */
     // 因为s[j]是小于s[key]的，所以交换二者值，则以s[key]分界，左边都比s[key]小，右边都比s[key]大
-    a[left] = a[j];
-    a[j] = key;
+    // a[left] = a[j];
+    // a[j] = key;
+    // swap2(a[left], a[j]); // 交换,用swap2不导致错误，，，，，swap还是用最初的方法吧
+    swap(a[left], a[j]); // 交换
     quickSort(a, left, j - 1);
     quickSort(a, j + 1, right);
 }
@@ -331,11 +334,11 @@ void chooseSort3(int s[], int len)
 void sink(int *s, int len, int k)
 {
     // 这里为什么判断的是左儿子?
-    // 如果判断右儿子，那么当k只有左儿子没有右儿子，找大儿子时2*k+1 超过len，而且左儿子比根大，则不会交换了
+    // 如果判断右儿子，那么当k只有左儿子没有右儿子，而且左儿子比根大，则不会交换了
     while (2 * k <= len) // k的儿子结点下标不能超过总结点数
     {
         int j = 2 * k;                  // 左儿子
-        if (j < len && s[j] < s[j + 1]) // j<len，为了不让j+1操作越界; 找树根下标为k的大儿子
+        if (j < len && s[j] < s[j + 1]) // 不能是=，为了不让j+1操作越界; 找树根下标为k的大儿子
             j++;
         if (s[k] > s[j])                // 这里不需要j<len了，j已是大儿子了，直接作比较, 根比大儿子还大, 无需交换
             break;
@@ -427,11 +430,12 @@ void heapSort2(int *s, int len)
 void insertSort1(int s[], int len)
 {
     int tmp, i, j;
-    for (i = 1; i < len; i++)
+    // for (i = 1; i < len; i++)
+    for (i = 0; i < len; i++)
     {
-        tmp = s[i];
+        tmp = s[i]; // 需要插入的数据
         // 取出下一个元素，在已经排序的元素序列中从后向前扫描, 知道找到一个比s[i]小的值
-        for (j = i - 1; j >= 0 && s[j] > tmp; j--)
+        for (j = i - 1; j >= 0 && s[j] > tmp; j--) // 第一个元素当然也要比较，所以j可以=0
         {
             // 如果被扫描的元素（已排序）大于新元素，将该元素后移一位
             // 直到找到已排序的元素小于或者等于新元素的位置
@@ -442,18 +446,14 @@ void insertSort1(int s[], int len)
         for (j = i - 1; j >= 0; --j)
         {
 			if (s[j] >= tmp)
-			{
                 s[j + 1] = s[j];
-            }
 			else
-			{
-				break;
-			}
+				break; // 找到插入位置就可以退出
 		}
         */
 
-        // 循环退出的时候,j指向<tmp的值的下标, 因为把元素复制后移, 所以s[j+1]就是腾给tmp的
-        s[j + 1] = tmp;
+        // 循环退出的时候, j指向<tmp的值的下标, 因为把元素复制后移了, 所以s[j+1]就是腾给tmp的
+        s[j + 1] = tmp; // 注意j要在for外定义
     }
 }
 
@@ -715,7 +715,8 @@ int main(int argc, char *argv[])
 
     int s[] = {999, 4, 6, 8, 32, 5, 9, 16, 7, 3, 20, 17, 18,0,-1};
     int len = sizeof(s) / sizeof(s[0]);
-    quickSort(s, 0, len - 1);
+    // quickSort(s, 0, len - 1);
+    insertSort1(s, len);
 
     for (int i = 0; i < len; i++)
         cout << s[i] << " ";

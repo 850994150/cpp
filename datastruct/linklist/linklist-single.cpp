@@ -116,10 +116,15 @@ int isNullList_link(LinkList llist)
 void showLinkList(LinkList llist)
 {
     PNode head = llist;
-    while(head->link != NULL)
+    if (head->link == NULL)
+        printf("empty linklist\n");
+    else
     {
-        head = head->link;
-        cout << head->info << " ";
+        while (head->link != NULL)
+        {
+            head = head->link;
+            cout << head->info << " ";
+        }
     }
     cout << endl;
 }
@@ -328,10 +333,9 @@ int ListNodeNum(LinkList llist)
 LinkList reverLinkList(LinkList llist)
 {
     PNode pPreIns = llist->link; // 反转前第一个结点(头结点之后的第一个结点), 始终是待插入节点的前驱节点
-    PNode pInsert;               // 待插入结点(例子中始终为1, 随着循环进行, 最后会把NULL赋值给1的link域)
     while (pPreIns->link != NULL)
     {
-        pInsert = pPreIns->link;
+        PNode pInsert = pPreIns->link;
         // 指针调整(从后往前)
         pPreIns->link = pInsert->link;
         pInsert->link = llist->link; // 这里不能用pPreIns，因为新节点需要插入到最前面
