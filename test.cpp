@@ -959,7 +959,6 @@ int main()
 
     int test[2] = {8, 8};
     swap2(test[0], test[1]);
-    cout << "after swap:" << swaptest[0] << " " << swaptest[1] << endl;
 
     return 2;
 }
