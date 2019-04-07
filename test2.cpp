@@ -182,9 +182,38 @@ int heapsortTest()
 	return 0;
 }
 
+
+
+class Base
+{
+  public:
+	virtual void f1() { cout << "Base:f1()"; };
+	int m_base_arg=10;
+	void f2() { cout << "Base:f2()"; };
+
+  protected:
+  private:
+};
+
+class Driver :public Base
+{
+  public:
+	void f1() { cout << "Driver:f1()"; };
+	void f2() { cout << "Driver:f2()"; };
+	virtual void f3() { cout << "Driver:f3()"; };
+	int m_driver_arg=10;
+  protected:
+  private:
+};
+
 int main(int argc, char *argv[])
 {
-	cout << system("/home/m_kepler/debug/test.out") << endl;
+	// cout << system("/home/m_kepler/debug/test.out") << endl;
+	Base *pbase = new Driver;
+	pbase->f1();
+	cout << pbase->m_base_arg << endl;
+	pbase->f2();
+	pbase->f3();
 	return 0;
 }
 

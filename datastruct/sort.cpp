@@ -77,7 +77,7 @@ void swap(int &a, int &b)
 void swap2(int &a, int &b)
 {
     a = a + b;
-    b = a - b;
+    b = a - b; // 这里要先 b=a-b再a=a-b
     a = a - b;
 }
 
@@ -86,7 +86,7 @@ void swap3(int &a, int &b)
 {
     a = a ^ b;
     b = a ^ b;
-    b = b ^ a;
+    a = b ^ a;
 }
 
 //交换排序 --- 冒泡 O(n) -> O(n^2)
@@ -713,10 +713,11 @@ int heapsort2Test()
 int main(int argc, char *argv[])
 {
 
-    int s[] = {999, 4, 6, 8, 32, 5, 9, 16, 7, 3, 20, 17, 18,0,-1};
+    int s[] = {999, 4, 6, 8, 32, 5, 9, 16, 7, 3, 20, 17, 18, -2, -11};
     int len = sizeof(s) / sizeof(s[0]);
+    heapSort2(s, len);
     // quickSort(s, 0, len - 1);
-    insertSort1(s, len);
+    // insertSort1(s, len);
 
     for (int i = 0; i < len; i++)
         cout << s[i] << " ";

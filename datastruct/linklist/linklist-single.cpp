@@ -122,7 +122,7 @@ void showLinkList(LinkList llist)
     {
         while (head->link != NULL)
         {
-            head = head->link;
+            head = head->link; // 先这步再输出
             cout << head->info << " ";
         }
     }

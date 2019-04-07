@@ -145,7 +145,7 @@ void bracketsTest()
 
 int main(int argc, char *argv[])
 {
-    // QueueTest();
-    bracketsTest();
+    QueueTest();
+    // bracketsTest();
     return 0;
 }

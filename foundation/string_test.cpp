@@ -135,8 +135,7 @@ using namespace std;
 
 // http://blog.csdn.net/eager7/article/details/8131437
 
-void debugLog(const char *, int , const char * , ...);
-
+void debugLog(const char *, int, const char *, ...);
 
 struct stuff
 {
@@ -144,7 +143,6 @@ struct stuff
     int age;
     float height;
 };
-
 
 /* ---- === --- === --- === --- === --- === --- === --- === --- === -- === --- ===  */
 /* ---- === --- === --- === --- == 字符处理库函数 == --- === --- === -- === --- ===  */
@@ -161,29 +159,29 @@ int MyVsnprintf(char *dest, int size, char *formate, ...)
     return iRst;
 }
 
-
-void MyStrcpy(char* dest, const char* src)
+void MyStrcpy(char *dest, const char *src)
 {
     assert((dest != NULL) && (src != NULL));
-    while ((*dest++ = *src++) != '\0') ; // 先赋值, 再自增, 然后用dest作为while条件
+    while ((*dest++ = *src++) != '\0')
+        ; // 先赋值, 再自增, 然后用dest作为while条件
 }
 
 void MyStrncpy(char *dest, const char *src, int len)
 {
-    assert((dest!=NULL)&&(src!=NULL));
+    assert((dest != NULL) && (src != NULL));
     char *cp = dest;
     int offset = len;
 
     // 当len = dest的时候, 需要手动给dest补充\0
 
-    while( len && (*cp++ = *src++) != '\0')
+    while (len && (*cp++ = *src++) != '\0')
     {
         len--;
     }
     // sizeof(dst) > len > sizeof(src) dst后面填\0
-    if(len)
+    if (len)
     {
-        while(--len)
+        while (--len)
             *cp++ = '\0';
     }
     // len >= sizeof(dst) 会破坏dst后面的内存
@@ -193,7 +191,6 @@ void MyStrncpy(char *dest, const char *src, int len)
         *(cp + len - 1) = '\0';
     }
     */
-
 }
 
 /*
@@ -207,7 +204,7 @@ char *mystrncpy(char *dest, const char *str, int dest_len, int len)
     int n;
     assert((dest != NULL) && (str != NULL));
 
-    char *cp=dest;
+    char *cp = dest;
     if (dest_len > len)
         n = len;
     if (dest_len <= len)
@@ -215,15 +212,13 @@ char *mystrncpy(char *dest, const char *str, int dest_len, int len)
 
     while ((*cp++ = *str++) != NULL && --n)
         ;
-	return dest;
+    return dest;
 }
-
-
 
 // 设置内存位置v开始的n个元素值为c
 void *MyMemset(void *v, int c, size_t n)
 {
-    char*p;
+    char *p;
     int m;
     while (--m >= 0)
         *p++ = c;
@@ -232,9 +227,10 @@ void *MyMemset(void *v, int c, size_t n)
 
 void *MyMemcpy1(void *dest, const void *src, size_t n)
 {
-    char* dp = (char*) dest;
-    const char* sp = (const char*) src;
-    while((*dp++ = *sp++) && *dp && *sp && --n) ;
+    char *dp = (char *)dest;
+    const char *sp = (const char *)src;
+    while ((*dp++ = *sp++) && *dp && *sp && --n)
+        ;
     return dest;
 }
 
@@ -247,8 +243,8 @@ void *MyMemcpy1(void *dest, const void *src, size_t n)
  */
 void *MyMemcpy(void *dest, const void *src, size_t n)
 {
-    char *dp = (char*)dest; // 不能对void*指针进行算术操作
-    const char *sp = (const char*)src;
+    char *dp = (char *)dest; // 不能对void*指针进行算术操作
+    const char *sp = (const char *)src;
 
     bool flag1 = (sp >= dp && sp < dp + n); // dst地址比src地址低 且发生重叠 (安全)
     // <低地址> dst: [1][2][3][4][5] // 初始为null
@@ -277,7 +273,7 @@ void *MyMemcpy(void *dest, const void *src, size_t n)
     return dest;
 }
 
-char* mymemcpy(char* dst, char* src, int n)
+char *mymemcpy(char *dst, char *src, int n)
 {
     // 判断是否存在内存重叠
     // src: [低地址] 1 2 3 4 5 6
@@ -299,7 +295,6 @@ char* mymemcpy(char* dst, char* src, int n)
     return dst;
 }
 
-
 /*
  * memcpy的效率优化(只优化, 没有加入内存重叠处理)
  * 原: 逐字节拷贝
@@ -313,13 +308,13 @@ void *MemcpyOptimised(void *dest, const void *src, size_t n)
     int slice = n % 4;
 
     // 转化为整型, 这样一次性就可以拷贝四个字节(32位机器)
-    int *psrc = (int*) src;
-    int *pdest = (int*) dest;
+    int *psrc = (int *)src;
+    int *pdest = (int *)dest;
 
-    while(wordnum--)
+    while (wordnum--)
         *pdest++ = *psrc++;
 
-    while(slice--)
+    while (slice--)
         *((char *)pdest++) = *((char *)psrc++);
     return dest;
 }
@@ -338,19 +333,17 @@ void *MyMemmove(void *dst, const void *src, size_t n)
     }
     else // 倒序拷贝
     {
-        pdst += n-1;
-        psrc += n-1;
+        pdst += n - 1;
+        psrc += n - 1;
         while (n--)
         {
             *(pdst--) = *(psrc--);
         }
-
     }
     return pdst;
 }
 
-
-char *MyStrdup(const char* src)
+char *MyStrdup(const char *src)
 {
     int len = strlen(src) + 1;
 
@@ -363,7 +356,7 @@ char *MyStrdup(const char* src)
     return newptr;
 }
 
-int MyStrcmp(const char* str1, const char* str2)
+int MyStrcmp(const char *str1, const char *str2)
 {
     if (str1 == NULL || str2 == NULL)
         return -1;
@@ -390,36 +383,34 @@ int MyStrncmp(const char *str1, const char *str2, size_t n)
 }
 
 // 实现和 MyStrcmp 一样, 只不过用了 tolower 把字符全转为小写
-int MyStrcasecmp(const char* str1, const char* str2)
+int MyStrcasecmp(const char *str1, const char *str2)
 {
     if (str1 == NULL || str2 == NULL)
         return -1;
 
-    while ((tolower(*str1++) == tolower(*str2++)) && *str1  && *str2)
+    while ((tolower(*str1++) == tolower(*str2++)) && *str1 && *str2)
         ;
     return tolower(*(--str1)) == tolower(*(str2--)) ? 0 : (tolower(*(--str1)) > tolower(*(--str2)) ? 1 : -1);
 }
 
-
-char* MyStrchr(const char* src, char ch)
+char *MyStrchr(const char *src, char ch)
 {
     assert(src != nullptr);
-    const char*cp = src;
+    const char *cp = src;
 
     while ((*cp++ != ch) && *cp)
         ;
     return (char *)(--cp);
 }
 
-char* mystrchr(char* str, char ch)
+char *mystrchr(char *str, char ch)
 {
     while ((*str++ != ch) != NULL)
         ;
     return --str; // 返回ch在str的地址, 所以要--
 }
 
-
-void* MyMemchr(const void* src, int chr, size_t n)
+void *MyMemchr(const void *src, int chr, size_t n)
 {
 
     while (n && (*(unsigned char *)src != (unsigned char)chr))
@@ -430,24 +421,23 @@ void* MyMemchr(const void* src, int chr, size_t n)
     return (n ? (void *)src : NULL);
 }
 
-
 // char *strrchr_res = strrchr(ch_str, ch);
-char* MyStrrchr(const char*src, char ch)
+char *MyStrrchr(const char *src, char ch)
 {
     assert(src != nullptr);
-    const char*cp = src;
-    char* ret = nullptr;
-    while(*cp++ !='\0')
+    const char *cp = src;
+    char *ret = nullptr;
+    while (*cp++ != '\0')
     {
         if (*cp == ch)
         {
-            ret = (char*)cp;
+            ret = (char *)cp;
         }
     }
     return ret;
 }
 
-char* MyStrstr(char* str1, const char* str2)
+char *MyStrstr(char *str1, const char *str2)
 {
     assert(str1 != NULL);
     assert(str2 != NULL);
@@ -455,7 +445,7 @@ char* MyStrstr(char* str1, const char* str2)
     if (*str2 == '\0')
         return str1;
 
-    while(str1)
+    while (str1)
     {
         const char *cur = str2; // 每次不相等都从第一个字符重新开始
         while ((*str1++ == *cur++) && *str1 && *cur)
@@ -463,16 +453,14 @@ char* MyStrstr(char* str1, const char* str2)
         // 循环退出, 指针指向不相等的字符的下一个字符
         if (*(--cur) == *(--str1))
             return str1 - strlen(str2) + 1;
-        str1++;
-
         if (*str1 == '\0')
             return NULL;
-
+        str1++;
     }
     return NULL;
 }
 
-char* MyStrstr2(char* str1, const char* str2)
+char *MyStrstr2(char *str1, const char *str2)
 {
     assert(str1 != NULL);
     assert(str2 != NULL);
@@ -480,7 +468,7 @@ char* MyStrstr2(char* str1, const char* str2)
     if (*str2 == '\0')
         return str1;
 
-    while(str1)
+    while (str1)
     {
         const char *cur = str2; // 每次不相等都从第一个字符重新开始
         while (*str1 == *cur)
@@ -503,7 +491,7 @@ char* MyStrstr2(char* str1, const char* str2)
  * @param	:
  * @return	:
  */
-int MyStrstrCnt(char* str1, const char* str2)
+int MyStrstrCnt(char *str1, const char *str2)
 {
     int cnt = 0;
     assert(str1 != NULL);
@@ -512,7 +500,7 @@ int MyStrstrCnt(char* str1, const char* str2)
     if (*str2 == '\0')
         return 0;
 
-    while(str1)
+    while (str1)
     {
         const char *cur = str2;
         // while ((*str1++ == *cur++) && *str1 && *cur) ;
@@ -530,13 +518,11 @@ int MyStrstrCnt(char* str1, const char* str2)
     return cnt;
 }
 
-char* MyStrspn()
+char *MyStrspn()
 {
-
 }
 
-
-char* MyStrcat(char* dst, const char* src)
+char *MyStrcat(char *dst, const char *src)
 {
     assert(dst != NULL);
     if (src == NULL)
@@ -544,33 +530,33 @@ char* MyStrcat(char* dst, const char* src)
         return dst;
     }
     int len = strlen(src);
-    char * tmp = dst + strlen(dst); // tmp指向dst的\0字符处
+    char *tmp = dst + strlen(dst); // tmp指向dst的\0字符处
 
-    while ((*tmp++ = *src++) != '\0'); // 退出的时已经拷贝\0了, 和strcpy一样
+    while ((*tmp++ = *src++) != '\0')
+        ; // 退出的时已经拷贝\0了, 和strcpy一样
     return dst;
 }
 
-
 // int len = strlen(str);
-int MyStrlen(const char*src)
+int MyStrlen(const char *src)
 {
     int iLen = 0;
     assert(src != NULL);
-    while ((*src++ != '\0') && ++iLen) ;
+    while ((*src++ != '\0') && ++iLen)
+        ;
     return iLen;
 }
 
-
-char* MyStrtok(char* str, const char* delimeter)
+char *MyStrtok(char *str, const char *delimeter)
 {
-    static char* strStatic = NULL;
-    const char* pDelimeter = NULL; // 始终指向分隔符的指针
-    char* pRetStr = NULL;          // 保存结果
+    static char *strStatic = NULL;
+    const char *pDelimeter = NULL; // 始终指向分隔符的指针
+    char *pRetStr = NULL;          // 保存结果
     bool bFind = false;            // 标志是否查找到分隔符
 
     if (str != NULL)
     {
-        strStatic  = str;
+        strStatic = str;
     }
 
     if (*strStatic == '\0')
@@ -579,9 +565,9 @@ char* MyStrtok(char* str, const char* delimeter)
     }
     pRetStr = strStatic;
 
-    while(*strStatic != '\0')
+    while (*strStatic != '\0')
     {
-        for(pDelimeter = delimeter; *pDelimeter != '\0'; pDelimeter++)
+        for (pDelimeter = delimeter; *pDelimeter != '\0'; pDelimeter++)
         {
             if (*pRetStr == *pDelimeter)
             {
@@ -604,7 +590,6 @@ char* MyStrtok(char* str, const char* delimeter)
     return pRetStr;
 }
 
-
 /* ---- === --- === --- === --- === --- === --- === --- === --- === -- === --- ===  */
 /* ---- === --- === --- === --- = string类成员函数 = --- === --- === -- === --- ===  */
 /* ---- === --- === --- === --- === --- === --- === --- === --- === -- === --- ===  */
@@ -614,7 +599,7 @@ char* MyStrtok(char* str, const char* delimeter)
  * @param	: 原字符串
  * @return	: 去除空格后字符串
  */
-string& StringTrim( string &str)
+string &StringTrim(string &str)
 {
     if (str.empty())
     {
@@ -634,23 +619,22 @@ string& StringTrim( string &str)
  */
 vector<string> SplitString(string strOrig, string strSplit)
 {
-    char *pDelim = (char*)strSplit.c_str();
+    char *pDelim = (char *)strSplit.c_str();
     char *strToken = NULL;
     char *nextToken = NULL;
     string sLine;
-    vector <string> vecStringLine;
+    vector<string> vecStringLine;
     vecStringLine.clear();
 
-    strToken = strtok_r((char*)strOrig.c_str(), pDelim, &nextToken);
+    strToken = strtok_r((char *)strOrig.c_str(), pDelim, &nextToken);
     while (strToken != NULL)
     {
         sLine.assign(strToken);
-		vecStringLine.push_back(sLine);
-		strToken = strtok_r(NULL, pDelim, &nextToken);
-	}
-	return vecStringLine;
+        vecStringLine.push_back(sLine);
+        strToken = strtok_r(NULL, pDelim, &nextToken);
+    }
+    return vecStringLine;
 }
-
 
 /*
 void email_check2(char * szEmail, const char * szEmailChkRegexp)
@@ -674,7 +658,6 @@ void email_check2(char * szEmail, const char * szEmailChkRegexp)
 }
 */
 
-
 void email_check(char str[])
 {
 
@@ -682,17 +665,17 @@ void email_check(char str[])
     // const char* pattern = "^[a-z0-9A-Z]+([a-z0-9A-Z._-]+)?[a-z0-9A-Z]+@([a-z0-9A-Z])+(-[a-z0-9A-Z]+)?.)+[a-zA-Z]{2,}$";
     // string str1="8701.31615@qq.com";
     smatch r1;
-    if (regex_match(str,reg))
+    if (regex_match(str, reg))
     {
-        cout << "邮箱格式正确" <<endl;
+        cout << "邮箱格式正确" << endl;
     }
     else
     {
-        cout << "邮箱格式有误" <<endl;
+        cout << "邮箱格式有误" << endl;
     }
 }
 
-// ------------------------------------------------------------ 字符翻转 ------------------------------------------------------------ 
+// ------------------------------------------------------------ 字符翻转 ------------------------------------------------------------
 
 /*
  * @function: 交换相邻字符
@@ -781,6 +764,20 @@ void reverseChar(char *left, char *right)
     }
 }
 
+void reverseChar2(char *msg, int len)
+{
+    int left = 0;
+    int right = len - 1;
+    while (left < right)
+    {
+        *(msg + left) = *(msg + left) + *(msg + right);
+        *(msg + right) = *(msg + left) - *(msg + right);
+        *(msg + left) = *(msg + left) - *(msg + right);
+        left++;
+        right--;
+    }
+}
+
 /*
  * @function: 翻转单词
  * @brief	: 基于反转字符串, 先把整个字符串翻转, 然后再按照空格把一个个单词翻转(注意最后一个单词的后一位是\0)
@@ -796,13 +793,13 @@ void reverseWord(char *msg)
     int left = 0;
     int right = 0;
     char *cur = msg;
-    // while (*cur != '\0')
-    while (right <= strlen(msg))
+    // while (*cur != '\0') // 用这个做退出条件的话，会导致第一个单词没有翻过来 huang jin jie --> jie jin gnauh
+    while (right <= strlen(msg)) // 要遍历到最后一个字符，这里当然要等于
     {
         if (*cur == ' ' || *cur == '\0')
         {
             reverseChar(msg + left, msg + right - 1); // -1 空格
-            left = right + 1; // +1 指向空格后一个字符
+            left = right + 1;                         // +1 指向空格后一个字符
         }
         right++;
         cur++;
@@ -816,21 +813,21 @@ void reverseWord(char *msg)
  * @param	: 左旋，k为指定的左旋字符的个数
  * @return	: 
  */
-void LRevolve_Words(char *Pword, int  k, int len)
+void LRevolve_Words(char *Pword, int k, int len)
 {
-	int i = len;                                         
-	char temp;
+    int i = len;
+    char temp;
     char *curr = Pword + 1;
     while (k--)
-	{
-		for ( i = 0; i < len - 1 ; i++)
+    {
+        for (i = 0; i < len - 1; i++)
         {
             // 首字符依次与后面的字符依次交换
             temp = *(Pword + i);
-			*(Pword + i) = *(Pword + i + 1);
-			*(Pword + i + 1) = temp;
-		}
-	}
+            *(Pword + i) = *(Pword + i + 1);
+            *(Pword + i + 1) = temp;
+        }
+    }
 }
 
 /*
@@ -840,7 +837,7 @@ void LRevolve_Words(char *Pword, int  k, int len)
  * @param	: 
  * @return	: 
  */
-void LReverStr(char* str, int cnt, int len)
+void LReverStr(char *str, int cnt, int len)
 {
     reverseChar(str, str + cnt - 1);
     reverseChar(str + cnt, str + len - 1);
@@ -853,21 +850,20 @@ void LReverStr(char* str, int cnt, int len)
  * @param	: 
  * @return	: 
  */
-void RRevolve_Words(char *Pword, int  k, int len)
+void RRevolve_Words(char *Pword, int k, int len)
 {
-	int i = len;
-	char temp;
-	while (k--)
-	{
-		for ( i = len ; i > 1 ; i--) // 从后往前
-		{
-			temp = *(Pword + i - 1);
-			*(Pword + i - 1) = *(Pword +  i - 2);
-			*(Pword + i - 2) = temp;
-		}
-	}
+    int i = len;
+    char temp;
+    while (k--)
+    {
+        for (i = len; i > 1; i--) // 从后往前
+        {
+            temp = *(Pword + i - 1);
+            *(Pword + i - 1) = *(Pword + i - 2);
+            *(Pword + i - 2) = temp;
+        }
+    }
 }
-
 
 /*
  * @function: 右旋字符串
@@ -877,7 +873,7 @@ void RRevolve_Words(char *Pword, int  k, int len)
  * @return	: 
  */
 
-void RReverStr(char* str, int cnt, int len)
+void RReverStr(char *str, int cnt, int len)
 {
     // str + len - cnt  为倒数第k个字符
     reverseChar(str + len - cnt, str + len - 1);
@@ -885,61 +881,64 @@ void RReverStr(char* str, int cnt, int len)
     reverseChar(str, str + len - 1);
 }
 
-
 // 打印信息
-void debugLog(const char * FileName, int Line, const char * msg, ...)
+void debugLog(const char *FileName, int Line, const char *msg, ...)
 {
-	FILE *fp;
-	char ViewStr[4096] = { 0 };
-	char bufStr[10240] = { 0 };
-	char szOccurTime[32 + 1] = { 0 };
+    FILE *fp;
+    char ViewStr[4096] = {0};
+    char bufStr[10240] = {0};
+    char szOccurTime[32 + 1] = {0};
 
-	va_list arg_ptr;
-	va_start(arg_ptr, msg);
-	vsprintf(ViewStr, msg, arg_ptr); // sprintf(ViewStr, msg, arg_ptr);
-	va_end(arg_ptr);
+    va_list arg_ptr;
+    va_start(arg_ptr, msg);
+    vsprintf(ViewStr, msg, arg_ptr); // sprintf(ViewStr, msg, arg_ptr);
+    va_end(arg_ptr);
 
-	time_t timep;
-	time(&timep);
-	strftime(szOccurTime, sizeof(szOccurTime), "%Y-%m-%d %H:%M:%S", localtime(&timep));
+    time_t timep;
+    time(&timep);
+    strftime(szOccurTime, sizeof(szOccurTime), "%Y-%m-%d %H:%M:%S", localtime(&timep));
 
-	sprintf(bufStr, "[Time:%s][File:%s][Line:%d][%s]\n", szOccurTime, FileName, Line, ViewStr);
+    sprintf(bufStr, "[Time:%s][File:%s][Line:%d][%s]\n", szOccurTime, FileName, Line, ViewStr);
 
-	fp = fopen("./debug.log", "a+");
-	if (fp == NULL)
-	{
-		printf("open file error\n");
-		return;
-	}
-	fprintf(fp, "%s\n", bufStr);
-	fclose(fp);
-	printf("%s", bufStr);
-	return;
+    fp = fopen("./debug.log", "a+");
+    if (fp == NULL)
+    {
+        printf("open file error\n");
+        return;
+    }
+    fprintf(fp, "%s\n", bufStr);
+    fclose(fp);
+    printf("%s", bufStr);
+    return;
 }
-
 
 void cString()
 {
     printf(" \n---------------------- 字符数组初始化 ---------------------------\n");
+
+    // char *a = "asdfg"; strlen(a) = 5;
+    // 真实字符串大小，一般的系统函数若返回值为char*类型，也会自动在末尾加上'\0'，故在初始化后，strlen是可以用的
+
     char str_ini1[] = "helloworld"; // 输出为helloworld
-    char str_ini2[2] = {"a"}; // 输出为a
+    char str_ini2[2] = {"a"};       // 输出为a
     // char str_ini3[2] = {"ab"}; // error, const char[3]类型不能用于初始化char[2]类型的实体, 因为字符串末尾会有一个'\0'结束符
-    // char str_ini4[2] = {"a", "b"}; // error, 初始值设定项太对, 因为是一维数组, 只能赋值一个字符串, 字符串末尾会默认加上'\0'结束符
+    // char str_ini4[2] = {"a", "b"}; // error, 初始值设定项不对, 因为是一维数组, 只能赋值一个字符串, 字符串末尾不会默认加上'\0'结束符
 
     // char str_ini5[2][3] = {{'a', 'b'}, {'e', 'd'}, {'e', 'f'}}; // error, 维度错误
-    char str_ini6[2] = {'a', 'b'}; // 不能直接输出str_ini6, 因为字符串没有结尾, 这种方式赋值编译器不会加上'\0'
+    char str_ini6[2] = {'a', 'b'};  // 不能直接输出str_ini6, 因为字符串没有结尾, 这种方式赋值编译器不会加上'\0'
     char str_ini7[2] = {'a', '\0'}; // 输出为a
     // char str_ini8[] = {"a", "b"}; // error, 初始项设定太多, 这是一个以为数组, 只能放下一个字符串
 
-
-    char str3[10] = {0};     // 元素均为'\0'
-    char str4[10] = {'0'};   // 第一个元素为'0'，其他元素均为'\0'
-    char str5[10] = {0,};    // 元素均为'\0'
-    char str6[10] = {'\0'};  // 元素均为'\0'
-    printf("str3[0]:%c,%c",str3[0],str3[1]);
-    printf("str4[0]:%c,%c",str4[0],str4[1]);
-    printf("str5[0]:%c,%c",str5[0],str5[1]);
-    printf("str6[0]:%c,%c\n",str6[0],str6[1]);
+    char str3[10] = {0};   // 元素均为'\0'
+    char str4[10] = {'0'}; // 第一个元素为'0'，其他元素均为'\0'
+    char str5[10] = {
+        0,
+    };                      // 元素均为'\0'
+    char str6[10] = {'\0'}; // 元素均为'\0'
+    printf("str3[0]:%c,%c", str3[0], str3[1]);
+    printf("str4[0]:%c,%c", str4[0], str4[1]);
+    printf("str5[0]:%c,%c", str5[0], str5[1]);
+    printf("str6[0]:%c,%c\n", str6[0], str6[1]);
 
     char octal[] = "123\0456"; // \0为字符串结束符, 但是\ddd中ddd是小于8, 则\ddd是一个8进制数
     cout << "octal & char: " << octal << endl;
@@ -960,12 +959,12 @@ void cString()
     char *strchr_rest = MyStrchr(strchr_ch, ch);
     printf("MyStrchr: %s\n", strchr_rest);
 
-    char *strrchr_res = strrchr(strchr_ch , ch);     // strrchr 返回指向最后出现字符ch的指针
+    char *strrchr_res = strrchr(strchr_ch, ch); // strrchr 返回指向最后出现字符ch的指针
     printf("strrchr: %s\n", strrchr_res);
     char *strrchr_rest = MyStrrchr(strchr_ch, ch);
     printf("MyStrrchr: %s\n", strrchr_rest);
 
-    char *strstr_res = strstr(strchr_ch, "as");     // strstr 返回str2中str1第一次出现的位置，返回指针，否则返回 NULL; strrstr返回最后一次出现
+    char *strstr_res = strstr(strchr_ch, "as"); // strstr 返回str2中str1第一次出现的位置，返回指针，否则返回 NULL; strrstr返回最后一次出现
     printf("strstr: %s\n", strstr_res);
 
     printf("orig    : %s\n", strchr_ch);
@@ -982,7 +981,6 @@ void cString()
     cout << "strpbrk: " << strpbrk(strspn_key, strspn_source) << endl;
     cout << "strcspn: " << strcspn(strspn_key, strspn_source) << endl;
 
-
     char *strcat_res = strcat(strchr_ch, "+strcat");
     printf("strcat: %s\n", strcat_res);
     char *strcat_rest = MyStrcat(strchr_ch, "-strcat");
@@ -994,10 +992,10 @@ void cString()
     char strcasecmp2[] = "asdf=ADsd";
     // if (strcmp(strcmp1, strcmp2) != 0)
     if (MyStrcmp(strcmp1, strcmp2) != 0)
-    // if (strncmp(strcmp1, strcmp2, 6) != 0)
-    // if (MyStrncmp(strcmp1, strcmp2, 6) != 0)
-    // if (strcasecmp(strcasecmp1, strcasecmp2) != 0)
-    // if (MyStrcasecmp(strcasecmp1, strcasecmp2) != 0)
+        // if (strncmp(strcmp1, strcmp2, 6) != 0)
+        // if (MyStrncmp(strcmp1, strcmp2, 6) != 0)
+        // if (strcasecmp(strcasecmp1, strcasecmp2) != 0)
+        // if (MyStrcasecmp(strcasecmp1, strcasecmp2) != 0)
         printf("不相等");
     else
         printf("相等");
@@ -1028,14 +1026,12 @@ void cString()
     printf("char b[] = \"abcdef\";\tsizeof:%Zu\t strlen:%Zu\n", sizeof(b), strlen(b));
     printf("char c[] = {'a', 'b', 'c', 'd', 'e', 'f'};\tsizeof:%Zu\t strlen:%Zu\n\n", sizeof(c), strlen(c));
 
-
-
     printf("\n----------------- ======================================================== -----------------\n");
     printf("----------------- strcpy / strncpy / mmecpy / memccpy / memset / / memmove -----------------\n");
     printf("----------------- ======================================================== -----------------\n\n");
 
     // const char* p_src = "asdfasdf\0 is a good boy";
-    const char* p_src = "huangjinjie is a good boy"; // 用strcpy不安全
+    const char *p_src = "huangjinjie is a good boy"; // 用strcpy不安全
     char dest[20], Mydest[20], vardst[22 + 1];
 
     strcpy(dest, p_src);
@@ -1047,7 +1043,6 @@ void cString()
     cout << "strncpy: " << vardst << endl;
     MyStrncpy(vardst, p_src, strlen(p_src));
     cout << "MyStrncpy: " << vardst << endl;
-
 
     const char *src = "abcdefghijklmnopqrstuvwxyz";
     int len = strlen(src);
@@ -1067,7 +1062,6 @@ void cString()
     MemcpyOptimised(&dst, src, len);
     cout << "MemcpyOptimised:\n\tsrc: " << src << "\t dst: " << dst << endl;
 
-
     printf("\n===---=== strcpy/strcat/memcpy都会有内存重叠的情况 ===---===\n");
 
     char c1[] = "0123456789";
@@ -1086,7 +1080,6 @@ void cString()
     c22 = NULL;
     printf("strdup:%s\n", c22);
 
-
     printf("\n------------------- ========================================== ---------------------------\n");
     printf("------------------- 格式化字符串 sprintf / snprintf / vsprintf ---------------------------\n");
     printf("------------------- ========================================== ---------------------------\n\n");
@@ -1101,7 +1094,6 @@ void cString()
     int snprintf_res = snprintf(snprintf_str, 20, "I'm %d years old!", 10);
     // int snprintf_res = MySnprintf(snprintf_str, sizeof(snprintf_str), "I'm %d years old!",10);
     printf("snprintf_str:%s\t snprintf_res:%d\n", snprintf_str, snprintf_res);
-
 
     printf("\n------------------- ==== ---------------------------\n");
     printf("------------------- 其他 ---------------------------\n");
@@ -1124,7 +1116,7 @@ void cString()
     printf("-------------------------- =============== ---------------------------\n");
     char date[64] = "home/m_kepler/project:/home/m_kepler:/home/git:"; // 字符串不能为常量，所以strdup
     // char *date = "salfgdfogffhe"; // error
-    char* token;
+    char *token;
     char delim[] = ":/";
 
     /*
@@ -1142,7 +1134,7 @@ void cString()
     for (token = strtok(date, delim); token != NULL; token = strtok(NULL, delim))
     {
         printf("%s", token);
-		printf("+");
+        printf("+");
     }
     cout << endl;
 
@@ -1167,21 +1159,18 @@ void cString()
     free(orgstr);
     cout << endl;
 
-
     vector<string> vecstrResult;
     char *pBuffer = (char *)"asdf1,asdf2,asdf3,asdf4,asdf5";
     // char pBuffer[] = "asdf1,asdf2,asdf3,asdf4,asdf5";
     string strStrtok = "asdf1,asdf2,asdf3,asdf4,asdf5";
     vecstrResult = SplitString(pBuffer, ",");
 
-    for(auto i : vecstrResult)
+    for (auto i : vecstrResult)
     {
         cout << i << " ";
     }
     cout << endl;
 }
-
-
 
 /*
  * @brief	从行中查找key("="号左边)对应的value("="号右边)值; 非限定'='符,也可以是":"
@@ -1193,48 +1182,48 @@ void cString()
  */
 string GetMsgValue(string strOrig, string strKey, string strSplit = ",")
 {
-	int iStrOrigLen;
-	int iStrKeyLen;
-	size_t uiPosKeyBegin;
-	size_t uiPosKeyEnd;
-	size_t uiPosStrSplit;
-	string strRetValue = "";
+    int iStrOrigLen;
+    int iStrKeyLen;
+    size_t uiPosKeyBegin;
+    size_t uiPosKeyEnd;
+    size_t uiPosStrSplit;
+    string strRetValue = "";
 
-	iStrOrigLen = strOrig.length();
-	iStrKeyLen = strKey.length();
-	uiPosKeyBegin = strOrig.find(strKey);
+    iStrOrigLen = strOrig.length();
+    iStrKeyLen = strKey.length();
+    uiPosKeyBegin = strOrig.find(strKey);
 
-	if (uiPosKeyBegin != string::npos)
-	{
-		// 从key的位置开始,第一次出现 str_split 的位置
-		uiPosStrSplit =  strOrig.substr(uiPosKeyBegin).find(strSplit);
-		if (uiPosStrSplit != string::npos)
-		{
-			uiPosKeyEnd = uiPosKeyBegin + uiPosStrSplit;
-		}
-		else
-		{
-			uiPosKeyEnd = iStrOrigLen;
-		}
-		int pos_begin = uiPosKeyBegin + iStrKeyLen + 1; // +1 跳过'='字符
-		int value_len = uiPosKeyEnd - pos_begin;
-		strRetValue = strOrig.substr(pos_begin, value_len);
-		return strRetValue;
-	}
-	return strRetValue;
+    if (uiPosKeyBegin != string::npos)
+    {
+        // 从key的位置开始,第一次出现 str_split 的位置
+        uiPosStrSplit = strOrig.substr(uiPosKeyBegin).find(strSplit);
+        if (uiPosStrSplit != string::npos)
+        {
+            uiPosKeyEnd = uiPosKeyBegin + uiPosStrSplit;
+        }
+        else
+        {
+            uiPosKeyEnd = iStrOrigLen;
+        }
+        int pos_begin = uiPosKeyBegin + iStrKeyLen + 1; // +1 跳过'='字符
+        int value_len = uiPosKeyEnd - pos_begin;
+        strRetValue = strOrig.substr(pos_begin, value_len);
+        return strRetValue;
+    }
+    return strRetValue;
 }
 
 void cppString()
 {
     string strReq = "20180202-091346-640257 18226    99 Req: LBM:L0301042,MsgId=0000000100F464531E4D4B4A,Len=283,Buf=_ENDIAN=0&F_OP_USER=9999&F_OP_ROLE=2&F_SESSION=0123456789&F_OP_SITE=0050569e247d&F_OP_BRANCH=999&F_CHANNEL=0&USE_NODE_FUNC=106127&CUST_CODE=150165853";
     string str = " L0000504cpp ";
-    string str2(3,'a'); // 相当于 str3 = "aaa";
+    string str2(3, 'a'); // 相当于 str3 = "aaa";
     char chs[20];
     str.copy(chs, str.size());
     cout << "copy: [" << chs << "] sizeof:" << sizeof(chs) << " strlen:" << strlen(chs) << endl;
 
     cout << str.at(1) << endl; // 类似数组下标, 越界报错
-    cout << str[20] << endl; // 类似数组下标, 越界不报错
+    cout << str[20] << endl;   // 类似数组下标, 越界不报错
 
     // size和length是一样的, size是为了和其他容器保持一致, 都是返回字符串长度;
     // capacity(容量)返回该string对象已分配大小即string中不必增加内存即可存放的元素个数, max_size 返回string对象可容纳的最大字符串长度
@@ -1279,7 +1268,7 @@ typedef struct FlexiableStruct
 {
     int a;
     char array[0]; //或char array[]; // 定义0长数组, 只是把一个符号放在结构体内, 不占用内存
-}stFlexiable, *pstFlexiable;
+} stFlexiable, *pstFlexiable;
 
 void FlexiableArray()
 {
@@ -1297,7 +1286,6 @@ void FlexiableArray()
     p_stFlexiable->a = 10;
 
     printf("struct.a:[%d]\nstruct.str:[%s]\n", p_stFlexiable->a, p_stFlexiable->array); // 为什么用cout不行?
-
 }
 
 /*
@@ -1315,7 +1303,7 @@ bool IsLittleEndian()
 {
     union {
         int a;
-		char b;
+        char b;
     } u;
 
     int k = 15; //要在char范围内
@@ -1330,10 +1318,7 @@ bool IsLittleEndian()
     }
 }
 
-
-
-
-int main( )
+int main()
 {
     char str_email[] = "fasdf2@aa.com";
     email_check(str_email);
@@ -1349,7 +1334,6 @@ int main( )
     printf("-------------------------- ================ ---------------------------\n\n");
 
     cppString();
-
 
     printf("\n\n-------------------------- ================ ---------------------------\n");
     printf("-------------------------- 其他 ---------------------------\n");
@@ -1380,7 +1364,7 @@ int main( )
 
     printf("翻转字符串\n");
     char rever[] = "huang jin jie";
-    reverseChar(rever, rever+ strlen(rever) - 1);
+    reverseChar(rever, rever + strlen(rever) - 1);
     printf("%s\n", rever);
 
     printf("倒序单词\n");

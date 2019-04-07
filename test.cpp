@@ -935,6 +935,32 @@ class Derive : public Base1, Base2, Base3
     virtual void k() { cout << "D::k()" << endl; }
 };
 
+void reverWorld(char* msg, int len)
+{
+	int left = 0;
+	int right = len-1;
+	while(left < right)
+	{
+		*(msg+left) = *(msg+left) + *(msg+right);
+		*(msg+right) = *(msg+left) - *(msg+right);
+		*(msg+left) = *(msg+left) - *(msg+right);
+		left++;
+		right--;
+	}
+}
+void reverseChar(char *left, char *right)
+{
+    assert(left != NULL && right != NULL);
+    while (left < right)
+    {
+        *left = *left + *right;
+        *right = *left - *right;
+        *left = *left - *right;
+        left++;
+		right--;
+    }
+}
+
 int main()
 {
     /*
@@ -960,5 +986,11 @@ int main()
     int test[2] = {8, 8};
     swap2(test[0], test[1]);
 
+    char name[] = "huangjinjie";
+    cout << name << endl;
+    int len = strlen(name);
+    reverWorld(name, len);
+    // reverseChar(name, name + len - 1);
+    cout << name << endl;
     return 2;
 }
