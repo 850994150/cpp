@@ -992,5 +992,16 @@ int main()
     reverWorld(name, len);
     // reverseChar(name, name + len - 1);
     cout << name << endl;
+
+    // uint8_t ua = 'a';
+    uint8_t ua = 97;
+    ua++;
+    cout << ua << endl;
+
+    char s= 'a';
+    int *ptr = (int *)&s;
+    *ptr = 98;
+    cout << *ptr << " " << s << endl;
+
     return 2;
 }

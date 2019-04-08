@@ -452,7 +452,7 @@ char *MyStrstr(char *str1, const char *str2)
             ;
         // 循环退出, 指针指向不相等的字符的下一个字符
         if (*(--cur) == *(--str1))
-            return str1 - strlen(str2) + 1;
+            return str1 - strlen(str2) + 1; // +1是因为strstr返回的是str2在str1中第一次出现的位置的指针
         if (*str1 == '\0')
             return NULL;
         str1++;
@@ -516,6 +516,23 @@ int MyStrstrCnt(char *str1, const char *str2)
         str1++;
     }
     return cnt;
+}
+
+int MyStrstrCnt2(char *str1, const char *str2)
+{
+    int icnt = 0;
+    while (str1)
+    {
+        const char *cur = str2;
+        while ((*str1++ == *cur++) && *str1 && *cur)
+            ;
+        if (*(--cur) == *(--str1))
+            icnt++;                 // 发现匹配的不是返回，而是++
+        if (*str1 == '\0')
+            break;
+        str1++;
+    }
+    return icnt;
 }
 
 char *MyStrspn()
