@@ -1003,5 +1003,17 @@ int main()
     *ptr = 98;
     cout << *ptr << " " << s << endl;
 
+    int sza[3] = {1, 4, 7};
+    int itest = 10;
+    int *p = &itest;
+    cout << &sza << " " << &sza + 1 << endl;
+    cout << *p << " " << *p++ << endl;
+
+    char szpp[4] = "123";
+    char *pp = "123";
+    cout << *pp << " " << *pp + 1 << endl;
+    printf("%s\n", szpp);
+    printf("%s\n", pp);
+
     return 2;
 }
