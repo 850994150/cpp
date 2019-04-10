@@ -81,19 +81,23 @@ class CQueue
 
 int CQueue::pop()
 {
+    int tmp;
     if (_stack2.empty())  // stack2的元素出完了再倒进去
     {
         while (!_stack1.empty())
         {
-            int tmp = _stack1.top();
+            // int tmp = _stack1.top();
+            _stack2.push(_stack1.top());
             _stack1.pop();
-            _stack2.push(tmp);
         }
     }
-    int rst = _stack2.top();
-    _stack2.pop();
-    cout << rst << endl;
-    return rst;
+    else
+    {
+        tmp = _stack2.top();
+        _stack2.pop();
+    }
+    cout << tmp << endl;
+    return tmp;
 }
 
 void CQueue::push(int x)
