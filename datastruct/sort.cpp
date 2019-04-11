@@ -101,7 +101,7 @@ void bubbleSort(int s[], int len)
     {
         for (j = 0; j < len - i - 1; j++) // 因为第i遍循环已经找到第i大的值了, 所以比较的时候只需要在s[0]到s[len-i-1]之间找
         {
-            if (s[j + 1] < s[j])
+            if (s[j + 1] < s[j]) // 前面（s[j]）比后面（s[j+1]）大就交换，所以是升序
             {
                 tmp = s[j + 1];
                 s[j + 1] = s[j];
