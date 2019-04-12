@@ -122,6 +122,7 @@
  ***********************************************************
  */
 
+#include <bitset>
 #include <regex>
 #include <vector>
 #include <time.h>
@@ -736,6 +737,32 @@ void SwapNeighbourCharacters(string str_swap)
 
     printf("%s\n", (char *)strResult.c_str());
 }
+
+/*
+ * @function: 二进制反序
+ * @brief	: 取出末位，左移一位，把取出的数拼到末尾
+ * @param	: 
+ * @return	: 
+ */
+unsigned int reverseBit(int num)
+{
+    int i, tmpbit;
+    unsigned new_num = 0;
+    for (size_t i = 0; i < 32; i++)
+    {
+        /*
+        tmpbit = num & 1; // 取出末位
+        new_num <<= 1;    // 新数左移
+        new_num = new_num | tmpbit; // 取出的数拼到新数中
+        num >>= 1; // 接着处理倒数第二位
+        */
+
+        new_num <<= 1;
+        new_num |= ((num >> i) & 1);
+    }
+    return new_num;
+}
+
 
 /*
  * @function: 反转字符串
@@ -1400,6 +1427,9 @@ int main()
     // RRevolve_Words(rrwords, 3, strlen(rrwords));
     RReverStr(rrwords, 3, strlen(lrwords));
     printf("%s\n", rrwords);
+
+    printf("二进制倒序\n");
+    printf("%u\n",reverseBit(6));
 
     return 0;
 }

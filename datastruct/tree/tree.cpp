@@ -435,7 +435,7 @@ void PreOrder2(BiTree T)
     //栈不空或者p不空时循环
     while (p || !stack.empty())
     {
-        if (p != NULL)
+        if (p != NULL) // 一直遍历到左边最小的那棵树
         {
             //存入栈中
             stack.push(p);
@@ -444,7 +444,7 @@ void PreOrder2(BiTree T)
             //遍历左子树
             p = p->lchild;
         }
-        else
+        else // 此时p指向左边最小那棵树的左结点
         {
             //退栈
             p = stack.top();

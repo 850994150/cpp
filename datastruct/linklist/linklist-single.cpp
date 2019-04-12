@@ -311,9 +311,7 @@ int ListNodeNum(LinkList llist)
 {
     int iNum = 0;
     if (llist->link == NULL)
-    {
         return 0;
-    }
     while (llist->link != NULL)
     {
         llist = llist->link; // llist(头指针)一直是下一个结点

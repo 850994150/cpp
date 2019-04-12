@@ -129,6 +129,42 @@ string WString2String(const std::wstring &ws)
     return strResult;
 }
 
+
+// 打印信息
+void debugLog(const char *FileName, int Line, const char *msg, ...)
+{
+    FILE *fp;
+    char ViewStr[4096] = {0};
+    char bufStr[10240] = {0};
+    char szOccurTime[32 + 1] = {0};
+
+    va_list arg_ptr;
+    va_start(arg_ptr, msg);
+    vsprintf(ViewStr, msg, arg_ptr); // sprintf(ViewStr, msg, arg_ptr);
+    va_end(arg_ptr);
+
+    time_t timep;
+    time(&timep);
+    strftime(szOccurTime, sizeof(szOccurTime), "%Y-%m-%d %H:%M:%S", localtime(&timep));
+
+    sprintf(bufStr, "[Time:%s][File:%s][Line:%d][%s]\n", szOccurTime, FileName, Line, ViewStr);
+    /*
+
+    fp = fopen("./debug.log", "a+");
+    if (fp == NULL)
+    {
+        printf("open file error\n");
+        return;
+    }
+    fprintf(fp, "%s\n", bufStr);
+    fclose(fp);
+    */
+    printf("%s", bufStr);
+
+    return;
+}
+
+
 string GetMsgValue(string strOrig, string strKey, string strSplit)
 {
     string strRetValue = "";
@@ -961,7 +997,7 @@ void reverseChar(char *left, char *right)
     }
 }
 
-int main()
+int test20190412()
 {
     /*
     Base1 base1;
@@ -1016,4 +1052,21 @@ int main()
     printf("%s\n", pp);
 
     return 2;
+}
+
+void printfpwn()
+{
+    int flag = 0;
+    int *p = &flag;
+    // char *a = "%010x%010x%010x%01970x%n";
+    char a[100];
+    scanf("%s", a);
+    printf(a);
+    if(flag == 2000)
+        printf("nice!\n");
+}
+int main(int argc, char *argv[])
+{
+    printfpwn();
+    return 0;
 }
