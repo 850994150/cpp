@@ -125,6 +125,7 @@ void main()
 // LIS三:quicksort + LCS
 #include <iostream>
 #include <stdlib.h>
+#include <string.h>
 using namespace std;
 //设数组长度不超过 30
 int cmp ( const void *a , const void *b )

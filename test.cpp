@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <chrono>
 #include <vector>
 #include <assert.h>
@@ -1067,6 +1068,58 @@ void printfpwn()
 }
 int main(int argc, char *argv[])
 {
-    printfpwn();
+    // printfpwn();
+    debugLog(__FILE__, __LINE__, "asdf");
+    
+    // strsep
+        // char *date = "salfgdfogffhe"; // error
+    char *token;
+    char delim[] = ":/";
+    fstream test;
+    test.open("./debug/test.log", ios::binary | ios::in);
+    if(!test)
+        perror("open");
+    string line;
+    string szstrTmp [3];
+
+    
+    while(getline(test, line))
+    {
+        // char *orgstr = strdup(line.c_str());
+        int i = 0;
+        char *orgstr = (char*)line.c_str();
+        // for (token = strsep(&orgstr, delim); token != NULL; token = strsep(&orgstr, delim))
+        for (token = strsep(&orgstr, delim), i = 0; token != NULL, i != 3; token = strsep(&orgstr, delim), i++)
+        {
+            szstrTmp[i] = token;
+            // i++;
+        }
+        // free(orgstr);
+    }
+    for(int j = 0; j < 3; j++)
+        cout << szstrTmp[j]<<endl;
+
+
+    /*
+    while(getline(test,line))
+    {
+        int j =0;
+        for(int i =0; i < 10; i++)
+        {
+            szstrTmp[j] = "aaaa";
+            j++;
+        }
+    }
+    */
+
+
+   char ab[10] = "ab";
+   char *tmp = "\",";
+   char s = tmp[0];
+   char p = tmp[1];
+   strncat(ab, &p, 1);
+   cout << ab << endl;
+
     return 0;
+
 }

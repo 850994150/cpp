@@ -3,10 +3,11 @@
     "tasks": [
         {
             "label": "make",
-            "command": "${workspaceFolder}/.vscode/make.bat",
+            "command": "${workspaceFolder}/.vscode/make.bat", 
             "args": [
-                "/mnt/f/workspaces/c++/${relativeFile}",
+                "${relativeFile}",
                 "./debug/${fileBasenameNoExtension}.out"
+                // "/mnt/f/workspaces/c++/${relativeFile}",
             ],
             "problemMatcher": {
                 "owner": "cpp",

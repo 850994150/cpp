@@ -24,7 +24,7 @@ using namespace std;
 
 //[a,b]
 #define random(a, b) ((rand() % (b - a + 1)) + a)
-#define N 50000
+#define N 5000
 #define PER_FILE_SIZE 1000
 string url = "-0123456789abcdefghijklmnopqrstuvwxyz";
 
