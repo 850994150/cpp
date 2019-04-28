@@ -52,5 +52,9 @@
         "**/CVS": true,
         "**/.DS_Store": true
     },
-    "git.ignoreLimitWarning": true
+    "git.ignoreLimitWarning": true,
+    "python.linting.flake8Enabled": true,
+    "python.linting.pylintEnabled": false,
+    "python.linting.enabled": true,
+    "C_Cpp.intelliSenseEngineFallback": "Enabled"
 }

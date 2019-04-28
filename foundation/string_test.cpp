@@ -1407,7 +1407,9 @@ int main()
     printf("%s\n", res.c_str());
 
     printf("翻转字符串\n");
+    // char *rever = "huang jin jie"; // segment fault , 字符常量不允许修改
     char rever[] = "huang jin jie";
+
     reverseChar(rever, rever + strlen(rever) - 1);
     printf("%s\n", rever);
 

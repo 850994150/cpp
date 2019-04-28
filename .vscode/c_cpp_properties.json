@@ -7,10 +7,9 @@
                 "C:/Users/M-Kepler/AppData/Local/lxss/rootfs/usr/include",
                 "E:/Source/szkingdom/PingAn_kbss_ums/lbm/src/oracle_include",
                 "C:/Users/M-Kepler/AppData/Local/lxss/rootfs/usr/include/linux",
-                "C:/Users/M-Kepler/AppData/Local/lxss/rootfs/usr/include/usr/include",
                 "C:/Users/M-Kepler/AppData/Local/lxss/rootfs/usr/include/asm-generic",
                 "C:/Users/M-Kepler/AppData/Local/lxss/rootfs/usr/include/x86_64-linux-gnu",
-                "C:/Users/M-Kepler/AppData/Local/lxss/rootfs/usr/include/x86_64-linux-gnu/c++/5",
+                "C:/Users/M-Kepler/AppData/Local/lxss/rootfs/usr/include/x86_64-linux-gnu/c++/7",
                 "D:/include/x86_64-linux-gnu/"
             ],
             "defines": [

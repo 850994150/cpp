@@ -110,6 +110,7 @@ int isNullList_link(LinkList llist)
 
 /*
  * @brief	: 正序输出链表结点值
+ *            带头结点的链表不会输出头节点
  * @param	:
  * @return	:
  */
@@ -128,6 +129,30 @@ void showLinkList(LinkList llist)
     }
     cout << endl;
 }
+
+/*
+ * @brief	: 正序输出链表结点值
+ *            包含头结点
+ * @param	:
+ * @return	:
+ */
+void showLinkListWithHead(LinkList llist)
+{
+    PNode head = llist;
+    if (head->link == NULL)
+        printf("empty linklist\n");
+    else
+    {
+        while (head != NULL)
+        {
+            cout << head->info << " ";
+            head = head->link;
+        }
+    }
+    cout << endl;
+}
+
+
 
 //求某元素的储存位置
 PNode locate_x(LinkList llist, DataType x)
@@ -321,7 +346,7 @@ int ListNodeNum(LinkList llist)
 }
 
 /*
- * @function: 带头结点的单链表翻转
+ * @function: 带头结点的单链表翻转（迭代实现）
  * @brief	: 头结点h不用动将2～n结点一个个插入到head结点后
               指针修改顺序从后往前, 想修改待插入的
               h -> 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> null
@@ -330,12 +355,16 @@ int ListNodeNum(LinkList llist)
  */
 LinkList reverLinkList(LinkList llist)
 {
+    if (llist == NULL || llist->link == NULL) // 如果链表为空或者链表中只有一个元素
+    {
+        return llist;
+    }
     PNode pPreIns = llist->link; // 反转前第一个结点(头结点之后的第一个结点), 始终是待插入节点的前驱节点
     while (pPreIns->link != NULL)
     {
         PNode pInsert = pPreIns->link;
         // 指针调整(从后往前)
-        pPreIns->link = pInsert->link;
+        pPreIns->link = pInsert->link; // 因为pInsert是要插入到头节点后面的，所以想修改待插入结点的前驱结点的link域
         pInsert->link = llist->link; // 这里不能用pPreIns，因为新节点需要插入到最前面
         llist->link = pInsert;
     }
@@ -343,20 +372,22 @@ LinkList reverLinkList(LinkList llist)
 }
 
 // []->1->2->3->4->5->6
-// 递归方式
-// FIXME
+/*
+ * @function: 链表反转（递归实现）
+ * @brief	: 递归走到链表末端，然后更新每一个结点的link域，实现翻转
+ * @param	: 
+ * @return	: 
+ */
 LinkList LinkKListRever(LinkList head)
 {
     PNode newhead;
-    // 如果链表为空或者链表中只有一个元素
-    if (head == NULL || head->link == NULL)
+    if (head == NULL || head->link == NULL) // 如果链表为空或者链表中只有一个元素
     {
         return head;
     }
     else
     {
-        // 先反转后面的链表，走到链表的末端结点
-        newhead = LinkKListRever(head->link);
+        newhead = LinkKListRever(head->link); // 先反转后面的链表，走到链表的末端结点
 
         // 再将当前节点设置为后面节点的后续节点
         head->link->link = head; // 把结点link域指向前驱结点
@@ -932,7 +963,8 @@ int main(int argc, char *argv[])
     // LinkList tmp_link = reverLinkList(llist);
     LinkList tmp_link = LinkKListRever(llist);
     cout << "翻转后:";
-    showLinkList(tmp_link);
+    // showLinkList(tmp_link);
+    showLinkListWithHead(tmp_link);
 
     cout << "链表排序\n";
     sort_test(llist);

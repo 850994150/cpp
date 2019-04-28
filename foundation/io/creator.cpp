@@ -5,7 +5,7 @@
  * Last modified: 2018-08-20 14:06:23
  * Filename     : creator.cpp
  * Description  : 
- * 功能: 没ms毫秒往file_name写入一行; 使用uuid生成随机码  
+ * 功能: 每ms毫秒往file_name写入一行; 使用uuid生成随机码  
  * 使用: [exec.out] file_name ms
  ***********************************************************
  */
