@@ -285,9 +285,9 @@ int client_select( )
 
 int main(int argc, char *argv[])
 {
-    client_block();
+    // client_block();
     // client_dontblock();
-    // client_select();
+    client_select();
     // peer2peer();
     return 0;
 }

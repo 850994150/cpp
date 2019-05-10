@@ -118,6 +118,18 @@ int rangeBitwiseAnd2(int m, int n)
     return m & d;
 }
 
+int rangeBitwiseAnd3(int m, int n)
+{
+    int count = 0;
+    while (m != n)
+    {
+        m >>= 1;
+        n >>= 1;
+        ++count;
+    }
+    return m << count;
+}
+
 int main(int argc, char *argv[])
 {
     int data = 99;

@@ -1066,7 +1066,8 @@ void printfpwn()
     if(flag == 2000)
         printf("nice!\n");
 }
-int main(int argc, char *argv[])
+
+int main20190430(int argc, char *argv[])
 {
     // printfpwn();
     debugLog(__FILE__, __LINE__, "asdf");

@@ -125,11 +125,11 @@ void bubbleSort(int s[], int len)
 void quickSort(int *a, int left, int right)
 {
     int i = left, j = right;
-    int key = a[left];
     if (left > right) // 递归退出条件
     {
         return;
     }
+    int key = a[left];
 
     // while (i != j)
     while (i < j) // 前面 left > right 已做处理了,这里条件可以直接是i<j
@@ -160,6 +160,7 @@ void quickSort(int *a, int left, int right)
     // a[left] = a[j];
     // a[j] = key;
     // swap2(a[left], a[j]); // 交换,用swap2不导致错误，，，，，swap还是用最初的方法吧
+    printf("i=%d, j=%d\n", i, j);
     swap(a[left], a[j]); // 交换
     quickSort(a, left, j - 1);
     quickSort(a, j + 1, right);
@@ -713,10 +714,12 @@ int heapsort2Test()
 int main(int argc, char *argv[])
 {
 
-    int s[] = {999, 4, 6, 8, 32, 5, 9, 16, 7, 3, 20, 17, 18, -2, -11};
-    int len = sizeof(s) / sizeof(s[0]);
-    heapSort2(s, len);
-    // quickSort(s, 0, len - 1);
+    // int s[] = {999, 4, 6, 8, 32, 5, 9, 16, 7, 3, 20, 17, 18, -2, -11};
+    // int len = sizeof(s) / sizeof(s[0]);
+    int len = 9;
+    int s[] = {1, 4, 5, 7, 9, 3, 2, 6, 8};
+    // heapSort2(s, len);
+    quickSort(s, 0, len-1);
     // insertSort1(s, len);
 
     for (int i = 0; i < len; i++)

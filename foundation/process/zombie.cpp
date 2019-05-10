@@ -38,7 +38,7 @@ void SignalHandler(int signal)
         printf("【Handler - wait】 get sub process exited signal!, status:%d\n", stat);
     }
     /*
-    while((sub_pid = waitpid(-1, &stat, WNOHANG)) > 0)
+    while((sub_pid = waitpid(-1, &stat, WNOHANG)) > 0) // WNOHANG 表示非阻塞模式
     {
        printf("【Handler - waitpid】get sub process %d exited signal!\n", sub_pid);
     }

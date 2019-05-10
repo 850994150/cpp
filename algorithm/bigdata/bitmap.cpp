@@ -2,85 +2,122 @@
  **********************************************************
  * Author       : M_Kepler
  * EMail        : m_kepler@foxmail.com
- * Last modified: 2018-12-31 22:39:42
+ * Last modified: 2019-05-10 17:37:10
  * Filename     : bitmap.cpp
- * Description  : 位图
+ * Description  : 位图操作封装
  ***********************************************************
  */
-
+ 
 #include <iostream>
 #include <time.h>
+#include <vector>
 using namespace std;
+
 #define BITWORD 32
-#define ARRNUM 100
+// #define BITWORD 8 * sizeof(unsigned int) // int类型4字节每字节8位，一共 8 * sizeof(int) = 32位
 
-int mmin = 10000000;
-int mmax = 99999999;
-int N = (mmax - mmin + 1);
-#define BITS_PER_WORD 32
-#define WORD_OFFSET(b) ((b) / BITS_PER_WORD)
-#define BIT_OFFSET(b) ((b) % BITS_PER_WORD)
-void SetBit(int *words, int n)
+#define INDEX(b) ((b) / (BITWORD))      // 除32可以用位操作: i >> 5 替代
+#define BIT_OFFSET(b) ((b) % (BITWORD)) // 对32求余可以用位操作: i & 31 替代
+
+class BitMap
 {
-    n -= mmin;
-    words[WORD_OFFSET(n)] |= (1 << BIT_OFFSET(n));
+public:
+    // 申请足够的位 range / 32+1 个 unsigned int空间
+    BitMap(size_t range);
+
+    // 设置值x对应的位为 1
+    void set(size_t x);
+
+    // 判断值x对应的位是否为 1
+    bool is_set(size_t x);
+
+    // 重置值x对应的位为 0
+    void clear(size_t x);
+
+    // 全部重置为 0
+    void reset();
+
+private:
+    vector<unsigned int> m_bits;
+};
+
+/*
+ * @function: 申请空间, int类型4字节即32位, 计算出需要申请多少个int类型
+ * @brief	: 所以第n位存放在第 n/32 个int类型中的第 n%32 位处
+ *            unsigned int 范围为 0 ~ 2^32-1
+ *            int 范围为 -2^31 ~ 2^31-1
+ * @param	: 
+ * @return	: 
+ */
+BitMap::BitMap(size_t range)
+{
+    m_bits.resize(range / BITWORD + 1); // 多开辟一个空间
 }
 
-void ClearBit(int *words, int n)
+void BitMap::set(size_t x)
 {
-    words[WORD_OFFSET(n)] &= ~(1 << BIT_OFFSET(n));
+    m_bits[INDEX(x)] |= (1 << BIT_OFFSET(x)); // 把 m_bits[i] 的第 x 位置为1
 }
 
-int GetBit(int *words, int n)
+bool BitMap::is_set(size_t x)
 {
-    int bit = words[WORD_OFFSET(n)] & (1 << BIT_OFFSET(n));
-    return bit != 0;
+    return m_bits[INDEX(x)] & (1 << (BIT_OFFSET(x)));
 }
 
-int main()
+void BitMap::clear(size_t x)
 {
-    int i;
-    int j;
-    int arr[ARRNUM];
-    int *words = new int[1 + N / BITS_PER_WORD];
-    if (words == NULL)
-    {
-        cout << "new error\n"
-             << endl;
-        exit(0);
-    }
-    int count = 0;
-    for (i = 0; i < N; i++)
-    {
-        ClearBit(words, i);
-    }
+    m_bits[INDEX(x)] &= ~(1 << BIT_OFFSET(x)); // &=~ 取反
+}
 
+
+
+
+
+
+
+
+// --------------------------------------------------------------------------------------------------
+
+
+
+/*
+ * @function: 利用位图法来排序、去重
+ * @brief	: 
+ * @param	: num num个随机数
+ * @return	: 
+ */
+void bit_sort(BitMap bm, int num = 10)
+{
+    int i, j, count = 0;
+    printf("\n排序前:\n");
+    int arr[num];
     srand((unsigned)time(NULL));
-    printf("数组大小:%d\n", ARRNUM);
-    for (j = 0; j < ARRNUM; j++)
+    for (j = 0; j < num; j++)
     {
-        arr[j] = rand() % N;
-        arr[j] += mmin;
+        arr[j] = rand() % 10 + 1;
         printf("%d\t", arr[j]);
     }
-    for (j = 0; j < ARRNUM; j++)
+
+    for (j = 0; j < num; j++)
     {
-        SetBit(words, arr[j]);
+        bm.set(arr[j]);
     }
 
-    printf("排序后a为:\n");
-
-    for (i = 0; i < N; i++)
+    printf("\n排序后:\n");
+    for (i = 0; i < num; i++)
     {
-        if (GetBit(words, i))
+        if (bm.is_set(i))
         {
-            printf("%d\t", i + mmin);
+            printf("%d\t", i);
             count++;
         }
     }
+    cout << "\n去重后个数为: " << count << endl;
+}
 
-    printf("总个数为:%d\n", count);
-    delete[] words;
-    words = NULL;
+int main(int argc, char *argv[])
+{
+    BitMap bm(10);
+    bit_sort(bm);
     return 0;
 }

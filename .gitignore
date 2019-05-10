@@ -8,3 +8,5 @@ debug.log
 /Coding Task - Dorabot Inc/
 /debug/
 /.vscode/ipch
+/.history
+/leetcode/.vscode/ipch

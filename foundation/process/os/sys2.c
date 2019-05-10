@@ -19,41 +19,41 @@
 
 int main()
 {
-    pid_t pid;
-    int fd;
-    char *buf1=(char *)malloc(20);
-    char *buf2=(char *)malloc(20);
-    strcpy(buf1,"this is child process:\n");
-    strcpy(buf2,"this is parent process:\n");
+    char *buf1 = (char *)malloc(20);
+    char *buf2 = (char *)malloc(20);
+    strcpy(buf1, "this is child process;\n");
+    strcpy(buf2, "this is parent process;\n");
 
-	fd=open("sys2_file.txt",O_CREAT|O_RDWR);
-	pid = fork();
-    if(fd < 0)
+    int fd = open("./debug/sys2_file.txt", O_CREAT | O_RDWR);
+    if (fd < 0)
     {
-        printf("open file error\n");
+        perror("open file error\n");
     }
-    if(pid==0)
+
+    pid_t pid = fork();
+    if (pid == 0)
     {
-        if(write(fd,buf1,strlen(buf1))<0)
+        if (write(fd, buf1, strlen(buf1)) < 0)
         {
-            printf("write error!\n");
+            perror("write error!\n");
             exit(0);
         }
-        printf("pid:%d\n",getpid());
+        printf("pid:%d\n", getpid());
         close(fd);
     }
     else
     {
-        if(write(fd,buf2,strlen(buf1))<0)
+        if (write(fd, buf2, strlen(buf1)) < 0)
         {
-            printf("write error!\n");
+            perror("write error!\n");
             exit(0);
         }
         close(fd);
-        wait(0);
-        printf("ppid:%d\n",getppid());
+        if (wait(0))
+        {
+            printf("【wait】 get sub process exited signal!\n");
+        }
+        printf("ppid:%d\n", getppid());
     }
     return 0;
 }
-
-

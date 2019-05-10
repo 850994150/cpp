@@ -12,7 +12,15 @@
 #include <iostream>
 using namespace std;
 
-// 动态规划: 一步两步上台阶
+/*
+ * @function: 跳台阶问题
+ * @brief	: 每次可以跳1步或2步，问从0跳到100总共需要跳多少次
+ *            假设f(100)表示跳100级台阶需要跳的次数
+ *            只有两种走法，从第99阶跳1步 或者 从第98阶跳2步
+ *            则通项公式为: f(n) = f(n-1) + f(n-2) (n>=2)
+ * @param	: 
+ * @return	: 
+ */
 int step(int s)
 {
     if (s <= 0)

@@ -8,14 +8,22 @@
         * [capture list] (param list) mutable exception -> ret_type { body }
         * https://www.cnblogs.com/DswCnblog/p/5629165.html
         * https://www.cnblogs.com/geloutingyu/p/8335230.html
-        * 捕获列表和函数体必需包含
-        * 如果函数体包含return, 则返回类型为对应return类型, 如果没有return语句,则返回类型为void
-        * 这个捕获参数列表和参数列表不是重复了吗? 引用捕获和参数列表入参引用有什么不一样
-        * 捕获列表为空表示该lambda不使用**它所在函数中的任何局部变量**
-        * 捕获参数列表形式：[]、[=]、[&]、[=,&x]、[this]
+      * 捕获列表和函数体必需包含，其他部分可以省去
+      * 捕获列表
+          * 捕获列表可以让匿名函数使用其可见范围(即作用域)内的外部变量
+            * 这个捕获参数列表和参数列表不是重复了吗? 引用捕获和参数列表入参引用有什么不一样
+            * 捕获列表的参数也可以放在参数列表如: [a]{cout << a << endl;}; 等同于 [](int a){cout << a << endl;};
+            * 捕获列表的变量不可以在函数体内部修改，如果要修改可以加mutable [x] mutable {x*=2;};
+          * 捕获参数列表形式：[]、[=]、[&]、[=, &x]、[this]
         * 匿名函数不支持默认参数、不支持可变参数、所有参数必须有参数名
-    * 尾置返回类型
+      * 尾置返回类型
         * 函数的返回值类型尾置，即放在函数的参数列表后面; 其基本形式为：在形参列表后面并以一个->符号开始。
+        * 如果函数体包含return, 则返回类型为对应return类型, 如果没有return语句,则返回类型为void
+      * lambda表达式赋值操作符被禁用了
+        auto x = [](){cout << "a";};
+        auto y = [](){cout << "b";};
+        x=y;// error
+         
     * 仿函数 functor
     * 值传递、引用传递、指针传递
         * 如果参数采用指针传递或引用传递，那么加上`const` 可以防止意外地改动该指针，起到保护作用
@@ -282,12 +290,12 @@ int main()
     cout << "指针传递:\tn=" << n << endl;
 
     cout << " \n----------------内联函数----------------\n";
-    double a, b;
-    double c = 13.0;
-    a = square(5.0);
-    b = square(4.5 + 7.5);
-    cout << "a = " << a << ", b = " << b;
-    cout << ", c = " << c << endl;
+    double dou_a, dou_b;
+    double dou_c = 13.0;
+    dou_a = square(5.0);
+    dou_b = square(4.5 + 7.5);
+    cout << "a = " << dou_a << ", b = " << dou_b;
+    cout << ", c = " << dou_c << endl;
 
     cout << " \n----------------回调函数----------------\n";
     CallPrintfText(PrintfText, (char *)"Hello World!\n");
@@ -319,6 +327,12 @@ int main()
     }
     cout << total << endl;
     */
+
+    vector<int> v(10);
+    int a(0), b(1);
+    std::generate(v.begin(), v.end(), [&a, &b] {int value=b; b=b+a;a=value;return value; });
+    for(auto i : v)
+        cout << v[i] << " ";
 
     cout << " \n--------------- nullptr ---------------\n";
     int *p = nullptr;

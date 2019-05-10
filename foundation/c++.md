@@ -1,7 +1,7 @@
 
 <!-- TOC -->
 
-- [C++语言基础](#c语言基础)
+- [C++ 语言基础](#c-语言基础)
     - [`i++ / ++i` 是否为原子操作？](#i--i-是否为原子操作)
     - [类里面`static`和`const`可以同时修饰成员函数吗](#类里面static和const可以同时修饰成员函数吗)
     - [`C++`中的四种类型转换方式](#c中的四种类型转换方式)
@@ -91,18 +91,21 @@
         - [你知道的智能指针有哪些？](#你知道的智能指针有哪些)
         - [野指针](#野指针)
     - [柔性数组](#柔性数组)
-    - [STL](#stl)
-        - [容器](#容器)
-        - [结构](#结构)
-    - [使用两个栈实现一个队列](#使用两个栈实现一个队列)
-    - [使用两个队列实现一个栈](#使用两个队列实现一个栈)
     - [可变参数](#可变参数)
     - [你对内存的了解](#你对内存的了解)
     - [内存溢出和内存泄漏](#内存溢出和内存泄漏)
     - [堆栈的区别](#堆栈的区别)
+    - [虚拟文件系统](#虚拟文件系统)
     - [段页式存储管理](#段页式存储管理)
     - [`mmap`](#mmap)
     - [虚拟地址是怎么映射到物理地址的，说一下这个过程](#虚拟地址是怎么映射到物理地址的说一下这个过程)
+- [STL](#stl)
+    - [容器](#容器)
+        - [使用两个栈实现一个队列](#使用两个栈实现一个队列)
+        - [使用两个队列实现一个栈](#使用两个队列实现一个栈)
+        - [`vector` 扩容](#vector-扩容)
+    - [结构](#结构)
+    - [算法](#算法)
 - [操作系统](#操作系统)
     - [进程](#进程)
         - [`fork`](#fork)
@@ -229,15 +232,21 @@
         - [缓存击穿](#缓存击穿)
     - [消息队列](#消息队列)
         - [消息队列主要解决了什么问题](#消息队列主要解决了什么问题)
-- [Linux](#linux)
-    - [`netstat`](#netstat)
-    - [`grep / sed / awk`](#grep--sed--awk)
+- [Linux命令](#linux命令)
+    - [字符操作](#字符操作)
+    - [脚本](#脚本)
+    - [系统资源](#系统资源)
+    - [网络相关](#网络相关)
+    - [`find`](#find)
+    - [`sed`](#sed)
+    - [`awk`](#awk)
+- [附录](#附录)
 
 <!-- /TOC -->
 
 ---
 
-# C++语言基础
+# C++ 语言基础
 
 ## `i++ / ++i` 是否为原子操作？
 
@@ -992,29 +1001,30 @@ TODO
 
 > 变量、函数名前、函数名后、函数参数
 
-* const修饰变量(包括指针)
-   ```c++
-   const int a = 10;
-   const int *p = 10; // 表示*p的值不允许改变，*p = 100;// error; int b = 20; p = &b; // ok
-   int c = 10;
-   int * const p = &c; // p存放了一个固定的地址，所以初始化的时候要给他一个初值，表示p的地址不允许改变
-   					   // int d = 20; p = &d // error; c = 20; //ok
-   ```
+* const修饰变量(包括指针)   
+  把`*`到`p` 用括号括起来就清楚了
+  ```c++
+  const int a = 10;
+  const int *p = 10; // 表示*p的值不允许改变，*p = 100;// error; int b = 20; p = &b; // ok
+  int c = 10;
+  int * const p = &c;  // p存放了一个固定的地址，所以初始化的时候要给他一个初值，表示p的地址不允许改变
+  					            // int d = 20; p = &d // error; c = 20; //ok
+  ```
 * const修饰函数参数
-   ```
-   char* strcpy(char* dst, const char* src); // 防止src在strcpy函数内部被改变
-   ```
+  ```
+  char* strcpy(char* dst, const char* src); // 防止src在strcpy函数内部被改变
+  ```
 * const修饰函数返回值
-   ```
-   const int get(); // 防止get() 函数返回值被改变
-   ```
+  ```
+  const int get(); // 防止get() 函数返回值被改变
+  ```
 * const修饰函数
-   ```c++
-   int get() const;
-   // 只可以用于类成员函数, 表示get()函数仅可访问类成员变量, 但是不可以改变类成员变量; 
-   // 非const对象也可以调用const成员函数
-   // 常对象（如 const A a(10);）,只能调用const 成员函数，因为get()函数隐含了一个const this*指针
-   ```
+  ```c++
+  int get() const;
+  // 只可以用于类成员函数, 表示get()函数仅可访问类成员变量, 但是不可以改变类成员变量; 
+  // 非const对象也可以调用const成员函数
+  // 常对象（如 const A a(10);）,只能调用const 成员函数，因为get()函数隐含了一个const this*指针
+  ```
 
 
 ## 说一说 `mutable`
@@ -1831,66 +1841,6 @@ A* c = new A(1);  //堆中分配 1. 内存分配在堆中; 2. 用new会自动调
 * 动态申请的内存只是申请给数组拓展所用，结构体的大小在创建时已经确定了 array明确来说不算是结构体成员，只是挂羊头卖狗肉而已  
    这样的变长数组常用于网络通信中构造不定长数据包，不会浪费空间浪费网络流量
 
-## STL
-
-* [c++标准模板库STL【快速查找】【最全】【常用】【语法】](https://blog.csdn.net/sinat_25721683/article/details/79073336)
-
-### 容器
-
-> `list` 封装了双向链表, `vector` 封装了数组  
-> 最主要的区别在于vector使用连续内存存储的，他支持`[]`运算符，而list是以链表形式实现的，不支持`[]`
-
-* `Vector`对于随机`访问`的速度很快，但是对于`插入`尤其是在头部插入元素速度很慢，在尾部插入速度很快。List对于随机访问速度慢得多，因为可能要遍历整个链表才能做到，但是对于插入就快的多了，不需要拷贝和移动数据，只需要改变指针的指向就可以了。另外对于新添加的元素，Vector有一套算法，而List可以任意加入。
-* vector 当插入新的元素内存不够时，通常以2倍重新申请更大的一块内存，将原来的元素拷贝过去，释放旧空间。
-
-* `map / set`
-  * Map,Set属于标准关联容器，使用了非常高效的平衡检索二叉树：`红黑树`，他的插入删除效率比其他序列容器高是因为不需要做内存拷贝和内存移动，而直接替换指向节点的指针即可。
-  * Set不包含重复的数据。Set只含有Key，而Map有一个Key和Key所对应的Value两个元素。
-  * unorder_map和map, 前者是通过哈希表来实现的, 后者则是通过红黑树(默认就是有序的)
-
-### 结构
-
-* `queue / stack`
-  ```
-  #include <queue>
-  queue<typename> name;
-  队首：front()
-  队尾：back()
-  栈首：top()
-  
-  公用:
-  入：push() 
-  出：pop()
-  是否空：empty()
-  大小：size()
-  ```
-
-## 使用两个栈实现一个队列
-
-> [使用两个栈实现一个队列](https://www.cnblogs.com/tracyhan/p/5490775.html)
-
-* 队先进先出，栈先进后出
-* 思路  
-  入队时全入到stack1中, 出队时把stack1全倒到stack2后，再由stack2来pop ；这样stack1是正确的入队顺序，stack2是正确的出队顺序
-  * 缺陷   
-    如果是连续出栈操作或连续进栈操作的话没问题, 但是如果入队1 2 3 4 5 6 7 出队 1 2 3 4 再入队 8 9
-    ```
-    [top] stack1: 1 2 3 4 5 6 7 ---> 5 6 7 ---> 5 6 7 8 9 ; stack2: 1 2 3 4 5 6 7 ---> 8 9 5 6 7
-    ```
-  * 修复  
-    问题在于stack2中的元素还没出队完就把stack1倒进去了, 修改为先判断stack2输出完, stack2不空则继续输出，否则才把stack1倒到stack2里
-
-## 使用两个队列实现一个栈
-
-* 思路  
-  入栈：队列1保存入栈序列  
-  出栈：队列1的size-1个元素转移到队列2，这样最后剩下的那个就是最后一个元素了  
-    再把队列2的元素放回队列1，以待下次pop，队列1暂时用队列2来保存队头前面的元素
-    ```
-    [back] queue1: 1 2 3 4  --> 4   queue2: 1 2 3 ---> queue1: 1 2 3
-    ```
-
-
 ## 可变参数
 
 > 三个宏`va_start, va_arg 和 va_end`，一个类型`va_list` 
@@ -2006,6 +1956,16 @@ A* c = new A(1);  //堆中分配 1. 内存分配在堆中; 2. 用new会自动调
   栈是系统提供的数据结构,计算机会在底层对栈提供支持,进栈/出栈都有专门的指令,这就决定了栈的效率比较高.堆则不然,它由C/C++函数库提供,机制复杂,堆的效率要比栈低得多.
 
 
+## 虚拟文件系统
+
+* 虚拟文件系统什么意思   
+  Linux 中允许众多不同的文件系统共存，如 ext2, ext3, vfat 等，通过使用同一套文件 I/O 系统调用即可对 Linux 中的任意文件进行操作而无需考虑其所在的具体文件系统格式；即对文件的操作无需考虑文件属于哪个文件系统
+
+* 一个实际的文件系统想要被 Linux 支持，就必须提供一个符合 VFS 标准 的接口，才能与 VFS 协同工作。`其实就像是库函数一样, 有对不同文件系统做封装，对于用户来说是透明的，操作是一样的`如下图:   
+  ![](http://www.ibm.com/developerworks/cn/linux/l-cn-vfs/3.jpg)
+
+
+
 ## 段页式存储管理  
 TODO
 
@@ -2037,6 +1997,75 @@ TODO
 
 * 地址翻译  
   * `linux` 内核采用页式存储管理。虚拟地址空间划分为固定大小的页面。由 `MMU 在运行时将虚拟地址映射成（或者说地址翻译）某个物理内存页面中的地址`
+
+
+# STL
+
+* [c++标准模板库STL【快速查找】【最全】【常用】【语法】](https://blog.csdn.net/sinat_25721683/article/details/79073336)
+
+## 容器
+
+> `list` 封装了双向链表, `vector` 封装了数组  
+> 最主要的区别在于vector使用连续内存存储的，他支持`[]`运算符，而list是以链表形式实现的，不支持`[]`
+
+* `Vector`对于随机`访问`的速度很快，但是对于`插入`尤其是在头部插入元素速度很慢，在尾部插入速度很快。List对于随机访问速度慢得多，因为可能要遍历整个链表才能做到，但是对于插入就快的多了，不需要拷贝和移动数据，只需要改变指针的指向就可以了。另外对于新添加的元素，Vector有一套算法，而List可以任意加入。
+* vector 当插入新的元素内存不够时，通常以2倍重新申请更大的一块内存，将原来的元素拷贝过去，释放旧空间。
+
+* `map / set`
+  * Map,Set属于标准关联容器，使用了非常高效的平衡检索二叉树：`红黑树`，他的插入删除效率比其他序列容器高是因为不需要做内存拷贝和内存移动，而直接替换指向节点的指针即可。
+  * Set不包含重复的数据。Set只含有Key，而Map有一个Key和Key所对应的Value两个元素。
+  * unorder_map和map, 前者是通过哈希表来实现的, 后者则是通过红黑树(默认就是有序的)
+
+### 使用两个栈实现一个队列
+
+> [使用两个栈实现一个队列](https://www.cnblogs.com/tracyhan/p/5490775.html)
+
+* 队先进先出，栈先进后出
+* 思路  
+  入队时全入到stack1中, 出队时把stack1全倒到stack2后，再由stack2来pop ；这样stack1是正确的入队顺序，stack2是正确的出队顺序
+  * 缺陷   
+    如果是连续出栈操作或连续进栈操作的话没问题, 但是如果入队1 2 3 4 5 6 7 出队 1 2 3 4 再入队 8 9
+    ```
+    [top] stack1: 1 2 3 4 5 6 7 ---> 5 6 7 ---> 5 6 7 8 9 ; stack2: 1 2 3 4 5 6 7 ---> 8 9 5 6 7
+    ```
+  * 修复  
+    问题在于stack2中的元素还没出队完就把stack1倒进去了, 修改为先判断stack2输出完, stack2不空则继续输出，否则才把stack1倒到stack2里
+
+### 使用两个队列实现一个栈
+
+* 思路  
+  入栈：队列1保存入栈序列  
+  出栈：队列1的size-1个元素转移到队列2，这样最后剩下的那个就是最后一个元素了  
+    再把队列2的元素放回队列1，以待下次pop，队列1暂时用队列2来保存队头前面的元素
+    ```
+    [back] queue1: 1 2 3 4  --> 4   queue2: 1 2 3 ---> queue1: 1 2 3
+    ```
+
+### `vector` 扩容
+
+
+* 底层数据结构是一个`动态数组`，如果动态数组的大小不够用就需要动态地重新分配，gcc 按照2，4，8，16进行而被扩容（vs中是以1.5倍扩容，原因可以考虑内存碎片和伙伴系统，内存的浪费）。扩容后是一片新的内存，`需要把旧内存空间的所有元素都拷贝到新内存空间去`（以后再在新内存空间中的原数据后面进行插入），并且同时释放旧内存空间，并且由于`vector`内存空间进行了重新配置，`旧空间中所有的迭代器都会失效`
+
+
+## 结构
+
+* `queue / stack`
+  ```
+  #include <queue>
+  queue<typename> name;
+  队首：front()
+  队尾：back()
+  栈首：top()
+  
+  公用:
+  入：push() 
+  出：pop()
+  是否空：empty()
+  大小：size()
+  ```
+
+## 算法
+
 
 
 # 操作系统
@@ -2519,7 +2548,9 @@ TODO
 * 怎么发信号？
   * 命令 `kill -s SIGCHLD pid`
   * 命令 `kill -9 pid`
-  * 库函数 `kill(pid, SIGUSR1)`
+  * 向指定进程发送信号 `kill(pid, SIGUSR1)`
+  * 向自己发送信号 `raise(SIGUSR1)`
+  * 先进程发送SIGABRT信号 `abort()`
 
 * 注册信号处理函数对信号做出响应，用户注册的信号处理函数是在用户态下运行
   ```c++
@@ -2547,11 +2578,17 @@ TODO
 * `SIGHUP`  
   和控制台操作有关，`当控制台被关闭时`系统会向拥有控制台sessionID的所有进程发送HUP信号
 * `SIGINT`  
-  interrupt 终止进程，用户按下`Ctrl+C`时发送
+  `interrupt` 终止进程，用户按下`Ctrl + c`时发送
+* `SIGQUIT`  
+  `Ctrl + \`
+* `SIGSTOP`  
+  `Ctrl + z` 使进程
 * `SIGKILL`  
   消息编号为9，kill -9来`杀死进程时`发送
 * `SIGSEGV`  
   `内存越界、权限问题`，试图访问未分配给内存, 或图往没有写权限的内存地址写数据
+* `SIGABRT`  
+  `abort()`函数生成的信号
 * `SIGIO`  
 * `SIGSYS`  
  系统调用中参数错，如系统调用号非法
@@ -4320,19 +4357,243 @@ TODO
   日志采集系统采集日志后写入到消息队列，日志处理系统订阅并消费队列中的日志数据
 
 
-# Linux
+# Linux命令
 
 
-## `netstat`
+> [Command](http://man.linuxde.net/)
 
-* ps
+
+## 字符操作
+
+* SED
+* AWK
+* GREP
+* FIND
+
+## 脚本
+
+* 怎么遍历文件夹下的全部文件，比如有很多sql，怎么全拿出来执行  
+  ```shell
+  filelist=`ls /path/to/folder`
+  for file in $filelist
+  do
+    filename="/path/to/folder/"$file
+    ./command $filename >> runlog.log &
+  done
+  ```
+
+* 删除a.txt中含"abc"的行，但不改变a.txt本身，操作之后的结果在终端显示
+  其中，"abc"也可以用正则表达式来代替。
+  ```
+  sed -e '/abc/d' a.txt
+  ```
+
+* 删除a.txt中含"abc"的行，将操作之后的结果保存到a.log
+  ```
+  sed -e '/abc/d' a.txt > a.log
+  ```
+
+* 删除含字符串"abc"或“efg"的行，将结果保存到a.log
+  ```
+  sed -e '/abc/d;/efg/d' a.txt > a.log
+  ```
+
+* [提取文件名、路径](https://www.jb51.net/article/103875.htm)
+  ```shell
+  var=/path/to/filename.txt
+  # 去掉变量var左起的最后一个'/'字符及其左边的内容
+  # 返回左起的最后一个'/'（不含该字符）的右边的内容
+  
+  ${var##*/} # 获取文件名称和后缀
+  ${var##*.} # 获取后缀
+  ```
+
+* 创建软链
+  ```
+  ln -s <源> <目的>
+  ```
+
+* 统计当前文件夹下文件的个数 
+  ```
+  ls -l | grep "^-" | wc -l
+  ```
+
+* 若要统计目录个数，将 `^-` 改为 `^d` 
+  ```
+  ls -l | grep "^d" | wc -l
+  ```
+
+* 若要统计包含子文件夹里文件个数，将 `-l` 改为 `-lR`
+  ```
+  ls -lR | grep "^-" | wc -l
+  ```
+
+* 将目录 dir 下面所有文件中的字符串 old 都修改成 new
+  ```
+  sed -i "s/old/new/g" `grep 'old' -rl dir` 
+  ```
+
+* 将输出内容以表格形式显示
+  ```
+  mount | column -t
+  ```
+
+* [linux系统中中断已连接的用户](https://www.cnblogs.com/rusking/p/5604735.html)
+  ```
+  [root@rhel7 ~]# w
+  [root@rhel7 ~]# pkill -kill -t  pts/1
+  [root@rhel7 ~]# w
+  ```
+
+* [shell脚本内执行多条命令](https://blog.csdn.net/bananasssss/article/details/51315342)
+
+
+## 系统资源
+
+> [linux查看资源信息常用命令](https://blog.csdn.net/freedom_824/article/details/80408700)
+
+* `CPU`
+  ```
+  $ cat /proc/cpuinfo
+
+  $ lscpu
+  Architecture:          x86_64
+  CPU op-mode(s):        32-bit, 64-bit
+  Byte Order:            Little Endian
+  CPU(s):                16（CPU数量）
+  On-line CPU(s) list:   0-15
+  Thread(s) per core:    1
+  Core(s) per socket:    4（每颗cpu核心数）
+  Socket(s):             4
+  NUMA node(s):          2
+  Vendor ID:             GenuineIntel
+  CPU family:            6
+  Model:                 79
+  Model name:            Intel(R) Xeon(R) CPU E5-2690 v4 @ 2.60GHz
+  Stepping:              1
+  CPU MHz:               2599.998（CPU主频）
+  BogoMIPS:              5199.99
+  Hypervisor vendor:     VMware
+  Virtualization type:   full
+  L1d cache:             32K
+  L1i cache:             32K
+  L2 cache:              256K
+  L3 cache:              35840K
+  NUMA node0 CPU(s):     0-7
+  NUMA node1 CPU(s):     8-15
+  ```
+
+* 内存
+  ```
+  $ cat /proc/meminfo
+  MemTotal:       16334160 kB
+  MemFree:         6524508 kB
+  ...
+  $ free -m 
+               total       used       free     shared    buffers     cached
+  Mem:           15G       9.4G       6.2G        44M       464M       8.0G
+  -/+ buffers/cache:       914M        14G
+  Swap:         8.0G         0B       8.0G
+  
+  $ top
+  Mem:  16334160k total,  9810200k used,  6523960k free,   475260k buffers
+  
+  $ vmstat
+  procs -----------memory---------- ---swap-- -----io---- --system-- -----cpu-----
+   r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
+   1  0      0 6525628 475260 8400980    0    0     0     1    0    0  0  0 100  0  0
+  ```
+
+* 磁盘空间
+  ```
+  $ df -h
+  Filesystem      Size  Used Avail Use% Mounted on
+  rootfs           98G   79G   19G  81% /
+  root             98G   79G   19G  81% /root
+  home             98G   79G   19G  81% /home
+  data             98G   79G   19G  81% /data
+  ```
+
+* 文件/文件夹占用空间
+  ```
+  $ du -sh <目录名>
+  $ du -h <文件名>
+  ```
+
+
+## 网络相关  
+
+* `netstat`
+
+* `netcat`
+
+* `tcpdump`
+
+
+## `find`
+
+* 当前目录下查找文件中包含"hello world!"这个字符串的文件
+  ```
+  grep -rn "hello,world!" *
+  ```
+
+* 查找目录下的所有文件中是否含有某个字符串
+  ```
+  find .|xargs grep -ri "SMS_ISSEND"
+  ```
+
+* 查找目录下的所有文件中是否含有某个字符串,并且只打印出文件名
+  ```
+  find .|xargs grep -ri "SMS_ISSEND" -l
+  ```
+
+* 对find到的文件进行command操作
+  ```
+  find /your/path -type f -name "*.swf" -exec cp {} dest_path \;
+  
+  find . -name "*log" -print -exec rm -rf {} \;
+  ```
 
 * 对 `find` 到的文件进行 `command` 操作
   ```sh
   find /your/path -type f -name "*.swf" -exec cp {} dest_path \;
   find . -name "*log" -print -exec rm -rf {} \;
   ```
+* 把目录下所有文件由dos转unix
+  ```
+  find . -type f -exec dos2unix {} \;
+  ```
 
+## `sed`
 
-## `grep / sed / awk`
+## `awk`
+
+# 附录
+
+* [牛客网](https://www.nowcoder.com/discuss)
+
+* [C/C++ 面试基础知识总结](https://github.com/huihut/interview)
+
+* [`剑指 Offer ——名企面试官精讲典型编程题](https://github.com/gatieme/CodingInterviews)
+
+* [CS-Notes`](https://cyc2018.github.io/CS-Notes/#/README)
+
+* [Skill-Tree](https://github.com/linw7/Skill-Tree)
+
+* [C++基础（笔记）](https://blog.csdn.net/xiongchao99/article/details/64441017)
+
+* [C++面试常见问题](https://blog.csdn.net/u012864854/article/details/79777991)
+
+* [常见C++面试题及基本知识点总结（一）](https://www.cnblogs.com/LUO77/p/5771237.html)
+
+* [轻松搞定面试中的链表题目](https://blog.csdn.net/luckyxiaoqiang/article/details/7393134)
+
+* [轻松搞定面试中的二叉树题目](https://blog.csdn.net/luckyxiaoqiang/article/details/7518888)
+
+* [C/C++内存管理详解](https://chenqx.github.io/2014/09/25/Cpp-Memory-Management)
+
+* [大数据算法](https://www.cnblogs.com/xzwblog/p/7127362.html)
+
+* [海量数据处理之经典实例分析](https://segmentfault.com/a/1190000000510258)
+
 
